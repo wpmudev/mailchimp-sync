@@ -1,0 +1,10 @@
+Plugin Name: MailChimp
+Author: Andrew Billits
+
+Files:
+----------------------------------------------------------------------
+mailchimp.php - goes in /wp-content/mu-plugins
+
+Instructions:
+----------------------------------------------------------------------
+1) Place the files in the specified directories
