@@ -1,16 +1,16 @@
 <?php
 /*
 Plugin Name: MailChimp
-Plugin URI: 
-Description:
+Plugin URI: http://premium.wpmudev.org/project/mailchimp-newsletter-integration
+Description: Simply integrate MailChimp with your Multisite (or regular old single user WP) site - automatically add new users to your email lists and import all your existing users
 Author: Andrew Billits (Incsub)
-Version: 1.0.3
-Author URI:
+Version: 1.0.4
+Author URI: http://premium.wpmudev.org
 WDP ID: 73
 */
 
 /* 
-Copyright 2007-2009 Incsub (http://incsub.com)
+Copyright 2007-2010 Incsub (http://incsub.com)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License (Version 2 - GPLv2) as published by
@@ -29,21 +29,22 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //------------------------------------------------------------------------//
 //---Hook-----------------------------------------------------------------//
 //------------------------------------------------------------------------//
+
 add_action('admin_menu', 'mailchimp_plug_pages');
 add_action('wpmu_new_user', 'mailchimp_add_wpmu_user');
 add_action('user_register', 'mailchimp_add_wp_user');
+
 //------------------------------------------------------------------------//
 //---Functions------------------------------------------------------------//
 //------------------------------------------------------------------------//
 
 function mailchimp_plug_pages() {
 	global $wpdb, $wp_roles, $current_user;
-	if ( function_exists("get_most_active_blogs") ) {
-		if ( is_site_admin() ) {
-			add_submenu_page('ms-admin.php', 'MailChimp', 'MailChimp', 10, 'mailchimp', 'mailchimp_settings_page_output');
-		}
+
+	if ( is_multisite() ) {
+		add_submenu_page('ms-admin.php', 'MailChimp', 'MailChimp', 'manage_options', 'mailchimp', 'mailchimp_settings_page_output');
 	} else {
-		add_submenu_page('options-general.php', 'MailChimp', 'MailChimp', 10, 'mailchimp', 'mailchimp_settings_page_output');
+		add_submenu_page('options-general.php', 'MailChimp', 'MailChimp', 'manage_options', 'mailchimp', 'mailchimp_settings_page_output');
 	}
 }
 
@@ -99,16 +100,18 @@ function mailchimp_add_wp_user($uid) {
 
 function mailchimp_settings_page_output() {
 	global $wpdb;
-	if ( function_exists("is_site_admin") ) {
-		if (isset($_GET['updated'])) {
-			?><div id="message" class="updated fade"><p><?php _e('' . urldecode($_GET['updatedmsg']) . '') ?></p></div><?php
-		}
+
+  if ( (is_multisite() && !is_super_admin()) || (!is_multisite() && !current_user_can('manage_options')) )
+    wp_die('Nice try!');
+
+	if (isset($_GET['updated'])) {
+		?><div id="message" class="updated fade"><p><?php _e('' . urldecode($_GET['updatedmsg']) . '') ?></p></div><?php
 	}
 	echo '<div class="wrap">';
 	switch( $_GET[ 'action' ] ) {
 		//---------------------------------------------------//
 		default:
-			if ( function_exists("is_site_admin") ) {
+			if ( is_multisite() ) {
 				$mailchimp_username = get_site_option('mailchimp_username');
 				$mailchimp_password = get_site_option('mailchimp_password');
 				$mailchimp_mailing_list = get_site_option('mailchimp_mailing_list');
@@ -124,7 +127,7 @@ function mailchimp_settings_page_output() {
 			?>
 			<h2><?php _e('MailChimp Settings') ?></h2>
             <?php
-			if ( function_exists("is_site_admin") ) {
+			if ( is_multisite() ) {
 			?>
             <form method="post" action="ms-admin.php?page=mailchimp&action=process">
             <?php
@@ -234,7 +237,7 @@ function mailchimp_settings_page_output() {
 				?>
 				<h3><?php _e('Import Existing Users') ?></h3>
 				<?php
-				if ( function_exists("is_site_admin") ) {
+				if ( is_multisite() ) {
 				?>
 				<form method="post" action="ms-admin.php?page=mailchimp&action=import-process">
 				<?php
@@ -245,7 +248,7 @@ function mailchimp_settings_page_output() {
 				}
 				?>
 				<?php
-				if ( function_exists("is_site_admin") ) {
+				if ( is_multisite() ) {
 					if ( get_site_option('mailchimp_imported') == 'yes' ) {
 						?>
                         <p><?php _e('You have already imported existing users once. Please be careful not to import users into the same list twice.'); ?></p>
@@ -296,7 +299,7 @@ function mailchimp_settings_page_output() {
 		break;
 		//---------------------------------------------------//
 		case "process":
-			if ( function_exists("is_site_admin") ) {
+			if ( is_multisite() ) {
 				update_site_option('mailchimp_username', $_POST['mailchimp_username']);
 				update_site_option('mailchimp_password', $_POST['mailchimp_password']);
 				update_site_option('mailchimp_mailing_list', $_POST['mailchimp_mailing_list']);
@@ -309,7 +312,7 @@ function mailchimp_settings_page_output() {
 				update_option('mailchimp_auto_opt_in', $_POST['mailchimp_auto_opt_in']);
 				update_option('mailchimp_ignore_plus', $_POST['mailchimp_ignore_plus']);
 			}
-			if ( function_exists("is_site_admin") ) {
+			if ( is_multisite() ) {
 				echo "
 				<SCRIPT LANGUAGE='JavaScript'>
 				window.location='ms-admin.php?page=mailchimp&updated=true&updatedmsg=" . urlencode(__('Settings saved.')) . "';
@@ -333,7 +336,7 @@ function mailchimp_settings_page_output() {
 			$mailchimp_import_auto_opt_in = $_POST['mailchimp_import_auto_opt_in'];
 			if ( !empty( $mailchimp_import_mailing_list ) ) {
 				set_time_limit(0);
-				if ( function_exists("is_site_admin") ) {
+				if ( is_multisite() ) {
 					$mailchimp_username = get_site_option('mailchimp_username');
 					$mailchimp_password = get_site_option('mailchimp_password');
 					$mailchimp_mailing_list = get_site_option('mailchimp_mailing_list');
@@ -373,7 +376,7 @@ function mailchimp_settings_page_output() {
 					}
 				}
 			}
-			if ( function_exists("is_site_admin") ) {
+			if ( is_multisite() ) {
 				update_site_option('mailchimp_imported', 'yes');
 				echo "
 				<SCRIPT LANGUAGE='JavaScript'>
