@@ -1,9 +1,17 @@
 Plugin Name: MailChimp
-Author: Andrew Billits
+Author: Aaron Edwards and Andrew Billits (Incsub)
 
 Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
+
+1.1 - 12/20/2010 - Aaron Edwards
+----------------------------------------------------------------------
+- Updated to the latest API to fix bugs
+- Now removes users when they or their blogs are spammed/deleted
+- Imports Names to MailChimp now on creation and profile updates
+- Works with BuddyPress now
+- Auto-update capable
 
 1.0.4 - 07/20/2010 - Aaron Edwards
 ----------------------------------------------------------------------
