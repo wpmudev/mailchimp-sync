@@ -59,7 +59,7 @@ function mailchimp_localization() {
 }
 
 function mailchimp_plug_pages() {
-	global $wpdb, $wp_roles, $current_user;
+	global $wpdb, $wp_roles, $current_user, $wp_version;
 
 	if ( is_multisite() ) {
     if ( version_compare($wp_version, '3.0.9', '>') )
@@ -157,7 +157,7 @@ function mailchimp_bp_spamming( $user_id, $is_spam ) {
 //------------------------------------------------------------------------//
 
 function mailchimp_settings_page_output() {
-	global $wpdb;
+	global $wpdb, $wp_version;
 
   if ( !current_user_can('edit_users') )
     wp_die('Nice try!');
@@ -179,13 +179,16 @@ function mailchimp_settings_page_output() {
 			<h2><?php _e('MailChimp Settings', 'mailchimp') ?></h2>
             <?php
 			if ( is_multisite() ) {
-			?>
-            <form method="post" action="ms-admin.php?page=mailchimp&action=process">
-            <?php
+			
+  			if ( version_compare($wp_version, '3.0.9', '>') ) {
+          ?><form method="post" action="settings.php?page=mailchimp&action=process"><?php
+        } else {
+          ?><form method="post" action="ms-admin.php?page=mailchimp&action=process"><?php
+        }
 			} else {
-			?>
-            <form method="post" action="options-general.php?page=mailchimp&action=process">
-            <?php
+  			?>
+        <form method="post" action="options-general.php?page=mailchimp&action=process">
+        <?php
 			}
 			if ( empty( $mailchimp_apikey ) ) {
 			?>
@@ -285,9 +288,12 @@ function mailchimp_settings_page_output() {
 				<span class="description"><?php _e('This function will syncronize all existing users on your install with your MailChimp list, adding new ones, updating the first/last name of previously imported users, and removing spammed or deleted users from your selected list. Note you really only need to do this once after installing, it is carried on automatically after installation.', 'mailchimp') ?></span>
 				<?php
 				if ( is_multisite() ) {
-				?>
-				<form method="post" action="ms-admin.php?page=mailchimp&action=import-process">
-				<?php
+          if ( version_compare($wp_version, '3.0.9', '>') ) {
+            ?><form method="post" action="settings.php?page=mailchimp&action=import-process"><?php
+          } else {
+            ?><form method="post" action="ms-admin.php?page=mailchimp&action=import-process"><?php
+          }
+
 				} else {
 				?>
 				<form method="post" action="options-general.php?page=mailchimp&action=import-process">
@@ -339,11 +345,20 @@ function mailchimp_settings_page_output() {
 			update_site_option('mailchimp_ignore_plus', $_POST['mailchimp_ignore_plus']);
 
 			if ( is_multisite() ) {
-				echo "
-				<SCRIPT LANGUAGE='JavaScript'>
-				window.location='ms-admin.php?page=mailchimp&updated=true&updatedmsg=" . urlencode(__('Settings saved.', 'mailchimp')) . "';
-				</script>
-				";
+        if ( version_compare($wp_version, '3.0.9', '>') ) {
+          echo "
+      				<SCRIPT LANGUAGE='JavaScript'>
+      				window.location='settings.php?page=mailchimp&updated=true&updatedmsg=" . urlencode(__('Settings saved.', 'mailchimp')) . "';
+      				</script>
+      				";
+        } else {
+          echo "
+    				<SCRIPT LANGUAGE='JavaScript'>
+    				window.location='ms-admin.php?page=mailchimp&updated=true&updatedmsg=" . urlencode(__('Settings saved.', 'mailchimp')) . "';
+    				</script>
+    				";
+        }
+
 			} else {
 				echo "
 				<SCRIPT LANGUAGE='JavaScript'>
@@ -415,11 +430,19 @@ function mailchimp_settings_page_output() {
 				}
 			}
 			if ( is_multisite() ) {
-				echo "
-				<SCRIPT LANGUAGE='JavaScript'>
-				window.location='ms-admin.php?page=mailchimp&updated=true&updatedmsg=" . urlencode($msg) . "';
-				</script>
-				";
+        if ( version_compare($wp_version, '3.0.9', '>') ) {
+          echo "
+      				<SCRIPT LANGUAGE='JavaScript'>
+      				window.location='settings.php?page=mailchimp&updated=true&updatedmsg=" . urlencode($msg) . "';
+      				</script>
+      				";
+        } else {
+          echo "
+    				<SCRIPT LANGUAGE='JavaScript'>
+    				window.location='ms-admin.php?page=mailchimp&updated=true&updatedmsg=" . urlencode($msg) . "';
+    				</script>
+    				";
+        }
 			} else {
 				echo "
 				<SCRIPT LANGUAGE='JavaScript'>
