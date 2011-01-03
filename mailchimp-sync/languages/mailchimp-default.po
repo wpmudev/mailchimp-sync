@@ -1,0 +1,160 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: mailchimp\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-01-03 14:35-0600\n"
+"PO-Revision-Date: 2011-01-03 14:35-0600\n"
+"Last-Translator: Aaron Edwards <aaron@uglyrobot.com>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-KeywordsList: _;gettext;gettext_noop;__;_e\n"
+"X-Poedit-Basepath: C:\\Users\\Aaron\\Desktop\\UglyRobot Projects\\Incsub\\mailchimp\\mailchimp-sync\n"
+"X-Poedit-SearchPath-0: C:\\Users\\Aaron\\Desktop\\UglyRobot Projects\\Incsub\\mailchimp\\mailchimp-sync\n"
+
+#: C:\Users\Aaron\Desktop\UglyRobot
+#: Projects\Incsub\mailchimp\mailchimp-sync/mailchimp-sync.php:179
+msgid "MailChimp Settings"
+msgstr ""
+
+#: C:\Users\Aaron\Desktop\UglyRobot
+#: Projects\Incsub\mailchimp\mailchimp-sync/mailchimp-sync.php:192
+msgid "After you have entered a valid API key you will be able to select different MailChimp options below."
+msgstr ""
+
+#: C:\Users\Aaron\Desktop\UglyRobot
+#: Projects\Incsub\mailchimp\mailchimp-sync/mailchimp-sync.php:198
+msgid "MailChimp API Key"
+msgstr ""
+
+#: C:\Users\Aaron\Desktop\UglyRobot
+#: Projects\Incsub\mailchimp\mailchimp-sync/mailchimp-sync.php:200
+msgid "Visit <a href=\"http://admin.mailchimp.com/account/api\" target=\"_blank\">your API dashboard</a> to create an API key."
+msgstr ""
+
+#: C:\Users\Aaron\Desktop\UglyRobot
+#: Projects\Incsub\mailchimp\mailchimp-sync/mailchimp-sync.php:210
+#: Projects\Incsub\mailchimp\mailchimp-sync/mailchimp-sync.php:266
+msgid "API Key Test"
+msgstr ""
+
+#: C:\Users\Aaron\Desktop\UglyRobot
+#: Projects\Incsub\mailchimp\mailchimp-sync/mailchimp-sync.php:211
+msgid "Passed"
+msgstr ""
+
+#: C:\Users\Aaron\Desktop\UglyRobot
+#: Projects\Incsub\mailchimp\mailchimp-sync/mailchimp-sync.php:215
+#: Projects\Incsub\mailchimp\mailchimp-sync/mailchimp-sync.php:315
+msgid "Auto Opt-in"
+msgstr ""
+
+#: C:\Users\Aaron\Desktop\UglyRobot
+#: Projects\Incsub\mailchimp\mailchimp-sync/mailchimp-sync.php:217
+#: Projects\Incsub\mailchimp\mailchimp-sync/mailchimp-sync.php:227
+#: Projects\Incsub\mailchimp\mailchimp-sync/mailchimp-sync.php:317
+msgid "Yes"
+msgstr ""
+
+#: C:\Users\Aaron\Desktop\UglyRobot
+#: Projects\Incsub\mailchimp\mailchimp-sync/mailchimp-sync.php:218
+#: Projects\Incsub\mailchimp\mailchimp-sync/mailchimp-sync.php:228
+#: Projects\Incsub\mailchimp\mailchimp-sync/mailchimp-sync.php:318
+msgid "No"
+msgstr ""
+
+#: C:\Users\Aaron\Desktop\UglyRobot
+#: Projects\Incsub\mailchimp\mailchimp-sync/mailchimp-sync.php:221
+#: Projects\Incsub\mailchimp\mailchimp-sync/mailchimp-sync.php:321
+msgid "Automatically opt-in new users to the mailing list. Users will not receive an email confirmation. Use at your own risk."
+msgstr ""
+
+#: C:\Users\Aaron\Desktop\UglyRobot
+#: Projects\Incsub\mailchimp\mailchimp-sync/mailchimp-sync.php:225
+msgid "Ignore email addresses including + signs"
+msgstr ""
+
+#: C:\Users\Aaron\Desktop\UglyRobot
+#: Projects\Incsub\mailchimp\mailchimp-sync/mailchimp-sync.php:231
+msgid "Ignore email address including + signs. These are usually duplicate accounts."
+msgstr ""
+
+#: C:\Users\Aaron\Desktop\UglyRobot
+#: Projects\Incsub\mailchimp\mailchimp-sync/mailchimp-sync.php:238
+msgid "You must have at least one MailChimp mailing list in order to use this plugin. Please create a mailing list via the MailChimp admin panel."
+msgstr ""
+
+#: C:\Users\Aaron\Desktop\UglyRobot
+#: Projects\Incsub\mailchimp\mailchimp-sync/mailchimp-sync.php:242
+#: Projects\Incsub\mailchimp\mailchimp-sync/mailchimp-sync.php:299
+msgid "Mailing List"
+msgstr ""
+
+#: C:\Users\Aaron\Desktop\UglyRobot
+#: Projects\Incsub\mailchimp\mailchimp-sync/mailchimp-sync.php:247
+msgid "Please select a mailing list"
+msgstr ""
+
+#: C:\Users\Aaron\Desktop\UglyRobot
+#: Projects\Incsub\mailchimp\mailchimp-sync/mailchimp-sync.php:258
+msgid "Select a mailing list you want to have new users added to."
+msgstr ""
+
+#: C:\Users\Aaron\Desktop\UglyRobot
+#: Projects\Incsub\mailchimp\mailchimp-sync/mailchimp-sync.php:267
+msgid "Failed - Please check your key and try again."
+msgstr ""
+
+#: C:\Users\Aaron\Desktop\UglyRobot
+#: Projects\Incsub\mailchimp\mailchimp-sync/mailchimp-sync.php:278
+msgid "Save Changes"
+msgstr ""
+
+#: C:\Users\Aaron\Desktop\UglyRobot
+#: Projects\Incsub\mailchimp\mailchimp-sync/mailchimp-sync.php:284
+msgid "Sync Existing Users"
+msgstr ""
+
+#: C:\Users\Aaron\Desktop\UglyRobot
+#: Projects\Incsub\mailchimp\mailchimp-sync/mailchimp-sync.php:285
+msgid "This function will syncronize all existing users on your install with your MailChimp list, adding new ones, updating the first/last name of previously imported users, and removing spammed or deleted users from your selected list. Note you really only need to do this once after installing, it is carried on automatically after installation."
+msgstr ""
+
+#: C:\Users\Aaron\Desktop\UglyRobot
+#: Projects\Incsub\mailchimp\mailchimp-sync/mailchimp-sync.php:311
+msgid "The mailing list you want to import existing users to."
+msgstr ""
+
+#: C:\Users\Aaron\Desktop\UglyRobot
+#: Projects\Incsub\mailchimp\mailchimp-sync/mailchimp-sync.php:327
+msgid "Import"
+msgstr ""
+
+#: C:\Users\Aaron\Desktop\UglyRobot
+#: Projects\Incsub\mailchimp\mailchimp-sync/mailchimp-sync.php:344
+#: Projects\Incsub\mailchimp\mailchimp-sync/mailchimp-sync.php:350
+msgid "Settings saved."
+msgstr ""
+
+#: C:\Users\Aaron\Desktop\UglyRobot
+#: Projects\Incsub\mailchimp\mailchimp-sync/mailchimp-sync.php:358
+msgid "Syncing Existing Users"
+msgstr ""
+
+#: C:\Users\Aaron\Desktop\UglyRobot
+#: Projects\Incsub\mailchimp\mailchimp-sync/mailchimp-sync.php:359
+msgid "This may take a while..."
+msgstr ""
+
+#: C:\Users\Aaron\Desktop\UglyRobot
+#: Projects\Incsub\mailchimp\mailchimp-sync/mailchimp-sync.php:414
+#, php-format
+msgid "%d users added, %d updated, and %d spam users removed from your list."
+msgstr ""
+
+#: C:\Users\Aaron\Desktop\UglyRobot
+#: Projects\Incsub\mailchimp\mailchimp-sync/mailchimp-sync.php:447
+msgid "Please install the latest version of <a href=\"http://premium.wpmudev.org/project/update-notifications/\" title=\"Download Now &raquo;\">our free Update Notifications plugin</a> which helps you stay up-to-date with the most stable, secure versions of WPMU DEV themes and plugins. <a href=\"http://premium.wpmudev.org/wpmu-dev/update-notifications-plugin-information/\">More information &raquo;</a>"
+msgstr ""
+

@@ -4,14 +4,14 @@ Plugin Name: MailChimp Synch
 Plugin URI: http://premium.wpmudev.org/project/mailchimp-newsletter-integration
 Description: Simply integrate MailChimp with your Multisite (or regular old single user WP) site - automatically add new users to your email lists and import all your existing users
 Author: Aaron Edwards and Andrew Billits (Incsub)
-Version: 1.1
+Version: 1.1.1
 Author URI: http://premium.wpmudev.org
 Network: true
 WDP ID: 73
 */
 
 /* 
-Copyright 2007-2010 Incsub (http://incsub.com)
+Copyright 2007-2011 Incsub (http://incsub.com)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License (Version 2 - GPLv2) as published by
@@ -31,7 +31,10 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //---Hook-----------------------------------------------------------------//
 //------------------------------------------------------------------------//
 
+add_action('plugins_loaded', 'mailchimp_localization');
+
 add_action('admin_menu', 'mailchimp_plug_pages');
+add_action('network_admin_menu', 'mailchimp_plug_pages');
 
 add_action('wpmu_new_user', 'mailchimp_add_user');
 add_action('user_register', 'mailchimp_add_user');
@@ -49,11 +52,20 @@ add_action('bp_core_action_set_spammer_status', 'mailchimp_bp_spamming', 10, 2);
 //---Functions------------------------------------------------------------//
 //------------------------------------------------------------------------//
 
+function mailchimp_localization() {
+  // Load up the localization file if we're using WordPress in a different language
+	// Place it in this plugin's "languages" folder and name it "mailchimp-[value in wp-config].mo"
+  load_plugin_textdomain( 'mailchimp', false, '/mailchimp-sync/languages/' );
+}
+
 function mailchimp_plug_pages() {
 	global $wpdb, $wp_roles, $current_user;
 
 	if ( is_multisite() ) {
-		add_submenu_page('ms-admin.php', 'MailChimp', 'MailChimp', 'manage_options', 'mailchimp', 'mailchimp_settings_page_output');
+    if ( version_compare($wp_version, '3.0.9', '>') )
+      $page = add_submenu_page('settings.php', 'MailChimp', 'MailChimp', 'manage_options', 'mailchimp', 'mailchimp_settings_page_output');
+    else
+      $page = add_submenu_page('ms-admin.php', 'MailChimp', 'MailChimp', 'manage_options', 'mailchimp', 'mailchimp_settings_page_output');
 	} else {
 		add_submenu_page('options-general.php', 'MailChimp', 'MailChimp', 'manage_options', 'mailchimp', 'mailchimp_settings_page_output');
 	}
@@ -147,7 +159,7 @@ function mailchimp_bp_spamming( $user_id, $is_spam ) {
 function mailchimp_settings_page_output() {
 	global $wpdb;
 
-  if ( (is_multisite() && !is_super_admin()) || (!is_multisite() && !current_user_can('manage_options')) )
+  if ( !current_user_can('edit_users') )
     wp_die('Nice try!');
 
 	if (isset($_GET['updated'])) {
@@ -423,6 +435,20 @@ function mailchimp_settings_page_output() {
 	}
 	echo '</div>';
 }
+
+
+///////////////////////////////////////////////////////////////////////////
+/* -------------------- Update Notifications Notice -------------------- */
+if ( !function_exists( 'wdp_un_check' ) ) {
+  add_action( 'admin_notices', 'wdp_un_check', 5 );
+  add_action( 'network_admin_notices', 'wdp_un_check', 5 );
+  function wdp_un_check() {
+    if ( !class_exists( 'WPMUDEV_Update_Notifications' ) && current_user_can( 'edit_users' ) )
+      echo '<div class="error fade"><p>' . __('Please install the latest version of <a href="http://premium.wpmudev.org/project/update-notifications/" title="Download Now &raquo;">our free Update Notifications plugin</a> which helps you stay up-to-date with the most stable, secure versions of WPMU DEV themes and plugins. <a href="http://premium.wpmudev.org/wpmu-dev/update-notifications-plugin-information/">More information &raquo;</a>', 'wpmudev') . '</a></p></div>';
+  }
+}
+/* --------------------------------------------------------------------- */
+
 
 //------------------------------------------------------------------------//
 //---Support Functions----------------------------------------------------//
