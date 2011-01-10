@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name: MailChimp Synch
+Plugin Name: MailChimp Sync
 Plugin URI: http://premium.wpmudev.org/project/mailchimp-newsletter-integration
 Description: Simply integrate MailChimp with your Multisite (or regular old single user WP) site - automatically add new users to your email lists and import all your existing users
 Author: Aaron Edwards and Andrew Billits (Incsub)
