@@ -3,7 +3,7 @@
 Plugin Name: MailChimp Sync
 Plugin URI: http://premium.wpmudev.org/project/mailchimp-newsletter-integration
 Description: Simply integrate MailChimp with your Multisite (or regular old single user WP) site - automatically add new users to your email lists and import all your existing users
-Author: Aaron Edwards and Andrew Billits (Incsub)
+Author: Aaron Edwards (Incsub)
 Version: 1.1.2
 Author URI: http://premium.wpmudev.org
 Network: true
@@ -99,6 +99,7 @@ function mailchimp_add_user($uid) {
 		$merge_vars = array( 'FNAME' => $user->user_firstname, 'LNAME' => $user->user_lastname );
 		$double_optin = true;
 	}
+	$merge_vars = apply_filters('mailchimp_merge_vars', $merge_vars, $user);
 	$mailchimp_subscribe = $api->listSubscribe($mailchimp_mailing_list, $user->user_email, $merge_vars, '', $double_optin);
 
 }
@@ -117,6 +118,7 @@ function mailchimp_edit_user($uid) {
 
 	$merge_vars = array( 'FNAME' => $user->user_firstname, 'LNAME' => $user->user_lastname );
 
+  $merge_vars = apply_filters('mailchimp_merge_vars', $merge_vars, $user);
 	$mailchimp_update = $api->listUpdateMember($mailchimp_mailing_list, $user->user_email, $merge_vars);
 
 }
@@ -413,6 +415,7 @@ function mailchimp_settings_page_output() {
             else if ( $user['meta_key'] == 'last_name' )
               $add_list[$user['ID']]['LNAME'] = html_entity_decode($user['meta_value']);
 
+            $add_list[$user['ID']] = apply_filters('mailchimp_bulk_merge_vars', $add_list[$user['ID']], $user['ID']);
           }
 
 					if ( $mailchimp_import_auto_opt_in == 'yes' ) {

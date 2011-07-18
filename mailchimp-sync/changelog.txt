@@ -1,9 +1,14 @@
 Plugin Name: MailChimp Sync
-Author: Aaron Edwards and Andrew Billits (Incsub)
+Author: Aaron Edwards (Incsub)
 
 Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
+
+1.1.2 - 8/05/2011 - Aaron Edwards
+----------------------------------------------------------------------
+- Add filters for merging additional fields
+- Fix entity problems with bulk import of names
 
 1.1.1 - 1/05/2011 - Aaron Edwards
 ----------------------------------------------------------------------
