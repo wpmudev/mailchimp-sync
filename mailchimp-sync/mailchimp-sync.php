@@ -101,7 +101,10 @@ function mailchimp_add_user($uid) {
 	}
 	$merge_vars = apply_filters('mailchimp_merge_vars', $merge_vars, $user);
 	$mailchimp_subscribe = $api->listSubscribe($mailchimp_mailing_list, $user->user_email, $merge_vars, '', $double_optin);
-
+	if ($api->errorCode) {
+		$error = "MailChimp listSubscribe() Error: " . $api->errorCode . " - " . $api->errorMessage;
+		trigger_error($error, E_USER_WARNING);
+	}
 }
 
 function mailchimp_edit_user($uid) {
