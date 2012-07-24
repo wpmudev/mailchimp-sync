@@ -4,6 +4,9 @@ Author: Aaron Edwards (Incsub)
 Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
+1.1.4 - 7/23/2012 - Paul Menard
+- Patched error returned from MailChimp API when user already is present in MailChimp
+http://premium.wpmudev.org/forums/topic/mailchimp-integration#post-249269
 
 1.1.3 - 4/15/2012 - Aaron Edwards
 ----------------------------------------------------------------------
