@@ -4,14 +4,14 @@ Plugin Name: MailChimp Sync
 Plugin URI: http://premium.wpmudev.org/project/mailchimp-newsletter-integration
 Description: Simply integrate MailChimp with your Multisite (or regular old single user WP) site - automatically add new users to your email lists and import all your existing users
 Author: Aaron Edwards (Incsub)
-Version: 1.1.4
+Version: 1.2
 Author URI: http://premium.wpmudev.org
 Network: true
 WDP ID: 73
 */
 
 /* 
-Copyright 2007-2011 Incsub (http://incsub.com)
+Copyright 2007-2013 Incsub (http://incsub.com)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License (Version 2 - GPLv2) as published by
@@ -44,6 +44,7 @@ add_action('xprofile_updated_profile', 'mailchimp_edit_user'); //for buddypress
 
 add_action('make_spam_blog', 'mailchimp_blog_users_remove');
 add_action('make_spam_user', 'mailchimp_user_remove');
+add_action('delete_user', 'mailchimp_user_remove');
 add_action('bp_core_action_set_spammer_status', 'mailchimp_bp_spamming', 10, 2); //for buddypress
 
 

@@ -4,7 +4,13 @@ Author: Aaron Edwards (Incsub)
 Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
+
+1.2 - 12/19/2012 - Aaron Edwards
+----------------------------------------------------------------------
+- Make deleting WP users remove them from mailchimp: http://wp.mu/77
+
 1.1.4 - 7/23/2012 - Paul Menard
+----------------------------------------------------------------------
 - Patched error returned from MailChimp API when user already is present in MailChimp
 http://premium.wpmudev.org/forums/topic/mailchimp-integration#post-249269
 
