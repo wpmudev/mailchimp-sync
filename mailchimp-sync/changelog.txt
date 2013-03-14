@@ -5,7 +5,7 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
-1.3 - 14/03/2013 - Ignacio Cruz
+1.2.1 - 14/03/2013 - Ignacio Cruz
 ----------------------------------------------------------------------
 - Fixed some PHP notices when displaying the settings and saving
 http://premium.wpmudev.org/forums/topic/basic-php-errors-turn-on-wp_edbug-to-see
