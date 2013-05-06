@@ -3,8 +3,8 @@
 Plugin Name: MailChimp Sync
 Plugin URI: http://premium.wpmudev.org/project/mailchimp-newsletter-integration
 Description: Simply integrate MailChimp with your Multisite (or regular old single user WP) site - automatically add new users to your email lists and import all your existing users
-Author: Aaron Edwards (Incsub)
-Version: 1.2.1
+Author: Aaron Edwards (Incsub), Ignacio Cruz (Incsub)
+Version: 1.2.2
 Author URI: http://premium.wpmudev.org
 Network: true
 WDP ID: 73
@@ -264,7 +264,7 @@ function mailchimp_settings_page_output() {
 										<option value="" selected="selected" ><?php _e('Please select a mailing list', 'mailchimp'); ?></option>
               						<?php endif; ?>
 									<?php foreach ( $mailchimp_lists as $mailchimp_list ): ?>
-										<option value="<?php echo $mailchimp_list['id']; ?>" <?php if ( $mailchimp_mailing_list == $mailchimp_list['id'] ) { echo 'selected="selected"'; } ?> ><?php echo $mailchimp_list['name']; ?></option>
+										<option value="<?php echo $mailchimp_list['id']; ?>" <?php selected( $mailchimp_mailing_list, $mailchimp_list['id'] ); ?>><?php echo $mailchimp_list['name']; ?></option>
 									<?php endforeach; ?>
 								</select><br />
               					<?php _e('Select a mailing list you want to have new users added to.', 'mailchimp'); ?>
@@ -394,8 +394,6 @@ function mailchimp_settings_page_output() {
 				$mailchimp_import_auto_opt_in = $_POST['mailchimp_import_auto_opt_in'];
 				if ( !empty( $mailchimp_import_mailing_list ) ) {
 					set_time_limit(0);
-					$mailchimp_mailing_list = get_site_option('mailchimp_mailing_list');
-					$mailchimp_auto_opt_in = get_site_option('mailchimp_auto_opt_in');
 					$mailchimp_ignore_plus = get_site_option('mailchimp_ignore_plus');
 
 					$query = "SELECT u.*, m.meta_key, m.meta_value FROM {$wpdb->users} u LEFT JOIN {$wpdb->usermeta} m ON u.ID = m.user_id WHERE m.meta_key IN ('first_name', 'last_name')";
@@ -437,12 +435,12 @@ function mailchimp_settings_page_output() {
 						} else {
 							$double_optin = true;
 						}
-					
+						
 						//add good users
-						$add_result = $api->listBatchSubscribe($mailchimp_mailing_list, $add_list, $double_optin, true);
+						$add_result = $api->listBatchSubscribe($mailchimp_import_mailing_list, $add_list, $double_optin, true);
 					
 						//remove bad users
-						$remove_result = $api->listBatchUnsubscribe($mailchimp_mailing_list, $remove_list, true, false);
+						$remove_result = $api->listBatchUnsubscribe($mailchimp_import_mailing_list, $remove_list, true, false);
 					
 						$msg = sprintf( __('%d users added, %d updated, and %d spam users removed from your list.', 'mailchimp'), $add_result['add_count'], $add_result['update_count'], $remove_result['success_count']);
 					}

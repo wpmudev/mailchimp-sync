@@ -1,9 +1,13 @@
 Plugin Name: MailChimp Sync
-Author: Aaron Edwards (Incsub)
+Author: Aaron Edwards (Incsub), Ignacio Cruz (Incsub)
 
 Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
+
+1.2.2 - 2013/05/06 - Ignacio Cruz
+----------------------------------------------------------------------
+- The import feature was using the list on the settings instead the list on the import section
 
 1.2.1 - 14/03/2013 - Ignacio Cruz
 ----------------------------------------------------------------------
