@@ -92,7 +92,13 @@ function mailchimp_add_user($uid) {
 	
 	$mailchimp_mailing_list = get_site_option('mailchimp_mailing_list');
 	$mailchimp_auto_opt_in = get_site_option('mailchimp_auto_opt_in');
-  $api = mailchimp_load_API();
+  	$api = mailchimp_load_API();
+
+  	$unsubscribed_list = mailchimp_get_unsubscribed_users( $api, $mailchimp_mailing_list );
+
+  	if ( in_array( $user->user_email, $unsubscribed_list ) )
+  		return false;
+
 	if ( $mailchimp_auto_opt_in == 'yes' ) {
 		$merge_vars = array( 'OPTINIP' => $_SERVER['REMOTE_ADDR'], 'FNAME' => $user->user_firstname, 'LNAME' => $user->user_lastname );
 		$double_optin = false;
@@ -102,6 +108,7 @@ function mailchimp_add_user($uid) {
 	}
 	$merge_vars = apply_filters('mailchimp_merge_vars', $merge_vars, $user);
 	$mailchimp_subscribe = $api->listSubscribe($mailchimp_mailing_list, $user->user_email, $merge_vars, '', $double_optin);
+
 	if (($api->errorCode) && ($api->errorCode != 214)) {
 		$error = "MailChimp listSubscribe() Error: " . $api->errorCode . " - " . $api->errorMessage;
 		trigger_error($error, E_USER_WARNING);
@@ -114,15 +121,20 @@ function mailchimp_edit_user($uid) {
 
 	//check for spam
 	if ( $user->spam || $user->deleted )
-    return false;
+    	return false;
 
 	$mailchimp_mailing_list = get_site_option('mailchimp_mailing_list');
 	$mailchimp_auto_opt_in = get_site_option('mailchimp_auto_opt_in');
-  $api = mailchimp_load_API();
+  	$api = mailchimp_load_API();
+
+  	$unsubscribed_list = mailchimp_get_unsubscribed_users( $api, $mailchimp_mailing_list );
+
+  	if ( in_array( $user->user_email, $unsubscribed_list ) )
+  		return false;
 
 	$merge_vars = array( 'FNAME' => $user->user_firstname, 'LNAME' => $user->user_lastname );
 
-  $merge_vars = apply_filters('mailchimp_merge_vars', $merge_vars, $user);
+  	$merge_vars = apply_filters('mailchimp_merge_vars', $merge_vars, $user);
 	$mailchimp_update = $api->listUpdateMember($mailchimp_mailing_list, $user->user_email, $merge_vars);
 
 }
@@ -132,7 +144,7 @@ function mailchimp_user_remove($uid) {
 	$user = get_userdata( $uid );
 
 	$mailchimp_mailing_list = get_site_option('mailchimp_mailing_list');
-  $api = mailchimp_load_API();
+  	$api = mailchimp_load_API();
 	$mailchimp_unsubscribe = $api->listUnsubscribe($mailchimp_mailing_list, $user->user_email, true, false);
 }
 
@@ -158,6 +170,16 @@ function mailchimp_bp_spamming( $user_id, $is_spam ) {
     mailchimp_add_user( $user_id );
 }
 
+function mailchimp_get_unsubscribed_users( $api, $mailchimp_import_mailing_list ) {
+	$unsubscribed_list = array();
+	$tmp_unsubscribed_list = $api->listMembers( $mailchimp_import_mailing_list, 'unsubscribed' );
+	if ( $tmp_unsubscribed_list['total'] > 0 ) {
+		foreach ( $tmp_unsubscribed_list['data'] as $unsubscribed ) {
+			$unsubscribed_list[] = $unsubscribed['email'];
+		}
+	}
+	return $unsubscribed_list;
+}
 //------------------------------------------------------------------------//
 //---Page Output Functions------------------------------------------------//
 //------------------------------------------------------------------------//
@@ -401,8 +423,10 @@ function mailchimp_settings_page_output() {
 
         			$add_list = array();
         			$remove_list = array();
+        			$unsubscribed_list = mailchimp_get_unsubscribed_users( $api, $mailchimp_import_mailing_list );
         			
         			if ( $existing_users ) {
+
 						foreach ( $existing_users as $user ) {
 							//skip + signs
 							if ( $mailchimp_ignore_plus == 'yes' ) {
@@ -416,18 +440,21 @@ function mailchimp_settings_page_output() {
               					$remove_list[$user['ID']] = $user['user_email'];
               					continue;
             				}
-						
-							//add email
-							$add_list[$user['ID']]['EMAIL'] = $user['user_email'];
-							$add_list[$user['ID']]['EMAIL_TYPE'] = 'html';
+							
+							if ( ! in_array( $user['user_email'], $unsubscribed_list ) ) {
+								//add email
+								$add_list[$user['ID']]['EMAIL'] = $user['user_email'];
+								$add_list[$user['ID']]['EMAIL_TYPE'] = 'html';
 
-							//add first last names
-							if ( $user['meta_key'] == 'first_name' )
-				            	$add_list[$user['ID']]['FNAME'] = html_entity_decode($user['meta_value']);
-				            else if ( $user['meta_key'] == 'last_name' )
-				            	$add_list[$user['ID']]['LNAME'] = html_entity_decode($user['meta_value']);
+								//add first last names
+								if ( $user['meta_key'] == 'first_name' )
+					            	$add_list[$user['ID']]['FNAME'] = html_entity_decode($user['meta_value']);
+					            else if ( $user['meta_key'] == 'last_name' )
+					            	$add_list[$user['ID']]['LNAME'] = html_entity_decode($user['meta_value']);
 
-				            $add_list[$user['ID']] = apply_filters('mailchimp_bulk_merge_vars', $add_list[$user['ID']], $user['ID']);
+
+				           		$add_list[$user['ID']] = apply_filters('mailchimp_bulk_merge_vars', $add_list[$user['ID']], $user['ID']);
+				           	}
 				        }
 
 						if ( $mailchimp_import_auto_opt_in == 'yes' ) {
@@ -436,9 +463,11 @@ function mailchimp_settings_page_output() {
 							$double_optin = true;
 						}
 						
+						
 						//add good users
 						$add_result = $api->listBatchSubscribe($mailchimp_import_mailing_list, $add_list, $double_optin, true);
-					
+//DADA
+						
 						//remove bad users
 						$remove_result = $api->listBatchUnsubscribe($mailchimp_import_mailing_list, $remove_list, true, false);
 					
