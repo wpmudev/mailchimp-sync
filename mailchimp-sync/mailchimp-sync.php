@@ -31,6 +31,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //---Hook-----------------------------------------------------------------//
 //------------------------------------------------------------------------//
 
+define( 'MAILCHIMP_MAX_LOG_LINES', 100 );
 add_action('plugins_loaded', 'mailchimp_localization');
 
 add_action('admin_menu', 'mailchimp_plug_pages');
@@ -74,7 +75,8 @@ function mailchimp_plug_pages() {
 
 function mailchimp_load_API() {
   $mailchimp_apikey = get_site_option('mailchimp_apikey');
-  return new MCAPI($mailchimp_apikey);
+  $api = new MCAPI($mailchimp_apikey);
+  return $api;
 }
 
 function mailchimp_add_user($uid) {
@@ -107,13 +109,19 @@ function mailchimp_add_user($uid) {
 		$double_optin = true;
 	}
 	$merge_vars = apply_filters('mailchimp_merge_vars', $merge_vars, $user);
-	$mailchimp_subscribe = $api->listSubscribe($mailchimp_mailing_list, $user->user_email, $merge_vars, '', $double_optin);
+
+	$mailchimp_subscribe = $api->listSubscribe( $mailchimp_mailing_list, $user->user_email, $merge_vars, '', $double_optin );
+
+	if ( ! $mailchimp_subscribe )
+		mailchimp_log_errors( mailchimp_extract_api_errors( $api, $user->user_email ) );
 
 	if (($api->errorCode) && ($api->errorCode != 214)) {
 		$error = "MailChimp listSubscribe() Error: " . $api->errorCode . " - " . $api->errorMessage;
 		trigger_error($error, E_USER_WARNING);
 	}
 }
+
+
 
 function mailchimp_edit_user($uid) {
 
@@ -136,6 +144,9 @@ function mailchimp_edit_user($uid) {
 
   	$merge_vars = apply_filters('mailchimp_merge_vars', $merge_vars, $user);
 	$mailchimp_update = $api->listUpdateMember($mailchimp_mailing_list, $user->user_email, $merge_vars);
+	
+	if ( ! $mailchimp_update )
+		mailchimp_log_errors( mailchimp_extract_api_errors( $api, $user->user_email ) );
 
 }
 
@@ -146,6 +157,8 @@ function mailchimp_user_remove($uid) {
 	$mailchimp_mailing_list = get_site_option('mailchimp_mailing_list');
   	$api = mailchimp_load_API();
 	$mailchimp_unsubscribe = $api->listUnsubscribe($mailchimp_mailing_list, $user->user_email, true, false);
+	if ( ! $mailchimp_unsubscribe )
+		mailchimp_log_errors( mailchimp_extract_api_errors( $api, $user->user_email ) );
 }
 
 function mailchimp_blog_users_remove( $blog_id ) {
@@ -161,6 +174,8 @@ function mailchimp_blog_users_remove( $blog_id ) {
   }
 
 	$mailchimp_unsubscribe = $api->listBatchUnsubscribe($mailchimp_mailing_list, $emails, true, false);
+	if ( $mailchimp_unsubscribe['error_count'] )
+		mailchimp_log_errors( $mailchimp_unsubscribe['errors'] );
 }
 
 function mailchimp_bp_spamming( $user_id, $is_spam ) {
@@ -358,6 +373,22 @@ function mailchimp_settings_page_output() {
 				</form>
 				<?php
 	            }
+
+	            $error_log = get_site_option( 'mailchimp_error_log' );
+	            $error_log = array_reverse( $error_log );
+
+	            $content = '';
+	            if ( ! empty( $error_log ) ) {
+	            	$content = array();
+	            	foreach ( $error_log as $error ) {
+	            		$content[] = '[' . $error['date'] . '] [CODE:' . $error['code'] . '] [EMAIL:' . $error['email'] . '] - ' . $error['message'];
+	            	} 
+	            	$content = implode( "\n", $content );
+	            }
+	            ?>
+	            	<h3><?php _e( 'Error log', 'mailchimp' ); ?> <span class="description"><?php printf( __( '(Last %d lines)', 'mailchimp' ), MAILCHIMP_MAX_LOG_LINES ); ?></span></h3>
+					<textarea name="" id="" cols="30" rows="10" disabled class="widefat code"><?php echo esc_textarea( $content ); ?></textarea>
+	            <?php
 			break;
 		//---------------------------------------------------//
 		case "process":
@@ -466,7 +497,10 @@ function mailchimp_settings_page_output() {
 						
 						//add good users
 						$add_result = $api->listBatchSubscribe($mailchimp_import_mailing_list, $add_list, $double_optin, true);
-//DADA
+
+						if ( $add_result['error_count'] )
+							mailchimp_log_errors( $add_result['errors'] );
+						
 						
 						//remove bad users
 						$remove_result = $api->listBatchUnsubscribe($mailchimp_import_mailing_list, $remove_list, true, false);
@@ -505,6 +539,55 @@ function mailchimp_settings_page_output() {
 	echo '</div>';
 }
 
+
+function mailchimp_extract_api_errors( $api, $email ) {
+	return array(
+		array(
+			'code' => $api->errorCode,
+			'message' => $api->errorMessage,
+			'email' => $email
+		)
+	);
+}
+
+/**
+ * Log MailChimp errors
+ * @param Array $errors 
+ * @return type
+ */
+function mailchimp_log_errors( $errors ) {
+
+	$current_log = get_site_option( 'mailchimp_error_log' );
+	$new_log = array();
+
+
+	foreach ( $errors as $error ) {
+
+		$code = isset( $error['code'] ) ? $error['code'] : 0;
+		$message = isset( $error['message'] ) ? $error['message'] : '';
+		$email = isset( $error['email'] ) ? $error['email'] : '';
+		$date = date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), time() );
+
+		$new_log[] = compact( 'code', 'message', 'email', 'date' );
+		
+	}
+
+
+	if ( $current_log ) {
+
+		$new_log = array_merge( $current_log, $new_log );
+
+		// We'll only saved the last X lines of the log
+		$count = count( $new_log );
+		if ( $count > MAILCHIMP_MAX_LOG_LINES ) {
+			$new_log = array_slice( $new_log, $count - $offset - 1 );
+		}
+		
+	}
+
+	update_site_option( 'mailchimp_error_log', $new_log );
+
+}
 
 ///////////////////////////////////////////////////////////////////////////
 /* -------------------- Update Notifications Notice -------------------- */
@@ -2143,7 +2226,7 @@ if ( !function_exists( 'wdp_un_check' ) ) {
 	        $params["merge_vars"] = $merge_vars;
 	        $params["email_type"] = $email_type;
 	        $params["replace_interests"] = $replace_interests;
-	        return $this->callServer("listUpdateMember", $params);
+	        return $this->callServer("listUpda<teMember", $params);
 	    }
 
 	    /**
