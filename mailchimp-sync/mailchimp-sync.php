@@ -4,7 +4,7 @@ Plugin Name: MailChimp Sync
 Plugin URI: http://premium.wpmudev.org/project/mailchimp-newsletter-integration
 Description: Simply integrate MailChimp with your Multisite (or regular old single user WP) site - automatically add new users to your email lists and import all your existing users
 Author: Aaron Edwards (Incsub), Ignacio Cruz (Incsub)
-Version: 1.2.3
+Version: 1.2.4
 Author URI: http://premium.wpmudev.org
 Network: true
 WDP ID: 73
@@ -375,16 +375,21 @@ function mailchimp_settings_page_output() {
 	            }
 
 	            $error_log = get_site_option( 'mailchimp_error_log' );
-	            $error_log = array_reverse( $error_log );
 
 	            $content = '';
-	            if ( ! empty( $error_log ) ) {
-	            	$content = array();
-	            	foreach ( $error_log as $error ) {
-	            		$content[] = '[' . $error['date'] . '] [CODE:' . $error['code'] . '] [EMAIL:' . $error['email'] . '] - ' . $error['message'];
-	            	} 
-	            	$content = implode( "\n", $content );
-	            }
+
+	            if ( is_array( $error_log ) ) {
+		            $error_log = array_reverse( $error_log );
+
+		            $content = '';
+		            if ( ! empty( $error_log ) ) {
+		            	$content = array();
+		            	foreach ( $error_log as $error ) {
+		            		$content[] = '[' . $error['date'] . '] [CODE:' . $error['code'] . '] [EMAIL:' . $error['email'] . '] - ' . $error['message'];
+		            	} 
+		            	$content = implode( "\n", $content );
+		            }
+		        }
 	            ?>
 	            	<h3><?php _e( 'Error log', 'mailchimp' ); ?> <span class="description"><?php printf( __( '(Last %d lines)', 'mailchimp' ), MAILCHIMP_MAX_LOG_LINES ); ?></span></h3>
 					<textarea name="" id="" cols="30" rows="10" disabled class="widefat code"><?php echo esc_textarea( $content ); ?></textarea>
