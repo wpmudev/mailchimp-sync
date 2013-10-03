@@ -32,6 +32,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //------------------------------------------------------------------------//
 
 define( 'MAILCHIMP_MAX_LOG_LINES', 100 );
+require_once( 'widget.php' );
 add_action('plugins_loaded', 'mailchimp_localization');
 
 add_action('admin_menu', 'mailchimp_plug_pages');
@@ -48,11 +49,14 @@ add_action('make_spam_user', 'mailchimp_user_remove');
 add_action('delete_user', 'mailchimp_user_remove');
 add_action('bp_core_action_set_spammer_status', 'mailchimp_bp_spamming', 10, 2); //for buddypress
 
+add_action( 'widgets_init', 'mailchimp_widget_init' );
+
 
 
 //------------------------------------------------------------------------//
 //---Functions------------------------------------------------------------//
 //------------------------------------------------------------------------//
+
 
 function mailchimp_localization() {
   // Load up the localization file if we're using WordPress in a different language
@@ -73,6 +77,13 @@ function mailchimp_plug_pages() {
 	}
 }
 
+function mailchimp_widget_init() {
+
+	if ( ! is_multisite() || ( is_multisite() && get_site_option( 'mailchimp_allow_widget', false ) ) )
+		register_widget( 'Incsub_Mailchimp_Widget' );
+}
+
+
 function mailchimp_load_API() {
   $mailchimp_apikey = get_site_option('mailchimp_apikey');
   $api = new MCAPI($mailchimp_apikey);
@@ -81,7 +92,20 @@ function mailchimp_load_API() {
 
 function mailchimp_add_user($uid) {
 
-	$user = get_userdata( $uid );
+	if ( is_integer( $uid ) ) {
+		$user = get_userdata( $uid );
+	}
+	elseif ( is_array( $uid ) ) {
+		$user = new stdClass;
+		$user->spam = false;
+		$user->deleted = false;
+		$user->user_email = $uid['email'];
+		$user->user_firstname = $uid['first_name'];
+		$user->user_lastname = $uid['last_name'];
+	}
+	else {
+		return false;
+	}
 	
 	//check for spam
 	if ( $user->spam || $user->deleted )
@@ -219,6 +243,7 @@ function mailchimp_settings_page_output() {
 			$mailchimp_mailing_list = get_site_option('mailchimp_mailing_list');
 			$mailchimp_auto_opt_in = get_site_option('mailchimp_auto_opt_in');
 			$mailchimp_ignore_plus = get_site_option('mailchimp_ignore_plus');
+			$mailchimp_allow_widget = get_site_option('mailchimp_allow_widget', false);
       
 			?>
 			<h2><?php _e('MailChimp Settings', 'mailchimp') ?></h2>
@@ -245,6 +270,15 @@ function mailchimp_settings_page_output() {
 			?>
       		
       			<table class="form-table">
+
+      				<?php if ( is_multisite() && ! empty( $mailchimp_apikey ) ): ?>
+	      				<tr class="form-field form-required">
+				            <th scope="row"><?php _e('Allow widget in all subsites', 'mailchimp')?></th>
+				            <td><input type="checkbox" name="allow_widget" id="allow_widget" <?php checked( $mailchimp_allow_widget ); ?> style="width:inherit;"/>
+				            </td>
+				        </tr>
+				    <?php endif; ?>
+
 			        <tr class="form-field form-required">
 			            <th scope="row"><?php _e('MailChimp API Key', 'mailchimp')?></th>
 			            <td><input type="text" name="mailchimp_apikey" id="mailchimp_apikey" value="<?php echo $mailchimp_apikey; ?>" style="width:25%" /><br />
@@ -397,6 +431,8 @@ function mailchimp_settings_page_output() {
 			break;
 		//---------------------------------------------------//
 		case "process":
+
+			update_site_option( 'mailchimp_allow_widget', ! empty( $_POST['allow_widget'] ) );
 
 			if ( isset( $_POST['mailchimp_apikey'] ) )
 				update_site_option('mailchimp_apikey', $_POST['mailchimp_apikey']);
