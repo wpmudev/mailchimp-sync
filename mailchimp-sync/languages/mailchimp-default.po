@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mailchimp\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-05-10 19:52+0100\n"
-"PO-Revision-Date: 2013-05-10 19:52+0100\n"
+"POT-Creation-Date: 2013-10-11 16:10+0100\n"
+"PO-Revision-Date: 2013-10-11 16:10+0100\n"
 "Last-Translator: Ignacio <igmoweb@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -13,131 +13,208 @@ msgstr ""
 "X-Poedit-Basepath: .\n"
 "X-Poedit-SearchPath-0: ..\n"
 
-#: ../mailchimp-sync.php:224
+#: ../mailchimp-sync.php:249
 msgid "MailChimp Settings"
 msgstr ""
 
-#: ../mailchimp-sync.php:242
+#: ../mailchimp-sync.php:267
 msgid "After you have entered a valid API key you will be able to select different MailChimp options below."
 msgstr ""
 
-#: ../mailchimp-sync.php:249
+#: ../mailchimp-sync.php:276
+msgid "Allow widget in all subsites"
+msgstr ""
+
+#: ../mailchimp-sync.php:283
 msgid "MailChimp API Key"
 msgstr ""
 
-#: ../mailchimp-sync.php:251
+#: ../mailchimp-sync.php:285
 msgid "Visit <a href=\"http://admin.mailchimp.com/account/api\" target=\"_blank\">your API dashboard</a> to create an API key."
 msgstr ""
 
-#: ../mailchimp-sync.php:265
-#: ../mailchimp-sync.php:315
+#: ../mailchimp-sync.php:299
+#: ../mailchimp-sync.php:349
 msgid "API Key Test"
 msgstr ""
 
-#: ../mailchimp-sync.php:266
+#: ../mailchimp-sync.php:300
 msgid "Passed"
 msgstr ""
 
-#: ../mailchimp-sync.php:270
-#: ../mailchimp-sync.php:359
+#: ../mailchimp-sync.php:304
+#: ../mailchimp-sync.php:393
 msgid "Auto Opt-in"
 msgstr ""
 
-#: ../mailchimp-sync.php:273
-#: ../mailchimp-sync.php:282
-#: ../mailchimp-sync.php:362
+#: ../mailchimp-sync.php:307
+#: ../mailchimp-sync.php:316
+#: ../mailchimp-sync.php:396
 msgid "Yes"
 msgstr ""
 
-#: ../mailchimp-sync.php:274
-#: ../mailchimp-sync.php:283
-#: ../mailchimp-sync.php:363
+#: ../mailchimp-sync.php:308
+#: ../mailchimp-sync.php:317
+#: ../mailchimp-sync.php:397
 msgid "No"
 msgstr ""
 
-#: ../mailchimp-sync.php:276
-#: ../mailchimp-sync.php:365
+#: ../mailchimp-sync.php:310
+#: ../mailchimp-sync.php:399
 msgid "Automatically opt-in new users to the mailing list. Users will not receive an email confirmation. Use at your own risk."
 msgstr ""
 
-#: ../mailchimp-sync.php:280
+#: ../mailchimp-sync.php:314
 msgid "Ignore email addresses including + signs"
 msgstr ""
 
-#: ../mailchimp-sync.php:286
+#: ../mailchimp-sync.php:320
 msgid "Ignore email address including + signs. These are usually duplicate accounts."
 msgstr ""
 
-#: ../mailchimp-sync.php:293
+#: ../mailchimp-sync.php:327
 msgid "You must have at least one MailChimp mailing list in order to use this plugin. Please create a mailing list via the MailChimp admin panel."
 msgstr ""
 
-#: ../mailchimp-sync.php:297
-#: ../mailchimp-sync.php:346
+#: ../mailchimp-sync.php:331
+#: ../mailchimp-sync.php:380
 msgid "Mailing List"
 msgstr ""
 
-#: ../mailchimp-sync.php:301
+#: ../mailchimp-sync.php:335
 msgid "Please select a mailing list"
 msgstr ""
 
-#: ../mailchimp-sync.php:307
+#: ../mailchimp-sync.php:341
 msgid "Select a mailing list you want to have new users added to."
 msgstr ""
 
-#: ../mailchimp-sync.php:316
+#: ../mailchimp-sync.php:350
 msgid "Failed - Please check your key and try again."
 msgstr ""
 
-#: ../mailchimp-sync.php:326
+#: ../mailchimp-sync.php:360
 msgid "Save Changes"
 msgstr ""
 
-#: ../mailchimp-sync.php:331
+#: ../mailchimp-sync.php:365
 msgid "Sync Existing Users"
 msgstr ""
 
-#: ../mailchimp-sync.php:332
+#: ../mailchimp-sync.php:366
 msgid "This function will syncronize all existing users on your install with your MailChimp list, adding new ones, updating the first/last name of previously imported users, and removing spammed or deleted users from your selected list. Note you really only need to do this once after installing, it is carried on automatically after installation."
 msgstr ""
 
-#: ../mailchimp-sync.php:355
+#: ../mailchimp-sync.php:389
 msgid "The mailing list you want to import existing users to."
 msgstr ""
 
-#: ../mailchimp-sync.php:371
+#: ../mailchimp-sync.php:405
 msgid "Import"
 msgstr ""
 
-#: ../mailchimp-sync.php:389
+#: ../mailchimp-sync.php:428
 msgid "Error log"
 msgstr ""
 
-#: ../mailchimp-sync.php:389
+#: ../mailchimp-sync.php:428
 #, php-format
 msgid "(Last %d lines)"
 msgstr ""
 
-#: ../mailchimp-sync.php:421
-#: ../mailchimp-sync.php:427
-#: ../mailchimp-sync.php:434
+#: ../mailchimp-sync.php:462
+#: ../mailchimp-sync.php:468
+#: ../mailchimp-sync.php:475
 msgid "Settings saved."
 msgstr ""
 
-#: ../mailchimp-sync.php:442
+#: ../mailchimp-sync.php:483
 msgid "Syncing Existing Users"
 msgstr ""
 
-#: ../mailchimp-sync.php:443
+#: ../mailchimp-sync.php:484
 msgid "This may take a while..."
 msgstr ""
 
-#: ../mailchimp-sync.php:508
+#: ../mailchimp-sync.php:549
 #, php-format
 msgid "%d users added, %d updated, and %d spam users removed from your list."
 msgstr ""
 
-#: ../mailchimp-sync.php:600
+#: ../mailchimp-sync.php:641
 msgid "Please install the latest version of <a href=\"http://premium.wpmudev.org/project/update-notifications/\" title=\"Download Now &raquo;\">our free Update Notifications plugin</a> which helps you stay up-to-date with the most stable, secure versions of WPMU DEV themes and plugins. <a href=\"http://premium.wpmudev.org/wpmu-dev/update-notifications-plugin-information/\">More information &raquo;</a>"
+msgstr ""
+
+#: ../widget.php:19
+msgid "This widget allows visitors to subscribe to a Mailchimp email list (set by the network administrator)."
+msgstr ""
+
+#: ../widget.php:23
+msgid "Mailchimp"
+msgstr ""
+
+#: ../widget.php:42
+msgid "Please, insert a valid email"
+msgstr ""
+
+#: ../widget.php:47
+msgid "First name is required"
+msgstr ""
+
+#: ../widget.php:53
+msgid "Last name is required"
+msgstr ""
+
+#: ../widget.php:92
+#: ../widget.php:160
+msgid "Subscribe"
+msgstr ""
+
+#: ../widget.php:119
+msgid "First name"
+msgstr ""
+
+#: ../widget.php:120
+msgid "Last name"
+msgstr ""
+
+#: ../widget.php:121
+msgid "Email"
+msgstr ""
+
+#: ../widget.php:158
+msgid "Subscribe to MailChimp"
+msgstr ""
+
+#: ../widget.php:159
+msgid "Subscribe to our MailChimp list."
+msgstr ""
+
+#: ../widget.php:161
+msgid "Thank you, your email has been added to the list."
+msgstr ""
+
+#: ../widget.php:168
+msgid "Title:"
+msgstr ""
+
+#: ../widget.php:172
+msgid "Text:"
+msgstr ""
+
+#: ../widget.php:176
+msgid "Subscribe button text:"
+msgstr ""
+
+#: ../widget.php:180
+msgid "Text displayed when a user subscribes:"
+msgstr ""
+
+#: ../widget.php:185
+msgid "Require first name field"
+msgstr ""
+
+#: ../widget.php:189
+msgid "Require last name field"
 msgstr ""
 
