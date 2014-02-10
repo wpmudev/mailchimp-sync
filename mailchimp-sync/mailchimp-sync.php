@@ -63,6 +63,19 @@ class WPMUDEV_MailChimp_Sync {
 		require_once( 'widget.php' );
 		require_once( 'helpers.php' );
 
+		// WPMUDEV Dashboard class
+		if ( is_admin() ) {
+			global $wpmudev_notices;
+			$wpmudev_notices[] = array( 
+				'id'=> 73,
+				'name'=> 'MailChimp Sync', 
+				'screens' => array( 
+					'settings_page_mailchimp-network'
+				) 
+			);
+			include_once( 'externals/wpmudev-dash-notification.php' );
+		}
+
 			
 	}
 
