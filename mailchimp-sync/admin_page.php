@@ -79,6 +79,7 @@ class WPMUDEV_MailChimp_Admin {
 			}
 
 			if ( $_POST['action'] == 'submit-import' ) {
+				global $wpdb, $mailchimp_sync;
 				$api = mailchimp_load_API();
 				$mailchimp_import_mailing_list = $_POST['mailchimp_import_mailing_list'];
 				$mailchimp_import_auto_opt_in = $_POST['mailchimp_import_auto_opt_in'];
@@ -91,7 +92,7 @@ class WPMUDEV_MailChimp_Admin {
 
         			$add_list = array();
         			$remove_list = array();
-        			$unsubscribed_list = mailchimp_get_unsubscribed_users( $api, $mailchimp_import_mailing_list );
+        			$unsubscribed_list = $mailchimp_sync->mailchimp_get_unsubscribed_users( $api, $mailchimp_import_mailing_list );
         			
         			if ( $existing_users ) {
 
@@ -136,13 +137,23 @@ class WPMUDEV_MailChimp_Admin {
 						$add_result = $api->listBatchSubscribe($mailchimp_import_mailing_list, $add_list, $double_optin, true);
 
 						if ( $add_result['error_count'] )
-							mailchimp_log_errors( $add_result['errors'] );
+							$mailchimp_sync->mailchimp_log_errors( $add_result['errors'] );
 						
 						
 						//remove bad users
 						$remove_result = $api->listBatchUnsubscribe($mailchimp_import_mailing_list, $remove_list, true, false);
-					
-						$msg = sprintf( __('%d users added, %d updated, and %d spam users removed from your list.', MAILCHIMP_LANG_DOMAIN), $add_result['add_count'], $add_result['update_count'], $remove_result['success_count']);
+							
+
+						wp_redirect( add_query_arg( array( 
+								'imported' => 'true',
+								'a' => $add_result['add_count'],
+								'u' => $add_result['update_count'],
+								's' => isset ( $remove_result['success_count'] ) ? $remove_result['success_count'] : 0,
+								'tab' => 'import'
+							),
+							$redirect_to ) 
+						);
+						exit();						
 					}
 				}
 			}
@@ -163,6 +174,15 @@ class WPMUDEV_MailChimp_Admin {
 					<?php endforeach; ?>
 				</h2>
 
+				<?php if ( isset( $_GET['updated'] ) ): ?>
+					<div class="updated"><p><?php _e( 'Settings updated', MAILCHIMP_LANG_DOMAIN ); ?></p></div>
+				<?php endif; ?>
+
+				<?php if ( isset( $_GET['imported'] ) ): ?>
+					<div class="updated"><p><?php printf( __('%d users added, %d updated, and %d spam users removed from your list.', MAILCHIMP_LANG_DOMAIN), $_GET['a'], $_GET['u'], $_GET['s'] ); ?></p></div>
+				<?php endif; ?>
+
+				
 				<form action="" method="post" id="mailchimp-settings-form">
 
 					<?php wp_nonce_field( 'mailchimp-settings', '_wpnonce' ); ?>
