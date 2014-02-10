@@ -16,11 +16,11 @@ class Incsub_Mailchimp_Widget extends WP_Widget {
 		/* Widget settings. */
 		$widget_ops = array( 
 			'classname' => 'incsub-mailchimp-widget' , 
-			'description' => __( 'This widget allows visitors to subscribe to a Mailchimp email list (set by the network administrator).', 'mailchimp' ) 
+			'description' => __( 'This widget allows visitors to subscribe to a Mailchimp email list (set by the network administrator).', MAILCHIMP_LANG_DOMAIN ) 
 		);
 
 		/* Create the widget. */
-		parent::WP_Widget( 'incsub-mailchimp-widget' , __( 'Mailchimp', 'mailchimp' ), $widget_ops );
+		parent::WP_Widget( 'incsub-mailchimp-widget' , __( 'Mailchimp', MAILCHIMP_LANG_DOMAIN ), $widget_ops );
 
 		add_action( 'template_redirect', array( &$this, 'validate' ) );
 
@@ -39,18 +39,18 @@ class Incsub_Mailchimp_Widget extends WP_Widget {
 				
 				$email = sanitize_email( $_POST['subscription-email'] );
 				if ( ! is_email( $email ) )
-					$this->add_error( __( 'Please, insert a valid email', 'mailchimp' ) );
+					$this->add_error( __( 'Please, insert a valid email', MAILCHIMP_LANG_DOMAIN ) );
 
 				$firstname = sanitize_text_field( $_POST['subscription-firstname'] );
 				$firstname = ! empty( $firstname ) ? $firstname : '';
 				if ( empty( $firstname ) && $instance['require_firstname'] )
-					$this->add_error( __( 'First name is required', 'mailchimp' ) );
+					$this->add_error( __( 'First name is required', MAILCHIMP_LANG_DOMAIN ) );
 
 
 				$lastname = sanitize_text_field( $_POST['subscription-lastname'] );
 				$lastname = ! empty( $lastname ) ? $lastname : '';
 				if ( empty( $lastname ) && $instance['require_lastname'] )
-					$this->add_error( __( 'Last name is required', 'mailchimp' ) );
+					$this->add_error( __( 'Last name is required', MAILCHIMP_LANG_DOMAIN ) );
 
 				if ( ! $this->is_error() ) {
 					$user['email'] = $email;
@@ -89,7 +89,7 @@ class Incsub_Mailchimp_Widget extends WP_Widget {
 
         $title = apply_filters( 'widget_title', $instance['title'] );
         $text = $instance['text'];
-		$button_text = ! empty( $instance['button_text'] ) ? $instance['button_text'] : __( 'Subscribe', 'mailchimp' );
+		$button_text = ! empty( $instance['button_text'] ) ? $instance['button_text'] : __( 'Subscribe', MAILCHIMP_LANG_DOMAIN );
 
 	    echo $before_widget;
 	     
@@ -116,9 +116,9 @@ class Incsub_Mailchimp_Widget extends WP_Widget {
 			        	<?php endforeach; ?>
 			        	</ul>
 			    	<?php endif; ?>
-		        	<input type="text" class="incsub-mailchimp-field" name="subscription-firstname" value="<?php echo isset( $_POST['subscription-firstname'] ) ? $_POST['subscription-firstname'] : ''; ?>" placeholder="<?php _e( 'First name', 'mailchimp' ); ?>"><br/>
-		        	<input type="text" class="incsub-mailchimp-field" name="subscription-lastname" value="<?php echo isset( $_POST['subscription-lastname'] ) ? $_POST['subscription-lastname'] : ''; ?>" placeholder="<?php _e( 'Last name', 'mailchimp' ); ?>"><br/>
-		        	<input type="email" class="incsub-mailchimp-field" name="subscription-email" value="<?php echo isset( $_POST['subscription-email'] ) ? $_POST['subscription-email'] : ''; ?>" placeholder="<?php _e( 'Email', 'mailchimp' ); ?>"><br/>
+		        	<input type="text" class="incsub-mailchimp-field" name="subscription-firstname" value="<?php echo isset( $_POST['subscription-firstname'] ) ? $_POST['subscription-firstname'] : ''; ?>" placeholder="<?php _e( 'First name', MAILCHIMP_LANG_DOMAIN ); ?>"><br/>
+		        	<input type="text" class="incsub-mailchimp-field" name="subscription-lastname" value="<?php echo isset( $_POST['subscription-lastname'] ) ? $_POST['subscription-lastname'] : ''; ?>" placeholder="<?php _e( 'Last name', MAILCHIMP_LANG_DOMAIN ); ?>"><br/>
+		        	<input type="email" class="incsub-mailchimp-field" name="subscription-email" value="<?php echo isset( $_POST['subscription-email'] ) ? $_POST['subscription-email'] : ''; ?>" placeholder="<?php _e( 'Email', MAILCHIMP_LANG_DOMAIN ); ?>"><br/>
 		        	<input type="hidden" name="action" value="incsub_mailchimp_subscribe_user">
 		        	<?php wp_nonce_field( 'mailchimp_subscribe_user' ); ?>
 		        	<input type="submit" class="incsub-mailchimp-submit" name="submit-subscribe-user" value="<?php echo $button_text; ?>">
@@ -155,38 +155,38 @@ class Incsub_Mailchimp_Widget extends WP_Widget {
 
 		/* Set up some default widget settings. */
 		$defaults = array( 
-			'title' => __( 'Subscribe to MailChimp', 'mailchimp' ), 
-			'text' => __( 'Subscribe to our MailChimp list.', 'mailchimp' ), 
-			'button_text' => __( 'Subscribe', 'mailchimp'  ),
-			'subscribed_placeholder' => __( 'Thank you, your email has been added to the list.', 'mailchimp' ),
+			'title' => __( 'Subscribe to MailChimp', MAILCHIMP_LANG_DOMAIN ), 
+			'text' => __( 'Subscribe to our MailChimp list.', MAILCHIMP_LANG_DOMAIN ), 
+			'button_text' => __( 'Subscribe', MAILCHIMP_LANG_DOMAIN  ),
+			'subscribed_placeholder' => __( 'Thank you, your email has been added to the list.', MAILCHIMP_LANG_DOMAIN ),
 			'require_firstname' => false,
 			'require_lastname' => false 
 		);
 
 		$instance = wp_parse_args( (array) $instance, $defaults ); ?>
 		<p>
-			<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e('Title:', 'mailchimp' ); ?></label>
+			<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e('Title:', MAILCHIMP_LANG_DOMAIN ); ?></label>
 			<input type="text" class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" value="<?php echo esc_attr( $instance['title'] ); ?>" />
 		</p>
 		<p>
-			<label for="<?php echo $this->get_field_id( 'text' ); ?>"><?php _e('Text:', 'mailchimp' ); ?></label>
+			<label for="<?php echo $this->get_field_id( 'text' ); ?>"><?php _e('Text:', MAILCHIMP_LANG_DOMAIN ); ?></label>
 			<input type="text" class="widefat" id="<?php echo $this->get_field_id( 'text' ); ?>" name="<?php echo $this->get_field_name( 'text' ); ?>" value="<?php echo esc_attr( $instance['text'] ); ?>" />
 		</p>
 		<p>
-			<label for="<?php echo $this->get_field_id( 'button_text' ); ?>"><?php _e('Subscribe button text:', 'mailchimp'); ?></label>
+			<label for="<?php echo $this->get_field_id( 'button_text' ); ?>"><?php _e('Subscribe button text:', MAILCHIMP_LANG_DOMAIN); ?></label>
 			<input type="text" class="widefat" id="<?php echo $this->get_field_id( 'button_text' ); ?>" name="<?php echo $this->get_field_name( 'button_text' ); ?>" value="<?php echo esc_attr( $instance['button_text'] ); ?>" />
 		</p>
 		<p>
-			<label for="<?php echo $this->get_field_id( 'subscribed_placeholder' ); ?>"><?php _e( 'Text displayed when a user subscribes:', 'mailchimp'); ?></label>
+			<label for="<?php echo $this->get_field_id( 'subscribed_placeholder' ); ?>"><?php _e( 'Text displayed when a user subscribes:', MAILCHIMP_LANG_DOMAIN); ?></label>
 			<input type="text" class="widefat" id="<?php echo $this->get_field_id( 'subscribed_placeholder' ); ?>" name="<?php echo $this->get_field_name( 'subscribed_placeholder' ); ?>" value="<?php echo esc_attr( $instance['subscribed_placeholder'] ); ?>" />
 		</p>
 		<p>
 			<input type="checkbox" id="<?php echo $this->get_field_id( 'require_firstname' ); ?>" name="<?php echo $this->get_field_name( 'require_firstname' ); ?>" value="1" <?php checked( $instance['require_firstname'] ); ?> /> 
-			<label for="<?php echo $this->get_field_id( 'require_firstname' ); ?>"><?php _e('Require first name field', 'mailchimp' ); ?></label>
+			<label for="<?php echo $this->get_field_id( 'require_firstname' ); ?>"><?php _e('Require first name field', MAILCHIMP_LANG_DOMAIN ); ?></label>
 		</p>
 		<p>
 			<input type="checkbox" id="<?php echo $this->get_field_id( 'require_lastname' ); ?>" name="<?php echo $this->get_field_name( 'require_lastname' ); ?>" value="1" <?php checked( $instance['require_lastname'] ); ?> /> 
-			<label for="<?php echo $this->get_field_id( 'require_lastname' ); ?>"><?php _e('Require last name field', 'mailchimp' ); ?></label>
+			<label for="<?php echo $this->get_field_id( 'require_lastname' ); ?>"><?php _e('Require last name field', MAILCHIMP_LANG_DOMAIN ); ?></label>
 		</p>
 	<?php
 	}
