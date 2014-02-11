@@ -47,7 +47,7 @@ class WPMUDEV_MailChimp_Admin {
 			if ( ! current_user_can( $this->capability ) )
 				return;
 
-			$admin_url = is_multisite() ? network_admin_url( 'settings.php' ) : admin_url( 'settings.php' );
+			$admin_url = is_multisite() ? network_admin_url( 'settings.php' ) : admin_url( 'options-general.php' );
 			$redirect_to = add_query_arg( 'page', 'mailchimp', $admin_url );
 
 			if ( $_POST['action'] == 'submit-settings' ) {

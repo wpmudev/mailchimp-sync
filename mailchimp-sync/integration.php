@@ -1,6 +1,7 @@
 <?php
 
-if ( ! is_admin() )
+
+if ( ! function_exists( 'is_plugin_active' ) )
 	include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 
 if ( is_plugin_active( 'wpmu-dev-facebook/wpmu-dev-facebook.php' ) ) {

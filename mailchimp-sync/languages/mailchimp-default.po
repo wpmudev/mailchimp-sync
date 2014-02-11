@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mailchimp\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-02-10 14:35+0100\n"
-"PO-Revision-Date: 2014-02-10 14:36+0100\n"
+"POT-Creation-Date: 2014-02-11 18:01+0100\n"
+"PO-Revision-Date: 2014-02-11 18:02+0100\n"
 "Last-Translator: Ignacio <igmoweb@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -18,7 +18,7 @@ msgid "Settings"
 msgstr ""
 
 #: ../admin_page.php:16
-#: ../admin_page.php:167
+#: ../admin_page.php:168
 msgid "Import"
 msgstr ""
 
@@ -31,110 +31,137 @@ msgstr ""
 msgid "MailChimp Settings"
 msgstr ""
 
-#: ../admin_page.php:178
+#: ../admin_page.php:179
 msgid "Settings updated"
 msgstr ""
 
-#: ../admin_page.php:182
+#: ../admin_page.php:183
 #, php-format
 msgid "%d users added, %d updated, and %d spam users removed from your list."
 msgstr ""
 
-#: ../admin_page.php:227
+#: ../admin_page.php:229
 msgid "After you have entered a valid API key you will be able to select different MailChimp options below."
 msgstr ""
 
-#: ../admin_page.php:234
+#: ../admin_page.php:236
 msgid "MailChimp API Key"
 msgstr ""
 
-#: ../admin_page.php:236
+#: ../admin_page.php:238
 msgid "Visit <a href=\"http://admin.mailchimp.com/account/api\" target=\"_blank\">your API dashboard</a> to create an API key."
 msgstr ""
 
-#: ../admin_page.php:244
-#: ../admin_page.php:298
+#: ../admin_page.php:246
+#: ../admin_page.php:305
 msgid "API Key Test"
 msgstr ""
 
-#: ../admin_page.php:245
+#: ../admin_page.php:247
 msgid "Passed"
 msgstr ""
 
-#: ../admin_page.php:249
-#: ../admin_page.php:346
+#: ../admin_page.php:251
+#: ../admin_page.php:353
 msgid "Auto Opt-in"
 msgstr ""
 
-#: ../admin_page.php:252
-#: ../admin_page.php:262
-#: ../admin_page.php:349
+#: ../admin_page.php:254
+#: ../admin_page.php:264
+#: ../admin_page.php:356
 msgid "Yes"
 msgstr ""
 
-#: ../admin_page.php:253
-#: ../admin_page.php:263
-#: ../admin_page.php:350
+#: ../admin_page.php:255
+#: ../admin_page.php:265
+#: ../admin_page.php:357
 msgid "No"
 msgstr ""
 
-#: ../admin_page.php:255
-#: ../admin_page.php:352
+#: ../admin_page.php:257
+#: ../admin_page.php:359
 msgid "Automatically opt-in new users to the mailing list. Users will not receive an email confirmation. Use at your own risk."
 msgstr ""
 
-#: ../admin_page.php:259
+#: ../admin_page.php:261
 msgid "Ignore email addresses including + signs"
 msgstr ""
 
-#: ../admin_page.php:265
+#: ../admin_page.php:267
 msgid "Ignore email address including + signs. These are usually duplicate accounts."
 msgstr ""
 
-#: ../admin_page.php:270
+#: ../admin_page.php:272
 msgid "You must have at least one MailChimp mailing list in order to use this plugin. Please create a mailing list via the MailChimp admin panel."
 msgstr ""
 
-#: ../admin_page.php:273
-#: ../admin_page.php:333
+#: ../admin_page.php:275
+#: ../admin_page.php:340
 msgid "Mailing List"
 msgstr ""
 
-#: ../admin_page.php:277
+#: ../admin_page.php:279
 msgid "Please select a mailing list"
 msgstr ""
 
-#: ../admin_page.php:283
+#: ../admin_page.php:285
 msgid "Select a mailing list you want to have new users added to."
 msgstr ""
 
-#: ../admin_page.php:290
+#: ../admin_page.php:292
 msgid "Allow widget in all subsites"
 msgstr ""
 
-#: ../admin_page.php:299
+#: ../admin_page.php:297
+msgid "Allow shortcode use in all subsites"
+msgstr ""
+
+#: ../admin_page.php:306
 msgid "Failed - Please check your key and try again."
 msgstr ""
 
-#: ../admin_page.php:327
+#: ../admin_page.php:334
 msgid "Sync Existing Users"
 msgstr ""
 
-#: ../admin_page.php:328
+#: ../admin_page.php:335
 msgid "This function will syncronize all existing users on your install with your MailChimp list, adding new ones, updating the first/last name of previously imported users, and removing spammed or deleted users from your selected list. Note you really only need to do this once after installing, it is carried on automatically after installation."
 msgstr ""
 
-#: ../admin_page.php:342
+#: ../admin_page.php:349
 msgid "The mailing list you want to import existing users to."
 msgstr ""
 
-#: ../admin_page.php:377
+#: ../admin_page.php:384
 msgid "Error log"
 msgstr ""
 
-#: ../admin_page.php:377
+#: ../admin_page.php:384
 #, php-format
 msgid "(Last %d lines)"
+msgstr ""
+
+#: ../shortcode.php:51
+msgid "Thanks, your email has been added to our subscription list."
+msgstr ""
+
+#: ../shortcode.php:73
+msgid "Email address"
+msgstr ""
+
+#: ../shortcode.php:74
+msgid "ex: someone@mydomain.com"
+msgstr ""
+
+#: ../shortcode.php:83
+#: ../widget.php:94
+#: ../widget.php:162
+msgid "Subscribe"
+msgstr ""
+
+#: ../shortcode.php:102
+#: ../widget.php:44
+msgid "Please, insert a valid email"
 msgstr ""
 
 #: ../widget.php:19
@@ -145,68 +172,59 @@ msgstr ""
 msgid "Mailchimp"
 msgstr ""
 
-#: ../widget.php:42
-msgid "Please, insert a valid email"
-msgstr ""
-
-#: ../widget.php:47
+#: ../widget.php:49
 msgid "First name is required"
 msgstr ""
 
-#: ../widget.php:53
+#: ../widget.php:55
 msgid "Last name is required"
 msgstr ""
 
-#: ../widget.php:92
-#: ../widget.php:160
-msgid "Subscribe"
-msgstr ""
-
-#: ../widget.php:119
+#: ../widget.php:121
 msgid "First name"
 msgstr ""
 
-#: ../widget.php:120
+#: ../widget.php:122
 msgid "Last name"
 msgstr ""
 
-#: ../widget.php:121
+#: ../widget.php:123
 msgid "Email"
 msgstr ""
 
-#: ../widget.php:158
+#: ../widget.php:160
 msgid "Subscribe to MailChimp"
 msgstr ""
 
-#: ../widget.php:159
+#: ../widget.php:161
 msgid "Subscribe to our MailChimp list."
 msgstr ""
 
-#: ../widget.php:161
+#: ../widget.php:163
 msgid "Thank you, your email has been added to the list."
 msgstr ""
 
-#: ../widget.php:168
+#: ../widget.php:170
 msgid "Title:"
 msgstr ""
 
-#: ../widget.php:172
+#: ../widget.php:174
 msgid "Text:"
 msgstr ""
 
-#: ../widget.php:176
+#: ../widget.php:178
 msgid "Subscribe button text:"
 msgstr ""
 
-#: ../widget.php:180
+#: ../widget.php:182
 msgid "Text displayed when a user subscribes:"
 msgstr ""
 
-#: ../widget.php:185
+#: ../widget.php:187
 msgid "Require first name field"
 msgstr ""
 
-#: ../widget.php:189
+#: ../widget.php:191
 msgid "Require last name field"
 msgstr ""
 
