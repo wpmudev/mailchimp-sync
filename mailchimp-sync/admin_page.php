@@ -52,6 +52,7 @@ class WPMUDEV_MailChimp_Admin {
 
 			if ( $_POST['action'] == 'submit-settings' ) {
 				update_site_option( 'mailchimp_allow_widget', ! empty( $_POST['allow_widget'] ) );
+				update_site_option( 'mailchimp_allow_shortcode', ! empty( $_POST['allow_shortcode'] ) );
 
 				if ( isset( $_POST['mailchimp_apikey'] ) )
 					update_site_option('mailchimp_apikey', $_POST['mailchimp_apikey']);
@@ -214,6 +215,7 @@ class WPMUDEV_MailChimp_Admin {
 		$mailchimp_auto_opt_in = get_site_option('mailchimp_auto_opt_in');
 		$mailchimp_ignore_plus = get_site_option('mailchimp_ignore_plus');
 		$mailchimp_allow_widget = get_site_option('mailchimp_allow_widget', false);
+		$mailchimp_allow_shortcode = get_site_option('mailchimp_allow_shortcode', false);
 
 		if ( ! empty( $mailchimp_apikey ) ) {
 			$api = mailchimp_load_API();
@@ -289,6 +291,11 @@ class WPMUDEV_MailChimp_Admin {
 	      				<tr class="form-field form-required">
 				            <th scope="row"><?php _e('Allow widget in all subsites', MAILCHIMP_LANG_DOMAIN)?></th>
 				            <td><input type="checkbox" name="allow_widget" id="allow_widget" <?php checked( $mailchimp_allow_widget ); ?> style="width:inherit;"/>
+				            </td>
+				        </tr>
+				        <tr class="form-field form-required">
+				            <th scope="row"><?php _e('Allow shortcode use in all subsites', MAILCHIMP_LANG_DOMAIN)?></th>
+				            <td><input type="checkbox" name="allow_shortcode" id="allow_shortcode" <?php checked( $mailchimp_allow_shortcode ); ?> style="width:inherit;"/>
 				            </td>
 				        </tr>
 				    <?php endif; ?>

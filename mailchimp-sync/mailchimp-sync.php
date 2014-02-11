@@ -38,7 +38,7 @@ class WPMUDEV_MailChimp_Sync {
 
 		add_action( 'plugins_loaded', array( $this, 'mailchimp_localization' ) );
 
-		add_action( 'init', array( $this, 'init' ) );
+		add_action( 'init', array( $this, 'init' ), 1 );
 
 		add_action( 'wpmu_new_user', array( $this, 'mailchimp_add_user' ) );
 		add_action( 'user_register', array( $this, 'mailchimp_add_user' ) );
@@ -57,11 +57,13 @@ class WPMUDEV_MailChimp_Sync {
 	private function set_globals() {
 		define( 'MAILCHIMP_MAX_LOG_LINES', 100 );
 		define( 'MAILCHIMP_LANG_DOMAIN', 'mailchimp' );
+		define( 'MAILCHIMP_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+		define( 'MAILCHIMP_ASSETS_URL', MAILCHIMP_PLUGIN_URL . 'assets/' );
 	}
 
 	private function includes() {
-		require_once( 'widget.php' );
 		require_once( 'helpers.php' );
+		require_once( 'integration.php' );
 
 		// WPMUDEV Dashboard class
 		if ( is_admin() ) {
@@ -84,6 +86,11 @@ class WPMUDEV_MailChimp_Sync {
 			require_once( 'admin_page.php' );
 			new WPMUDEV_MailChimp_Admin();
 		}
+
+		if ( ! is_multisite() || ( is_multisite() && get_site_option( 'mailchimp_allow_shortcode', false ) ) ) {
+			require_once( 'shortcode.php' );
+			new WPMUDEV_MailChimp_Shortcode();
+		}
 	}
 
 	function mailchimp_localization() {
@@ -96,8 +103,10 @@ class WPMUDEV_MailChimp_Sync {
 
 	function mailchimp_widget_init() {
 
-		if ( ! is_multisite() || ( is_multisite() && get_site_option( 'mailchimp_allow_widget', false ) ) )
+		if ( ! is_multisite() || ( is_multisite() && get_site_option( 'mailchimp_allow_widget', false ) ) ) {
+			require_once( 'widget.php' );
 			register_widget( 'Incsub_Mailchimp_Widget' );
+		}
 	}
 
 
@@ -120,7 +129,7 @@ class WPMUDEV_MailChimp_Sync {
 		
 		//check for spam
 		if ( $user->spam || $user->deleted )
-	    return false;
+	    	return false;
 		
 		//remove + sign emails
 		if ( get_site_option('mailchimp_ignore_plus') == 'yes' && strstr($user->user_email, '+') ) {
@@ -143,7 +152,7 @@ class WPMUDEV_MailChimp_Sync {
 			$merge_vars = array( 'FNAME' => $user->user_firstname, 'LNAME' => $user->user_lastname );
 			$double_optin = true;
 		}
-		$merge_vars = apply_filters('mailchimp_merge_vars', $merge_vars, $user);
+		$merge_vars = apply_filters( 'mailchimp_merge_vars', $merge_vars, $user );
 
 		$mailchimp_subscribe = $api->listSubscribe( $mailchimp_mailing_list, $user->user_email, $merge_vars, '', $double_optin );
 

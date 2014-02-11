@@ -1,0 +1,43 @@
+#mailchimp-form .mailchimp-form-field-title {
+	font-size:16px;
+	margin-bottom:0.7em;
+}
+#mailchimp-form input[type="email"],
+#mailchimp-form input[type="text"] {
+	padding:8px 12px;
+	font-size: 14px;
+	margin-bottom:1em;
+	border:1px solid #ABABAB;
+}
+#mailchimp-form .mailchimp-form-submit {
+	padding:6px 10px;
+	font-size: 14px;
+	border:1px solid #ABABAB;
+	cursor:pointer;
+	background-color:#DEDEDE;
+}
+#mailchimp-form .mailchimp-form-field:hover,
+#mailchimp-form .mailchimp-form-field:focus,
+#mailchimp-form .mailchimp-form-submit:hover,
+#mailchimp-form .mailchimp-form-submit:focus {
+	border-color:#333;
+}
+
+#mailchimp-form .mailchimp-form-error,
+.mailchimp-form-updated {
+	border: 1px solid transparent;
+	font-size: 15px;
+	line-height: 1.467;
+	padding: 8px 12px;
+	list-style:none;
+}
+
+#mailchimp-form .mailchimp-form-error {
+	color: #E74C3C;
+	border-color: #E74C3C;
+}
+
+.mailchimp-form-updated {
+	color: #2ECC71;
+	border-color: #2ECC71;
+}

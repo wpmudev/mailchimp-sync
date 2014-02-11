@@ -27,6 +27,8 @@ class Incsub_Mailchimp_Widget extends WP_Widget {
 	}
 
 	public function validate() {
+		global $mailchimp_sync;
+
 		if ( isset( $_POST['action'] ) && 'incsub_mailchimp_subscribe_user' == $_POST['action'] ) {
 
 			if ( ! wp_verify_nonce( $_POST['_wpnonce'], 'mailchimp_subscribe_user' ) )
@@ -57,7 +59,7 @@ class Incsub_Mailchimp_Widget extends WP_Widget {
 					$user['first_name'] = $firstname;
 					$user['last_name'] = $lastname;
 
-					mailchimp_add_user( $user );
+					$mailchimp_sync->mailchimp_add_user( $user );
 
 					$link = add_query_arg( 'mailchimp-subscribed', 'true' );
 					$link .= '#incsub-mailchimp-widget-' . $this->number;
