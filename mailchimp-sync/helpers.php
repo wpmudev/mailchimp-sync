@@ -5,3 +5,4 @@ function mailchimp_load_API() {
 	$api = new MCAPI( $mailchimp_apikey );
 	return $api;
 }
+

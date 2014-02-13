@@ -4,19 +4,21 @@ jQuery(document).ready(function($) {
 		init: function() {
 			// Hiding labels
 			var inputs = $( '.incsub-mailchimp-form .incsub-mailchimp-field-wrap input' );
+
 			$.each( inputs, function( index, val ) {
 				 var label = $( '#incsub-mailchimp-label-' + $(val).data('label') );
+				 $(this).attr( 'placeholder', label.text() );
 				 label.hide();
 			});
 
-
+			// There could be more than one form in the same screen
 			var mailchimp_forms = $( '.incsub-mailchimp-form' );
 
 			if ( mailchimp_forms.length ) {
 				mailchimp_forms.submit( function(e) {
 					e.preventDefault();
-					alert();
 
+					// Populating form data
 					var elems = $(this).find('.incsub-mailchimp-field');
 
 					var form_data = {};
@@ -24,7 +26,7 @@ jQuery(document).ready(function($) {
 					    form_data[ $(this).attr("name") ] = $(this).val();
 					});
 
-					form_data['nonce'] = mailchimp_widget_captions.nonce;
+					form_data['nonce'] = mailchimp_form_captions.nonce;
 
 				  	mailchimp_widget.submit_form( form_data, $(this).attr('id') );
 				  	return false;
@@ -39,12 +41,16 @@ jQuery(document).ready(function($) {
 				.css('visibility', 'visible');
 
 			$.ajax({
-				url: mailchimp_widget_captions.ajaxurl,
+				url: mailchimp_form_captions.ajaxurl,
 				type: 'POST',
 				data: form_data
 			})
 			.done(function(return_data,xhr) {
-				$('.mailchimp-widget-error').hide();
+
+				the_form
+					.find('.incsub-mailchimp-error')
+					.hide();
+
 				if ( return_data.success ) {
 					the_form.find('*').detach();
 					var message_container = $('<p class="incsub-mailchimp-updated"></p>').text(return_data.data['message']).hide();

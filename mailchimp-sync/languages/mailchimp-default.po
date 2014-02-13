@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mailchimp\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-02-11 18:01+0100\n"
-"PO-Revision-Date: 2014-02-11 18:02+0100\n"
+"POT-Creation-Date: 2014-02-13 11:01+0100\n"
+"PO-Revision-Date: 2014-02-13 11:02+0100\n"
 "Last-Translator: Ignacio <igmoweb@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -141,26 +141,26 @@ msgstr ""
 msgid "(Last %d lines)"
 msgstr ""
 
-#: ../shortcode.php:51
+#: ../shortcode.php:44
 msgid "Thanks, your email has been added to our subscription list."
 msgstr ""
 
-#: ../shortcode.php:73
+#: ../shortcode.php:68
 msgid "Email address"
 msgstr ""
 
-#: ../shortcode.php:74
+#: ../shortcode.php:69
 msgid "ex: someone@mydomain.com"
 msgstr ""
 
-#: ../shortcode.php:83
-#: ../widget.php:94
-#: ../widget.php:162
+#: ../shortcode.php:78
+#: ../widget.php:117
+#: ../widget.php:211
 msgid "Subscribe"
 msgstr ""
 
-#: ../shortcode.php:102
-#: ../widget.php:44
+#: ../shortcode.php:98
+#: ../widget.php:66
 msgid "Please, insert a valid email"
 msgstr ""
 
@@ -172,59 +172,59 @@ msgstr ""
 msgid "Mailchimp"
 msgstr ""
 
-#: ../widget.php:49
+#: ../widget.php:71
 msgid "First name is required"
 msgstr ""
 
-#: ../widget.php:55
+#: ../widget.php:77
 msgid "Last name is required"
 msgstr ""
 
-#: ../widget.php:121
+#: ../widget.php:144
 msgid "First name"
 msgstr ""
 
-#: ../widget.php:122
+#: ../widget.php:145
 msgid "Last name"
 msgstr ""
 
-#: ../widget.php:123
+#: ../widget.php:146
 msgid "Email"
 msgstr ""
 
-#: ../widget.php:160
+#: ../widget.php:209
 msgid "Subscribe to MailChimp"
 msgstr ""
 
-#: ../widget.php:161
+#: ../widget.php:210
 msgid "Subscribe to our MailChimp list."
 msgstr ""
 
-#: ../widget.php:163
+#: ../widget.php:212
 msgid "Thank you, your email has been added to the list."
 msgstr ""
 
-#: ../widget.php:170
+#: ../widget.php:219
 msgid "Title:"
 msgstr ""
 
-#: ../widget.php:174
+#: ../widget.php:223
 msgid "Text:"
 msgstr ""
 
-#: ../widget.php:178
+#: ../widget.php:227
 msgid "Subscribe button text:"
 msgstr ""
 
-#: ../widget.php:182
+#: ../widget.php:231
 msgid "Text displayed when a user subscribes:"
 msgstr ""
 
-#: ../widget.php:187
+#: ../widget.php:236
 msgid "Require first name field"
 msgstr ""
 
-#: ../widget.php:191
+#: ../widget.php:240
 msgid "Require last name field"
 msgstr ""
 

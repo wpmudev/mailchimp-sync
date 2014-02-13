@@ -4,7 +4,7 @@ Plugin Name: MailChimp Sync
 Plugin URI: http://premium.wpmudev.org/project/mailchimp-newsletter-integration
 Description: Simply integrate MailChimp with your Multisite (or regular old single user WP) site - automatically add new users to your email lists and import all your existing users
 Author: WPMU DEV
-Version: 1.4
+Version: 1.4.1
 Author URI: http://premium.wpmudev.org
 Network: true
 WDP ID: 73
@@ -58,7 +58,10 @@ class WPMUDEV_MailChimp_Sync {
 		define( 'MAILCHIMP_MAX_LOG_LINES', 100 );
 		define( 'MAILCHIMP_LANG_DOMAIN', 'mailchimp' );
 		define( 'MAILCHIMP_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+		define( 'MAILCHIMP_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+
 		define( 'MAILCHIMP_ASSETS_URL', MAILCHIMP_PLUGIN_URL . 'assets/' );
+		define( 'MAILCHIMP_FRONT_DIR', MAILCHIMP_PLUGIN_DIR . 'front/' );
 	}
 
 	private function includes() {
@@ -88,7 +91,7 @@ class WPMUDEV_MailChimp_Sync {
 		}
 
 		if ( ! is_multisite() || ( is_multisite() && get_site_option( 'mailchimp_allow_shortcode', false ) ) ) {
-			require_once( 'shortcode.php' );
+			require_once( MAILCHIMP_FRONT_DIR . 'shortcode.php' );
 			new WPMUDEV_MailChimp_Shortcode();
 		}
 	}
@@ -104,7 +107,7 @@ class WPMUDEV_MailChimp_Sync {
 	function mailchimp_widget_init() {
 
 		if ( ! is_multisite() || ( is_multisite() && get_site_option( 'mailchimp_allow_widget', false ) ) ) {
-			require_once( 'widget.php' );
+			require_once( MAILCHIMP_FRONT_DIR . 'widget.php' );
 			register_widget( 'Incsub_Mailchimp_Widget' );
 		}
 	}
@@ -154,6 +157,7 @@ class WPMUDEV_MailChimp_Sync {
 		}
 		$merge_vars = apply_filters( 'mailchimp_merge_vars', $merge_vars, $user );
 
+		do_action( 'mailchimp_subscribe_user', $merge_vars, $user );
 		$mailchimp_subscribe = $api->listSubscribe( $mailchimp_mailing_list, $user->user_email, $merge_vars, '', $double_optin );
 
 		if ( ! $mailchimp_subscribe )
