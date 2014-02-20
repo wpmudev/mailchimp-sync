@@ -30,12 +30,18 @@ class Incsub_Mailchimp_Widget extends WP_Widget {
 
 		add_filter( 'mailchimp_form_require_field', array( &$this, 'set_require_field' ), 10, 3 );
 		add_filter( 'mailchimp_form_success_redirect', array( &$this, 'set_form_success_redirect' ) );
+		add_filter( 'mailchimp_form_subscribed_placeholder', array( &$this, 'set_form_success_placeholder' ), 10, 2 );
 
 	}
 
 	public function init_form() {
 		$instance = $this->get_settings();
+		
+		if ( ! isset( $instance[ $this->number ] ) )
+			return;
+
 		$instance = $instance[ $this->number ];
+
 		$form_args = array(
 	    	'text' => $instance['text'],
 	    	'subscribed' => isset( $_GET['mailchimp-subscribed'] ) && 'true' == $_GET['mailchimp-subscribed'],
@@ -44,15 +50,17 @@ class Incsub_Mailchimp_Widget extends WP_Widget {
 	    	'form_id' => 'incsub-mailchimp-widget-form-' . $this->number,
 	    	'form_class' => 'incsub-mailchimp-widget-form'
 	    );
+
 		$this->form = new WPMUDEV_MailChimp_Form( $form_args );
 	}
 
 	public function set_require_field( $require, $field, $form_id ) {
 		$instance = $this->get_settings();
-		if ( false !== $instance && $form_id == 'incsub-mailchimp-widget-form-' . $this->number ) {
-			$widget_settings = $instance [ $this->number ];
+		if ( false !== $instance && 'incsub-mailchimp-widget-form-' . $this->number == $form_id ) {
+			$widget_settings = $instance[ $this->number ];
 			$require = $widget_settings[ 'require_' . $field ];
 		}
+
 		
 		return $require;
 	}
@@ -63,12 +71,22 @@ class Incsub_Mailchimp_Widget extends WP_Widget {
 
 	public function set_form_success_redirect( $redirect_to ) {
 		$instance = $this->get_settings();
-		if ( false !== $instance && $form_id == 'incsub-mailchimp-widget-form-' . $this->number ) {
-			$widget_settings = $instance [ $this->number ];
+		if ( false !== $instance ) {
+			$widget_settings = $instance[ $this->number ];
 			$redirect_to .= '#incsub-mailchimp-widget-' . $this->number;
 		}
 		
 		return $redirect_to;
+	}
+
+	public function set_form_success_placeholder( $placeholder, $form_id ) {
+		$instance = $this->get_settings();
+		if ( false !== $instance && 'incsub-mailchimp-widget-form-' . $this->number == $form_id ) {
+			$widget_settings = $instance[ $this->number ];
+			$placeholder = $widget_settings['subscribed_placeholder'];
+		}
+		
+		return $placeholder;
 	}
 
 

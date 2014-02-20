@@ -6,9 +6,9 @@ jQuery(document).ready(function($) {
 			var inputs = $( '.incsub-mailchimp-form .incsub-mailchimp-field-wrap input' );
 
 			$.each( inputs, function( index, val ) {
-				 var label = $( '#incsub-mailchimp-label-' + $(val).data('label') );
-				 $(this).attr( 'placeholder', label.text() );
-				 label.hide();
+				var label = ( $(this).siblings('label'));				
+				$(this).attr( 'placeholder', label.text() );
+				label.hide();
 			});
 
 			// There could be more than one form in the same screen

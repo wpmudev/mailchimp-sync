@@ -61,8 +61,7 @@ class WPMUDEV_MailChimp_Form {
 		$this->enqueue_scripts = true;
 		$errors = $this->errors;
 		extract( $this->args );
-
-		include_once( 'form-template.php' );
+		include( 'form-template.php' );
 	}
 
 	public function validate_form() {
@@ -87,14 +86,14 @@ class WPMUDEV_MailChimp_Form {
 
 			$firstname = sanitize_text_field( $_POST['subscription-firstname'] );
 			$firstname = ! empty( $firstname ) ? $firstname : '';
-			$require_firstname = apply_filters( 'mailchimp_form_require_field', false, 'firstname', $this->form_id );
+			$require_firstname = apply_filters( 'mailchimp_form_require_field', false, 'firstname', $_POST['form_id'] );
 			if ( empty( $firstname ) && $require_firstname )
 				$errors[] = ( __( 'First name is required', MAILCHIMP_LANG_DOMAIN ) );
 
 			
 			$lastname = sanitize_text_field( $_POST['subscription-lastname'] );
 			$lastname = ! empty( $lastname ) ? $lastname : '';
-			$require_lastname = apply_filters( 'mailchimp_form_require_field', false, 'lastname', $this->form_id );
+			$require_lastname = apply_filters( 'mailchimp_form_require_field', false, 'lastname', $_POST['form_id'] );
 			if ( empty( $lastname ) && $require_lastname )
 				$errors[] = ( __( 'Last name is required', MAILCHIMP_LANG_DOMAIN ) );
 
@@ -114,7 +113,7 @@ class WPMUDEV_MailChimp_Form {
 					exit;		
 				}
 				else {
-					$text = apply_filters( 'mailchimp_form_subscribed_placeholder', __( 'Thank you, your email has been added to the list.', MAILCHIMP_LANG_DOMAIN ) );
+					$text = apply_filters( 'mailchimp_form_subscribed_placeholder', $this->args['subscribed_placeholder'], $_POST['form_id'] );
 					wp_send_json_success( array( 'message' => $text ) );
 				}
 			}
