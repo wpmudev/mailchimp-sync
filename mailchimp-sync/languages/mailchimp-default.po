@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mailchimp\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-02-13 11:01+0100\n"
-"PO-Revision-Date: 2014-02-13 11:02+0100\n"
+"POT-Creation-Date: 2014-04-25 14:32+0100\n"
+"PO-Revision-Date: 2014-04-25 14:32+0100\n"
 "Last-Translator: Ignacio <igmoweb@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -11,220 +11,246 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-KeywordsList: _;gettext;gettext_noop;__;_e\n"
 "X-Poedit-Basepath: .\n"
+"X-Generator: Poedit 1.5.4\n"
 "X-Poedit-SearchPath-0: ..\n"
 
-#: ../admin_page.php:15
+#: ../admin_page.php:17
 msgid "Settings"
 msgstr ""
 
-#: ../admin_page.php:16
-#: ../admin_page.php:168
+#: ../admin_page.php:21 ../admin_page.php:167
 msgid "Import"
 msgstr ""
 
-#: ../admin_page.php:17
+#: ../admin_page.php:23
 msgid "Error Log"
 msgstr ""
 
-#: ../admin_page.php:33
-#: ../admin_page.php:36
+#: ../admin_page.php:38 ../admin_page.php:41
 msgid "MailChimp Settings"
 msgstr ""
 
-#: ../admin_page.php:179
+#: ../admin_page.php:178
 msgid "Settings updated"
 msgstr ""
 
-#: ../admin_page.php:183
+#: ../admin_page.php:182
 #, php-format
-msgid "%d users added, %d updated, and %d spam users removed from your list."
+msgid "%d users added, %d updated, and %d errors."
 msgstr ""
 
-#: ../admin_page.php:229
-msgid "After you have entered a valid API key you will be able to select different MailChimp options below."
+#: ../admin_page.php:230
+msgid ""
+"After you have entered a valid API key you will be able to select different "
+"MailChimp options below."
 msgstr ""
 
-#: ../admin_page.php:236
+#: ../admin_page.php:237
 msgid "MailChimp API Key"
 msgstr ""
 
-#: ../admin_page.php:238
-msgid "Visit <a href=\"http://admin.mailchimp.com/account/api\" target=\"_blank\">your API dashboard</a> to create an API key."
+#: ../admin_page.php:239
+msgid ""
+"Visit <a href=\"http://admin.mailchimp.com/account/api\" target=\"_blank"
+"\">your API dashboard</a> to create an API key."
 msgstr ""
 
-#: ../admin_page.php:246
-#: ../admin_page.php:305
+#: ../admin_page.php:247 ../admin_page.php:306
 msgid "API Key Test"
 msgstr ""
 
-#: ../admin_page.php:247
+#: ../admin_page.php:248
 msgid "Passed"
 msgstr ""
 
-#: ../admin_page.php:251
-#: ../admin_page.php:353
+#: ../admin_page.php:252 ../admin_page.php:356
 msgid "Auto Opt-in"
 msgstr ""
 
-#: ../admin_page.php:254
-#: ../admin_page.php:264
-#: ../admin_page.php:356
+#: ../admin_page.php:255 ../admin_page.php:265 ../admin_page.php:359
 msgid "Yes"
 msgstr ""
 
-#: ../admin_page.php:255
-#: ../admin_page.php:265
-#: ../admin_page.php:357
+#: ../admin_page.php:256 ../admin_page.php:266 ../admin_page.php:360
 msgid "No"
 msgstr ""
 
-#: ../admin_page.php:257
-#: ../admin_page.php:359
-msgid "Automatically opt-in new users to the mailing list. Users will not receive an email confirmation. Use at your own risk."
+#: ../admin_page.php:258 ../admin_page.php:362
+msgid ""
+"Automatically opt-in new users to the mailing list. Users will not receive "
+"an email confirmation. Use at your own risk."
 msgstr ""
 
-#: ../admin_page.php:261
+#: ../admin_page.php:262
 msgid "Ignore email addresses including + signs"
 msgstr ""
 
-#: ../admin_page.php:267
-msgid "Ignore email address including + signs. These are usually duplicate accounts."
+#: ../admin_page.php:268
+msgid ""
+"Ignore email address including + signs. These are usually duplicate accounts."
 msgstr ""
 
-#: ../admin_page.php:272
-msgid "You must have at least one MailChimp mailing list in order to use this plugin. Please create a mailing list via the MailChimp admin panel."
+#: ../admin_page.php:273
+msgid ""
+"You must have at least one MailChimp mailing list in order to use this "
+"plugin. Please create a mailing list via the MailChimp admin panel."
 msgstr ""
 
-#: ../admin_page.php:275
-#: ../admin_page.php:340
+#: ../admin_page.php:276 ../admin_page.php:343
 msgid "Mailing List"
 msgstr ""
 
-#: ../admin_page.php:279
+#: ../admin_page.php:280
 msgid "Please select a mailing list"
 msgstr ""
 
-#: ../admin_page.php:285
+#: ../admin_page.php:286
 msgid "Select a mailing list you want to have new users added to."
 msgstr ""
 
-#: ../admin_page.php:292
+#: ../admin_page.php:293
 msgid "Allow widget in all subsites"
 msgstr ""
 
-#: ../admin_page.php:297
+#: ../admin_page.php:298
 msgid "Allow shortcode use in all subsites"
 msgstr ""
 
-#: ../admin_page.php:306
+#: ../admin_page.php:307
 msgid "Failed - Please check your key and try again."
 msgstr ""
 
-#: ../admin_page.php:334
+#: ../admin_page.php:337
 msgid "Sync Existing Users"
 msgstr ""
 
-#: ../admin_page.php:335
-msgid "This function will syncronize all existing users on your install with your MailChimp list, adding new ones, updating the first/last name of previously imported users, and removing spammed or deleted users from your selected list. Note you really only need to do this once after installing, it is carried on automatically after installation."
+#: ../admin_page.php:338
+msgid ""
+"This function will syncronize all existing users on your install with your "
+"MailChimp list, adding new ones, updating the first/last name of previously "
+"imported users, and removing spammed or deleted users from your selected "
+"list. Note you really only need to do this once after installing, it is "
+"carried on automatically after installation."
 msgstr ""
 
-#: ../admin_page.php:349
+#: ../admin_page.php:352
 msgid "The mailing list you want to import existing users to."
 msgstr ""
 
-#: ../admin_page.php:384
+#: ../admin_page.php:387
 msgid "Error log"
 msgstr ""
 
-#: ../admin_page.php:384
+#: ../admin_page.php:387
 #, php-format
 msgid "(Last %d lines)"
 msgstr ""
 
-#: ../shortcode.php:44
-msgid "Thanks, your email has been added to our subscription list."
-msgstr ""
-
-#: ../shortcode.php:68
-msgid "Email address"
-msgstr ""
-
-#: ../shortcode.php:69
-msgid "ex: someone@mydomain.com"
-msgstr ""
-
-#: ../shortcode.php:78
-#: ../widget.php:117
-#: ../widget.php:211
-msgid "Subscribe"
-msgstr ""
-
-#: ../shortcode.php:98
-#: ../widget.php:66
-msgid "Please, insert a valid email"
-msgstr ""
-
-#: ../widget.php:19
-msgid "This widget allows visitors to subscribe to a Mailchimp email list (set by the network administrator)."
-msgstr ""
-
-#: ../widget.php:23
-msgid "Mailchimp"
-msgstr ""
-
-#: ../widget.php:71
-msgid "First name is required"
-msgstr ""
-
-#: ../widget.php:77
-msgid "Last name is required"
-msgstr ""
-
-#: ../widget.php:144
-msgid "First name"
-msgstr ""
-
-#: ../widget.php:145
-msgid "Last name"
-msgstr ""
-
-#: ../widget.php:146
-msgid "Email"
-msgstr ""
-
-#: ../widget.php:209
-msgid "Subscribe to MailChimp"
-msgstr ""
-
-#: ../widget.php:210
+#: ../front/form.class.php:12 ../front/widget.php:141
+#: ../front/shortcode.php:148
 msgid "Subscribe to our MailChimp list."
 msgstr ""
 
-#: ../widget.php:212
+#: ../front/form.class.php:13 ../front/widget.php:49 ../front/widget.php:142
+#: ../front/shortcode.php:160
+msgid "Subscribe"
+msgstr ""
+
+#: ../front/form.class.php:14 ../front/widget.php:143
+#: ../front/shortcode.php:154
 msgid "Thank you, your email has been added to the list."
 msgstr ""
 
-#: ../widget.php:219
+#: ../front/form.class.php:85
+msgid "Please, insert a valid email"
+msgstr ""
+
+#: ../front/form.class.php:91
+msgid "First name is required"
+msgstr ""
+
+#: ../front/form.class.php:98
+msgid "Last name is required"
+msgstr ""
+
+#: ../front/form-template.php:21
+msgid "First name"
+msgstr ""
+
+#: ../front/form-template.php:26
+msgid "Last name"
+msgstr ""
+
+#: ../front/form-template.php:31
+msgid "Email"
+msgstr ""
+
+#: ../front/widget.php:22
+msgid ""
+"This widget allows visitors to subscribe to a Mailchimp email list (set by "
+"the network administrator)."
+msgstr ""
+
+#: ../front/widget.php:26
+msgid "Mailchimp"
+msgstr ""
+
+#: ../front/widget.php:140
+msgid "Subscribe to MailChimp"
+msgstr ""
+
+#: ../front/widget.php:150
 msgid "Title:"
 msgstr ""
 
-#: ../widget.php:223
+#: ../front/widget.php:154
 msgid "Text:"
 msgstr ""
 
-#: ../widget.php:227
+#: ../front/widget.php:158
 msgid "Subscribe button text:"
 msgstr ""
 
-#: ../widget.php:231
+#: ../front/widget.php:162
 msgid "Text displayed when a user subscribes:"
 msgstr ""
 
-#: ../widget.php:236
+#: ../front/widget.php:167
 msgid "Require first name field"
 msgstr ""
 
-#: ../widget.php:240
+#: ../front/widget.php:171
 msgid "Require last name field"
 msgstr ""
 
+#: ../front/shortcode.php:83
+msgid "Mailchimp Shortcode"
+msgstr ""
+
+#: ../front/shortcode.php:147
+msgid "Form title"
+msgstr ""
+
+#: ../front/shortcode.php:153
+msgid "Text displayed when a user subscribes"
+msgstr ""
+
+#: ../front/shortcode.php:159
+msgid "Subscribe button text"
+msgstr ""
+
+#: ../front/shortcode.php:166
+msgid "Require First Name"
+msgstr ""
+
+#: ../front/shortcode.php:172
+msgid "Require Last Name"
+msgstr ""
+
+#: ../front/shortcode.php:178
+msgid "Cancel"
+msgstr ""
+
+#: ../front/shortcode.php:182
+msgid "Insert"
+msgstr ""
