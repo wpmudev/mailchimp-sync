@@ -11,11 +11,16 @@ class WPMUDEV_MailChimp_Admin {
 		add_action( 'admin_menu', array( $this, 'add_page' ) );
 		add_action( 'network_admin_menu', array( $this, 'add_page' ) );
 
+		$api = mailchimp_load_API();
+
 		$this->tabs = array(
-			'settings' 	=> __( 'Settings', MAILCHIMP_LANG_DOMAIN ),
-			'import'	=> __( 'Import', MAILCHIMP_LANG_DOMAIN ),
-			'error-log'	=> __( 'Error Log', MAILCHIMP_LANG_DOMAIN )
+			'settings' 	=> __( 'Settings', MAILCHIMP_LANG_DOMAIN )
 		);
+
+		if ( ! is_wp_error( $api ) )
+			$this->tabs['import'] = __( 'Import', MAILCHIMP_LANG_DOMAIN );
+
+		$this->tabs['error-log'] = __( 'Error Log', MAILCHIMP_LANG_DOMAIN );
 
 		$this->capability = is_multisite() ? 'manage_network' : 'manage_options';
 	}
@@ -81,81 +86,75 @@ class WPMUDEV_MailChimp_Admin {
 
 			if ( $_POST['action'] == 'submit-import' ) {
 				global $wpdb, $mailchimp_sync;
-				$api = mailchimp_load_API();
+
 				$mailchimp_import_mailing_list = $_POST['mailchimp_import_mailing_list'];
 				$mailchimp_import_auto_opt_in = $_POST['mailchimp_import_auto_opt_in'];
-				if ( !empty( $mailchimp_import_mailing_list ) ) {
+				if ( ! empty( $mailchimp_import_mailing_list ) ) {
 					set_time_limit(0);
-					$mailchimp_ignore_plus = get_site_option('mailchimp_ignore_plus');
+					$mailchimp_ignore_plus = get_site_option( 'mailchimp_ignore_plus' );
 
-					$query = "SELECT u.*, m.meta_key, m.meta_value FROM {$wpdb->users} u LEFT JOIN {$wpdb->usermeta} m ON u.ID = m.user_id WHERE m.meta_key IN ('first_name', 'last_name')";
-					$existing_users = $wpdb->get_results( $query, ARRAY_A );
 
+					$query = "SELECT u.ID FROM {$wpdb->users} u";
+					$existing_users = $wpdb->get_col( $query );
+
+					
         			$add_list = array();
-        			$remove_list = array();
-        			$unsubscribed_list = $mailchimp_sync->mailchimp_get_unsubscribed_users( $api, $mailchimp_import_mailing_list );
-        			
-        			if ( $existing_users ) {
+        			foreach ( $existing_users as $user_id ) {
+        				$user = get_user_by( 'id', $user_id );
 
-						foreach ( $existing_users as $user ) {
-							//skip + signs
-							if ( $mailchimp_ignore_plus == 'yes' ) {
-								if ( strstr($user['user_email'], '+') ) {
-               						$remove_list[$user['ID']] = $user['user_email'];
-               						continue;
-								}
-							}
-							//remove spammed users
-							if ( $user['spam'] || $user['deleted'] || $user['user_status'] == 1 ) {
-              					$remove_list[$user['ID']] = $user['user_email'];
-              					continue;
-            				}
-							
-							if ( ! in_array( $user['user_email'], $unsubscribed_list ) ) {
-								//add email
-								$add_list[$user['ID']]['EMAIL'] = $user['user_email'];
-								$add_list[$user['ID']]['EMAIL_TYPE'] = 'html';
+        				if ( ! $user || ! empty( $user->spam ) || ! empty( $user->deleted ) )
+        					continue;
 
-								//add first last names
-								if ( $user['meta_key'] == 'first_name' )
-					            	$add_list[$user['ID']]['FNAME'] = html_entity_decode($user['meta_value']);
-					            else if ( $user['meta_key'] == 'last_name' )
-					            	$add_list[$user['ID']]['LNAME'] = html_entity_decode($user['meta_value']);
+        				$item = array(
+        					'email' => array( 'email' => $user->user_email )
+        				);
 
+        				$merge_vars = array();
+        				if ( $first_name = get_user_meta( $user_id, 'first_name', true ) )
+        					$merge_vars['FNAME'] = $first_name;
 
-				           		$add_list[$user['ID']] = apply_filters('mailchimp_bulk_merge_vars', $add_list[$user['ID']], $user['ID']);
-				           	}
-				        }
+        				if ( $last_name = get_user_meta( $user_id, 'last_name', true ) )
+        					$merge_vars['LNAME'] = $last_name;
 
-						if ( $mailchimp_import_auto_opt_in == 'yes' ) {
-							$double_optin = false;
-						} else {
-							$double_optin = true;
-						}
-						
-						
-						//add good users
-						$add_result = $api->listBatchSubscribe($mailchimp_import_mailing_list, $add_list, $double_optin, true);
+        				$merge_vars = apply_filters( 'mailchimp_bulk_merge_vars', $merge_vars, $item, $user_id );
 
-						if ( $add_result['error_count'] )
-							$mailchimp_sync->mailchimp_log_errors( $add_result['errors'] );
-						
-						
-						//remove bad users
-						$remove_result = $api->listBatchUnsubscribe($mailchimp_import_mailing_list, $remove_list, true, false);
-							
+        				$item['merge_vars'] = $merge_vars;
+        				$add_list[] = $item; 
+        			}
 
-						wp_redirect( add_query_arg( array( 
+        			if ( ! empty( $add_list ) ) {
+        				$mailchimp_import_auto_opt_in == 'yes' ? true : false;
+        				$results = mailchimp_bulk_subscribe_users( $add_list, $mailchimp_import_mailing_list, $mailchimp_import_auto_opt_in, true );
+
+        				if ( $results['errors'] ) {
+        					$errors = array();
+        					foreach ( $results['errors'] as $error ) {
+        						if ( ! is_wp_error( $error ) )
+        							continue;
+
+        						$errors[] = array(
+        							'code' => $error->get_error_code(),
+        							'message' => $error->get_error_message(),
+        							'email' => ''
+        						);
+        					}
+
+        					$mailchimp_sync->mailchimp_log_errors( $errors );
+        					
+        				}
+
+        				wp_redirect( add_query_arg( array( 
 								'imported' => 'true',
-								'a' => $add_result['add_count'],
-								'u' => $add_result['update_count'],
-								's' => isset ( $remove_result['success_count'] ) ? $remove_result['success_count'] : 0,
+								'a' => count( $results['added'] ),
+								'u' => count( $results['updated'] ),
+								'e' => count( $results['errors'] ),
 								'tab' => 'import'
 							),
 							$redirect_to ) 
 						);
-						exit();						
-					}
+						exit();	
+        			}
+        			
 				}
 			}
 
@@ -180,7 +179,7 @@ class WPMUDEV_MailChimp_Admin {
 				<?php endif; ?>
 
 				<?php if ( isset( $_GET['imported'] ) ): ?>
-					<div class="updated"><p><?php printf( __('%d users added, %d updated, and %d spam users removed from your list.', MAILCHIMP_LANG_DOMAIN), $_GET['a'], $_GET['u'], $_GET['s'] ); ?></p></div>
+					<div class="updated"><p><?php printf( __('%d users added, %d updated, and %d errors.', MAILCHIMP_LANG_DOMAIN), $_GET['a'], $_GET['u'], $_GET['e'] ); ?></p></div>
 				<?php endif; ?>
 
 				
@@ -194,16 +193,17 @@ class WPMUDEV_MailChimp_Admin {
 					
 						if ( 'settings' == $this->get_current_tab() ) {
 							$this->render_settings_tab();
+							submit_button( $submit_text, 'primary', 'submit-mailchimp-settings' );
 						}
 						elseif ( 'import' == $this->get_current_tab() ) {
 							$this->render_import_tab();
+							submit_button( $submit_text, 'primary', 'submit-mailchimp-settings' );
 						}
 						elseif ( 'error-log' == $this->get_current_tab() ) {
 							$this->render_error_log_tab();
 						}
 					?>
 
-					<?php submit_button( $submit_text, 'primary', 'submit-mailchimp-settings' ); ?>
 				</form>
 			</div>
 		<?php
@@ -219,10 +219,11 @@ class WPMUDEV_MailChimp_Admin {
 
 		if ( ! empty( $mailchimp_apikey ) ) {
 			$api = mailchimp_load_API();
-        	$api->ping();
-        	$mailchimp_lists = $api->lists();
-			$mailchimp_lists = $mailchimp_lists['data'];
-			$api_error = ! empty( $api->errorMessage );
+			if ( is_wp_error( $api ) )
+				$api_error = $api->get_error_message();
+        	
+        	$mailchimp_lists = mailchimp_get_lists();
+			$api_error = ! empty( $api_error );
 		}
 
 		if ( empty( $mailchimp_apikey ) ): ?>
@@ -324,11 +325,13 @@ class WPMUDEV_MailChimp_Admin {
 
 		if ( ! empty( $mailchimp_apikey ) ) {
 			$api = mailchimp_load_API();
-        	$api->ping();
-        	$mailchimp_lists = $api->lists();
-			$mailchimp_lists = $mailchimp_lists['data'];
-			$api_error = ! empty( $api->errorMessage );
+			if ( is_wp_error( $api ) )
+				$api_error = $api->get_error_message();
+        	
+        	$mailchimp_lists = mailchimp_get_lists();
+			$api_error = ! empty( $api_error );
 		}
+		
 
 		if ( is_array( $mailchimp_lists ) && count( $mailchimp_lists ) ): ?>
 			<h3><?php _e('Sync Existing Users', MAILCHIMP_LANG_DOMAIN) ?></h3>

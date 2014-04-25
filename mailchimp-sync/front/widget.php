@@ -7,7 +7,7 @@ class Incsub_Mailchimp_Widget extends WP_Widget {
 	private $errors = array();
 	private $success;
 	private $enqueue_scripts = false;
-	private $form;
+	private $form = null;
 
 	/**
 	 * Widget setup.
@@ -25,7 +25,7 @@ class Incsub_Mailchimp_Widget extends WP_Widget {
 		/* Create the widget. */
 		parent::WP_Widget( 'incsub-mailchimp-widget' , __( 'Mailchimp', MAILCHIMP_LANG_DOMAIN ), $widget_ops );
 
-		add_action( 'wp_loaded', array( &$this, 'init_form' ) );
+		add_action( 'init', array( &$this, 'init_form' ) );
 		add_action( 'wp_enqueue_scripts', array( &$this, 'register_scripts' ) );
 
 		add_filter( 'mailchimp_form_require_field', array( &$this, 'set_require_field' ), 10, 3 );
@@ -36,10 +36,10 @@ class Incsub_Mailchimp_Widget extends WP_Widget {
 
 	public function init_form() {
 		$instance = $this->get_settings();
-		
+
 		if ( ! isset( $instance[ $this->number ] ) )
 			return;
-
+		
 		$instance = $instance[ $this->number ];
 
 		$form_args = array(
@@ -52,6 +52,7 @@ class Incsub_Mailchimp_Widget extends WP_Widget {
 	    );
 
 		$this->form = new WPMUDEV_MailChimp_Form( $form_args );
+		
 	}
 
 	public function set_require_field( $require, $field, $form_id ) {
@@ -66,7 +67,8 @@ class Incsub_Mailchimp_Widget extends WP_Widget {
 	}
 
 	public function register_scripts() {
-		$this->form->register_scripts();
+		if ( ! is_null( $this->form ) )
+			$this->form->register_scripts();
 	}
 
 	public function set_form_success_redirect( $redirect_to ) {

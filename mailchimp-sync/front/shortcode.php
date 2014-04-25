@@ -141,7 +141,7 @@ class WPMUDEV_MailChimp_Shortcode {
 		    </head>
 
 		    <body id="link">
-		        <form name="themedelta" action="#">
+		        <form action="#">
 		            <div class="mailchimp-admin-shortcode-field">
 						<label>
 							<?php _e( 'Form title', MAILCHIMP_LANG_DOMAIN ); ?> <br/>
