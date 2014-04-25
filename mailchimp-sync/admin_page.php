@@ -319,7 +319,6 @@ class WPMUDEV_MailChimp_Admin {
 	private function render_import_tab() {
 		$mailchimp_apikey = get_site_option('mailchimp_apikey', '');
 		$mailchimp_mailing_list = get_site_option('mailchimp_mailing_list');
-		$mailchimp_auto_opt_in = get_site_option('mailchimp_auto_opt_in');
 		$mailchimp_ignore_plus = get_site_option('mailchimp_ignore_plus');
 		$mailchimp_allow_widget = get_site_option('mailchimp_allow_widget', false);
 
