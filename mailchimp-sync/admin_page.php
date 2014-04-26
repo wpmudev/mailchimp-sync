@@ -11,17 +11,6 @@ class WPMUDEV_MailChimp_Admin {
 		add_action( 'admin_menu', array( $this, 'add_page' ) );
 		add_action( 'network_admin_menu', array( $this, 'add_page' ) );
 
-		$api = mailchimp_load_API();
-
-		$this->tabs = array(
-			'settings' 	=> __( 'Settings', MAILCHIMP_LANG_DOMAIN )
-		);
-
-		if ( ! is_wp_error( $api ) )
-			$this->tabs['import'] = __( 'Import', MAILCHIMP_LANG_DOMAIN );
-
-		$this->tabs['error-log'] = __( 'Error Log', MAILCHIMP_LANG_DOMAIN );
-
 		$this->capability = is_multisite() ? 'manage_network' : 'manage_options';
 	}
 
@@ -41,7 +30,21 @@ class WPMUDEV_MailChimp_Admin {
 			$this->page_id = add_options_page( __( 'MailChimp Settings', MAILCHIMP_LANG_DOMAIN ), 'MailChimp', $this->capability, 'mailchimp', array( $this, 'render_page' ) );
 		}
 
+		add_action( 'load-' . $this->page_id, array( $this, 'generate_tabs' ) );
 		add_action( 'load-' . $this->page_id, array( $this, 'process_form' ) );
+	}
+
+	public function generate_tabs() {
+		$api = mailchimp_load_API();
+
+		$this->tabs = array(
+			'settings' 	=> __( 'Settings', MAILCHIMP_LANG_DOMAIN )
+		);
+
+		if ( ! is_wp_error( $api ) )
+			$this->tabs['import'] = __( 'Import', MAILCHIMP_LANG_DOMAIN );
+
+		$this->tabs['error-log'] = __( 'Error Log', MAILCHIMP_LANG_DOMAIN );
 	}
 
 	public function process_form() {

@@ -33,7 +33,12 @@ function mailchimp_load_API() {
 		$options['debug'] = $debug;
 	}
 
-	$api = new Mailchimp( $mailchimp_apikey, $options );
+	try {
+		$api = new Mailchimp( $mailchimp_apikey, $options );
+	}
+	catch ( Exception $e ) {
+		return new WP_Error( $e->getCode(), $e->getMessage() );
+	}
 
 	// Pinging the server
 	$ping = $api->helper->ping();
