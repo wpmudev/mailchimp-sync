@@ -118,11 +118,17 @@ class Mailchimp {
     public $ssl_cainfo = null;
 
     /**
+     * Timeout setting
+     * @var  bool
+     */
+    public $timeout = 600;
+
+    /**
      * the api key in use
      * @var  string
      */
     public $apikey;
-    public $ch;
+
     public $root = 'https://api.mailchimp.com/2.0';
     /**
      * whether debug mode is enabled
@@ -233,31 +239,20 @@ class Mailchimp {
         $this->root = str_replace('https://api', 'https://'.$dc.'.api', $this->root);
         $this->root = rtrim($this->root, '/') . '/';
 
-        if (!isset($opts['timeout']) || !is_int($opts['timeout'])){
-            $opts['timeout']=600;
-        }
-        if (isset($opts['debug'])){
+        if ( isset( $opts['timeout'] ) && is_int( $opts['timeout'] ) )
+            $this->timeout = absint( $opts['ssl_verifypeer'] );
+
+        if ( isset( $opts['debug'] ) )
             $this->debug = true;
-        }
-        if (isset($opts['ssl_verifypeer'])){
+
+        if ( isset( $opts['ssl_verifypeer'] ) )
             $this->ssl_verifypeer = $opts['ssl_verifypeer'];
-        }
-        if (isset($opts['ssl_verifyhost'])){
+
+        if ( isset( $opts['ssl_verifyhost'] ) )
             $this->ssl_verifyhost = $opts['ssl_verifyhost'];
-        }
-        if (isset($opts['ssl_cainfo'])){
+
+        if ( isset( $opts['ssl_cainfo'] ) )
             $this->ssl_cainfo = $opts['ssl_cainfo'];
-        }
-
-
-        $this->ch = curl_init();
-        curl_setopt($this->ch, CURLOPT_USERAGENT, 'MailChimp-PHP/2.0.4');
-        curl_setopt($this->ch, CURLOPT_POST, true);
-        curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($this->ch, CURLOPT_HEADER, false);
-        curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($this->ch, CURLOPT_CONNECTTIMEOUT, 30);
-        curl_setopt($this->ch, CURLOPT_TIMEOUT, $opts['timeout']);
 
 
         $this->folders = new Mailchimp_Folders($this);
@@ -274,49 +269,56 @@ class Mailchimp {
         $this->gallery = new Mailchimp_Gallery($this);
     }
 
-    public function __destruct() {
-        curl_close($this->ch);
-    }
-
     public function call($url, $params) {
+
         $params['apikey'] = $this->apikey;
         $params = json_encode($params);
-        $ch = $this->ch;
-
-        curl_setopt($ch, CURLOPT_URL, $this->root . $url . '.json');
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
-        curl_setopt($ch, CURLOPT_VERBOSE, $this->debug);
-        // SSL Options
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->ssl_verifypeer);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $this->ssl_verifyhost);
-        if ($this->ssl_cainfo) curl_setopt($ch, CURLOPT_CAINFO, $this->ssl_cainfo);
 
         $start = microtime(true);
         $this->log('Call to ' . $this->root . $url . '.json: ' . $params);
-        if($this->debug) {
-            $curl_buffer = fopen('php://memory', 'w+');
-            curl_setopt($ch, CURLOPT_STDERR, $curl_buffer);
+
+        $args = array(
+            'timeout'     => $this->timeout,
+            'user-agent'  => 'MailChimp-PHP/2.0.4',
+            'blocking'    => true,
+            'headers'     => array( 'Content-Type' => 'application/json' ),
+            'body'        => $params,
+            'sslverify'   => $this->ssl_verifypeer,
+            'filename'    => null
+        );
+
+        if ( $this->ssl_cainfo )
+            $args['sslcertificates'] = $this->ssl_cainfo;
+
+        $response = wp_remote_post( $this->root . $url . '.json', $args );
+
+        if ( is_wp_error( $response ) ) {
+            $this->log_errors(
+                array( array(  
+                    'code' => $response->get_error_code(),
+                    'message' => $response->get_error_message()
+                ) )
+            );
+            return $response;
         }
 
-        $response_body = curl_exec($ch);
-        $info = curl_getinfo($ch);
+        $response_body = wp_remote_retrieve_body( $response );
+
         $time = microtime(true) - $start;
-        if($this->debug) {
-            rewind($curl_buffer);
-            $this->log(stream_get_contents($curl_buffer));
-            fclose($curl_buffer);
-        }
+
         $this->log('Completed in ' . number_format($time * 1000, 2) . 'ms');
         $this->log('Got response: ' . $response_body);
 
-        if(curl_error($ch)) {
-            return new WP_Error( 'mc_api_call', "API call to $url failed: " . curl_error($ch) );
-        }
         $result = json_decode($response_body, true);
         
-        if(floor($info['http_code'] / 100) >= 4) {
+        if( floor( $response['response']['code'] / 100 ) >= 4 ) {
             $error = $this->castError($result);
+            $this->log_errors(
+                array( array(  
+                    'code' => $error->getCode(),
+                    'message' => $error->getMessage()
+                ) )
+            );
             return new WP_Error( $error->getCode(), $error->getMessage() );
         }
 
@@ -343,6 +345,41 @@ class Mailchimp {
 
     public function log($msg) {
         if($this->debug) error_log($msg);
+    }
+
+    public function log_errors( $errors ) {
+        if ( ! is_array( $errors ) )
+            $errors = array( $errors );
+
+        $current_log = get_site_option( 'mailchimp_error_log' );
+        $new_log = array();
+
+
+        foreach ( $errors as $error ) {
+
+            $code = isset( $error['code'] ) ? $error['code'] : 0;
+            $message = isset( $error['message'] ) ? $error['message'] : '';
+            $email = isset( $error['email'] ) ? $error['email'] : '';
+            $date = date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), current_time( 'timestamp' ) );
+
+            $new_log[] = compact( 'code', 'message', 'email', 'date' );
+            
+        }
+
+
+        if ( $current_log ) {
+
+            $new_log = array_merge( $current_log, $new_log );
+
+            // We'll only saved the last X lines of the log
+            $count = count( $new_log );
+            if ( $count > MAILCHIMP_MAX_LOG_LINES ) {
+                $new_log = array_slice( $new_log, $count - $offset - 1 );
+            }
+            
+        }
+
+        update_site_option( 'mailchimp_error_log', $new_log );
     }
 }
 

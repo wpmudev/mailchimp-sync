@@ -29,6 +29,8 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class WPMUDEV_MailChimp_Sync {
 
+	public $api = null;
+
 	public function __construct() {
 		$this->set_globals();
 		$this->includes();
@@ -147,15 +149,6 @@ class WPMUDEV_MailChimp_Sync {
 		do_action( 'mailchimp_subscribe_user', $merge_vars, $user );
 
 		$results = mailchimp_subscribe_user( $user->user_email, $mailchimp_mailing_list, $autopt, $merge_vars, true );
-
-		if ( is_wp_error( $results ) ) {
-			$error = array( array(
-				'code' => $results->get_error_code(),
-				'message' => $results->get_error_message(),
-				'email' => $user->user_email
-			) );
-			$this->mailchimp_log_errors( $error );
-		}
 	}
 
 
@@ -176,15 +169,6 @@ class WPMUDEV_MailChimp_Sync {
 	  	do_action( 'mailchimp_update_user', $merge_vars, $user );
 
 		$results = mailchimp_update_user( $mailchimp_mailing_list, $user->user_email, $merge_vars );
-		
-		if ( is_wp_error( $results ) ) {
-			$error = array( array(
-				'code' => $results->get_error_code(),
-				'message' => $results->get_error_message(),
-				'email' => $user->user_email
-			) );
-			$this->mailchimp_log_errors( $error );
-		}
 
 	}
 
@@ -198,14 +182,6 @@ class WPMUDEV_MailChimp_Sync {
 		$mailchimp_mailing_list = get_site_option('mailchimp_mailing_list');
 
 		$results = mailchimp_unsubscribe_user( $user->user_email, $mailchimp_mailing_list );
-		if ( is_wp_error( $results ) ) {
-			$error = array( array(
-				'code' => $results->get_error_code(),
-				'message' => $results->get_error_message(),
-				'email' => $user->user_email
-			) );
-			$this->mailchimp_log_errors( $error );
-		}
 	}
 
 	function mailchimp_blog_users_remove( $blog_id ) {
@@ -221,19 +197,6 @@ class WPMUDEV_MailChimp_Sync {
 		}
 
 		$results = mailchimp_bulk_unsubscribe_users( $emails, $mailchimp_mailing_list );
-
-		if ( ! empty( $results['errors'] ) ) {
-			$errors = array();
-			foreach ( $results['errors'] as $error ) {
-				$errors[] = array(
-					'code' => $results->get_error_code(),
-					'message' => $results->get_error_message(),
-					'email' => ''
-				);
-			}
-
-			$this->mailchimp_log_errors( $errors );
-		}
 	}
 
 	function mailchimp_bp_spamming( $user_id, $is_spam ) {

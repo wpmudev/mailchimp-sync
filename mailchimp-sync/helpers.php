@@ -6,6 +6,11 @@
  * @return Mailchimp Object
  */
 function mailchimp_load_API() {
+	global $mailchimp_sync;
+
+	if ( ! empty( $mailchimp_sync->api ) )
+		return $mailchimp_sync->api;
+
 	require_once( 'mailchimp-api/Mailchimp.php' );
 	$mailchimp_apikey = get_site_option('mailchimp_apikey');
 
@@ -45,6 +50,8 @@ function mailchimp_load_API() {
 
 	if ( is_wp_error( $ping ) )
 		return $ping;
+
+	$mailchimp_sync->api = $api;
 
 	return $api;
 }

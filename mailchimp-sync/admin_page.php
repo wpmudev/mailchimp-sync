@@ -1,5 +1,73 @@
 <?php
 
+add_action( 'wp_ajax_mailchimp_import', 'mailchimp_import_process' );
+function mailchimp_import_process() {
+	global $wpdb;
+
+	check_ajax_referer( 'mailchimp-import', 'nonce' );
+
+	$mailchimp_stats = $_POST['mailchimp_stats'];
+
+	$mailchimp_import_mailing_list = $_POST['mailchimp_import_mailing_list'];
+	$mailchimp_import_auto_opt_in = $_POST['mailchimp_import_auto_opt_in'];
+
+	if ( ! empty( $mailchimp_import_mailing_list ) ) {
+		$mailchimp_ignore_plus = get_site_option( 'mailchimp_ignore_plus' );
+
+		$users_count = absint( $_POST['import_user_counts'] );
+		$import_users_batch = apply_filters( 'mailchimp_import_users_batch', 200 );
+
+		$query = "SELECT u.ID FROM {$wpdb->users} u LIMIT $users_count, $import_users_batch";
+		$existing_users = $wpdb->get_col( $query );
+
+		$add_list = array();
+		foreach ( $existing_users as $user_id ) {
+			$user = get_user_by( 'id', $user_id );
+
+			if ( ! $user || ! empty( $user->spam ) || ! empty( $user->deleted ) )
+				continue;
+
+			$item = array(
+				'email' => array( 'email' => $user->user_email )
+			);
+
+			$merge_vars = array();
+			if ( $first_name = get_user_meta( $user_id, 'first_name', true ) )
+				$merge_vars['FNAME'] = $first_name;
+
+			if ( $last_name = get_user_meta( $user_id, 'last_name', true ) )
+				$merge_vars['LNAME'] = $last_name;
+
+			$merge_vars = apply_filters( 'mailchimp_bulk_merge_vars', $merge_vars, $item, $user_id );
+
+			$item['merge_vars'] = $merge_vars;
+			$add_list[] = $item; 			
+			
+		}
+
+		if ( ! empty( $add_list ) ) {
+			$results = mailchimp_bulk_subscribe_users( $add_list, $mailchimp_import_mailing_list, $mailchimp_import_auto_opt_in, true );
+
+			$mailchimp_stats['added'] = $mailchimp_stats['added'] + count( $results['added'] );
+			$mailchimp_stats['updated'] = $mailchimp_stats['updated'] + count( $results['updated'] );
+			$mailchimp_stats['errors'] = $mailchimp_stats['errors'] + count( $results['errors'] );
+
+		}
+
+		$data = array(
+			'processed' => $import_users_batch,
+			'mailchimp_stats' => $mailchimp_stats
+		);
+		wp_send_json_success( $data );
+	}
+	else {
+		$data = array(
+			'error' => __( 'Please, select a list to subscribe users', MAILCHIMP_LANG_DOMAIN )
+		);
+		wp_send_json_error( $data );
+	}
+	
+}
 class WPMUDEV_MailChimp_Admin {
 
 	private $page_id;
@@ -10,6 +78,8 @@ class WPMUDEV_MailChimp_Admin {
 	public function __construct() {
 		add_action( 'admin_menu', array( $this, 'add_page' ) );
 		add_action( 'network_admin_menu', array( $this, 'add_page' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_styles' ) );
 
 		$this->capability = is_multisite() ? 'manage_network' : 'manage_options';
 	}
@@ -33,6 +103,104 @@ class WPMUDEV_MailChimp_Admin {
 		add_action( 'load-' . $this->page_id, array( $this, 'generate_tabs' ) );
 		add_action( 'load-' . $this->page_id, array( $this, 'process_form' ) );
 	}
+
+	public function enqueue_scripts( $hook ) {
+		return;
+		if ( $hook === $this->page_id && $this->get_current_tab() === 'import' )
+			wp_enqueue_script( 'jquery-ui-progressbar' );
+	}
+
+	public function enqueue_styles( $hook ) {
+		if ( $hook === $this->page_id && $this->get_current_tab() === 'import' )
+			wp_enqueue_style( 'jquery-ui-mailchimp', MAILCHIMP_ASSETS_URL . 'jquery-ui/jquery-ui-1.10.3.custom.min.css', array() );
+	}
+
+	public function process_import_javascript() {
+		global $wpdb;
+
+		$users_count = $wpdb->get_var( "SELECT COUNT(ID) FROM $wpdb->users;" );
+
+		$mailchimp_import_mailing_list = $_POST['mailchimp_import_mailing_list'];
+		$mailchimp_import_auto_opt_in = $_POST['mailchimp_import_auto_opt_in'] == 'yes' ? true : false;
+
+		$destination = add_query_arg( 
+			array(
+				'tab' => 'import',
+				'imported' => 'true',
+				'page' => 'mailchimp' 
+			),
+			network_admin_url( 'settings.php', false )
+		);
+
+		?>
+		<script type="text/javascript" >
+			jQuery(function($) {
+
+
+				var rt_total = <?php echo $users_count; ?>;
+
+				var label = 0;
+
+				var mailchimp_stats = {
+					total : rt_total,
+					added : 0,
+					updated : 0,
+					errors : 0
+				};
+
+				$('.processing_result')
+					.html('<div id="progressbar"></div>');
+
+				$('#progressbar').progressbar({
+					"value": 0,
+					complete: function(event,ui) {
+						window.location = "<?php echo $destination; ?>" + '&a=' + mailchimp_stats.added + '&u=' + mailchimp_stats.updated + '&e=' + mailchimp_stats.errors;},
+				});
+
+				var import_user_counts = 0;
+				var last_user_id = 0;
+				// Initialize processing
+				import_users();
+
+				function import_users () {
+					if ( import_user_counts >= rt_total ) 
+						return false;
+
+					$.post(
+						ajaxurl, 
+						{
+							"action": "mailchimp_import",
+							'nonce': '<?php echo wp_create_nonce( "mailchimp-import" ); ?>',
+							'import_user_counts': import_user_counts,
+							//'last_user_id' : last_user_id,
+							'mailchimp_import_mailing_list' : '<?php echo $mailchimp_import_mailing_list; ?>',
+							'mailchimp_import_auto_opt_in' : <?php if ( $mailchimp_import_auto_opt_in ): ?> true <?php else: ?> false <?php endif; ?>,
+							'mailchimp_stats': mailchimp_stats
+						}, 
+						function(response) {
+							if ( response.success ) {
+								import_user_counts = response.data.processed + import_user_counts;
+								mailchimp_stats = response.data.mailchimp_stats;
+
+								label = Math.ceil( (import_user_counts / rt_total) * 100 );
+
+								$( '#progressbar' ).progressbar( 'value', label );
+								
+								import_users();
+							}
+							else {
+								alert( response.data.error );
+								window.location = "<?php echo $destination; ?>";
+							}
+														
+						}
+					);
+				}
+			});
+		</script>
+		<?php
+	}
+
 
 	public function generate_tabs() {
 		$api = mailchimp_load_API();
@@ -90,75 +258,8 @@ class WPMUDEV_MailChimp_Admin {
 			if ( $_POST['action'] == 'submit-import' ) {
 				global $wpdb, $mailchimp_sync;
 
-				$mailchimp_import_mailing_list = $_POST['mailchimp_import_mailing_list'];
-				$mailchimp_import_auto_opt_in = $_POST['mailchimp_import_auto_opt_in'];
-				if ( ! empty( $mailchimp_import_mailing_list ) ) {
-					set_time_limit(0);
-					$mailchimp_ignore_plus = get_site_option( 'mailchimp_ignore_plus' );
-
-
-					$query = "SELECT u.ID FROM {$wpdb->users} u";
-					$existing_users = $wpdb->get_col( $query );
-
-					
-        			$add_list = array();
-        			foreach ( $existing_users as $user_id ) {
-        				$user = get_user_by( 'id', $user_id );
-
-        				if ( ! $user || ! empty( $user->spam ) || ! empty( $user->deleted ) )
-        					continue;
-
-        				$item = array(
-        					'email' => array( 'email' => $user->user_email )
-        				);
-
-        				$merge_vars = array();
-        				if ( $first_name = get_user_meta( $user_id, 'first_name', true ) )
-        					$merge_vars['FNAME'] = $first_name;
-
-        				if ( $last_name = get_user_meta( $user_id, 'last_name', true ) )
-        					$merge_vars['LNAME'] = $last_name;
-
-        				$merge_vars = apply_filters( 'mailchimp_bulk_merge_vars', $merge_vars, $item, $user_id );
-
-        				$item['merge_vars'] = $merge_vars;
-        				$add_list[] = $item; 
-        			}
-
-        			if ( ! empty( $add_list ) ) {
-        				$mailchimp_import_auto_opt_in == 'yes' ? true : false;
-        				$results = mailchimp_bulk_subscribe_users( $add_list, $mailchimp_import_mailing_list, $mailchimp_import_auto_opt_in, true );
-
-        				if ( $results['errors'] ) {
-        					$errors = array();
-        					foreach ( $results['errors'] as $error ) {
-        						if ( ! is_wp_error( $error ) )
-        							continue;
-
-        						$errors[] = array(
-        							'code' => $error->get_error_code(),
-        							'message' => $error->get_error_message(),
-        							'email' => ''
-        						);
-        					}
-
-        					$mailchimp_sync->mailchimp_log_errors( $errors );
-        					
-        				}
-
-        				wp_redirect( add_query_arg( array( 
-								'imported' => 'true',
-								'a' => count( $results['added'] ),
-								'u' => count( $results['updated'] ),
-								'e' => count( $results['errors'] ),
-								'tab' => 'import'
-							),
-							$redirect_to ) 
-						);
-						exit();	
-        			}
-        			
-				}
+				// Render progressbar script
+				add_action( 'admin_head', array( &$this, 'process_import_javascript' ) );
 			}
 
 		}
@@ -200,7 +301,6 @@ class WPMUDEV_MailChimp_Admin {
 						}
 						elseif ( 'import' == $this->get_current_tab() ) {
 							$this->render_import_tab();
-							submit_button( $submit_text, 'primary', 'submit-mailchimp-settings' );
 						}
 						elseif ( 'error-log' == $this->get_current_tab() ) {
 							$this->render_error_log_tab();
@@ -238,7 +338,7 @@ class WPMUDEV_MailChimp_Admin {
 
 	        <tr class="form-field form-required">
 	            <th scope="row"><?php _e('MailChimp API Key', MAILCHIMP_LANG_DOMAIN)?></th>
-	            <td><input type="text" name="mailchimp_apikey" id="mailchimp_apikey" value="<?php echo $mailchimp_apikey; ?>" style="width:25%" /><br />
+	            <td><input type="text" name="mailchimp_apikey" id="mailchimp_apikey" value="<?php echo $mailchimp_apikey; ?>" /><br />
 	            <?php _e('Visit <a href="http://admin.mailchimp.com/account/api" target="_blank">your API dashboard</a> to create an API key.', MAILCHIMP_LANG_DOMAIN); ?>
 	            </td>
 	        </tr>
@@ -334,7 +434,13 @@ class WPMUDEV_MailChimp_Admin {
 			$api_error = ! empty( $api_error );
 		}
 		
-
+		if ( isset( $_POST['action'] ) && $_POST['action'] == 'submit-import' ) {
+			?>
+				<div class="processing_result"></div>
+				<p><?php _e( 'Importing users, please wait. This could take long depending on the number of users you have in your site...', MAILCHIMP_LANG_DOMAIN ); ?></p>
+			<?php
+			return;
+		}
 		if ( is_array( $mailchimp_lists ) && count( $mailchimp_lists ) ): ?>
 			<h3><?php _e('Sync Existing Users', MAILCHIMP_LANG_DOMAIN) ?></h3>
 			<span class="description"><?php _e('This function will syncronize all existing users on your install with your MailChimp list, adding new ones, updating the first/last name of previously imported users, and removing spammed or deleted users from your selected list. Note you really only need to do this once after installing, it is carried on automatically after installation.', MAILCHIMP_LANG_DOMAIN) ?></span>
@@ -366,6 +472,8 @@ class WPMUDEV_MailChimp_Admin {
 			</tr>
 		</table>
 		<?php
+
+		submit_button( __( 'Import', MAILCHIMP_LANG_DOMAIN ), 'primary', 'submit-mailchimp-settings' );
 	}
 
 	private function render_error_log_tab() {
