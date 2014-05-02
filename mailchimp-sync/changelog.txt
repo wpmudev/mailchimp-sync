@@ -1,9 +1,18 @@
 Plugin Name: MailChimp Sync
 Author: WPMU DEV
+Requires at least: 3.5
+Tested up to: 3.9
 
 Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
+
+1.6 - 2014-05-02
+----------------------------------------------------------------------
+- curl functions replaced by wp_remote_* functions in Maiclhimp API
+- Better errors management
+- Fixed Javascript conflict
+- Fixed redirection in import tab to 404 page in single sites
 
 1.5.1 - 2014-04-26
 ----------------------------------------------------------------------

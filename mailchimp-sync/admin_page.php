@@ -128,7 +128,7 @@ class WPMUDEV_MailChimp_Admin {
 				'imported' => 'true',
 				'page' => 'mailchimp' 
 			),
-			network_admin_url( 'settings.php', false )
+			is_multisite() ? network_admin_url( 'settings.php' ) : admin_url( 'options-general.php' )
 		);
 
 		?>
