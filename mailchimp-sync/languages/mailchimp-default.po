@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mailchimp\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-04-25 16:06+0100\n"
-"PO-Revision-Date: 2014-04-25 16:06+0100\n"
+"POT-Creation-Date: 2014-05-02 11:52+0100\n"
+"PO-Revision-Date: 2014-05-02 11:52+0100\n"
 "Last-Translator: Ignacio <igmoweb@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -14,117 +14,127 @@ msgstr ""
 "X-Generator: Poedit 1.5.4\n"
 "X-Poedit-SearchPath-0: ..\n"
 
-#: ../admin_page.php:17
-msgid "Settings"
+#: ../admin_page.php:65
+msgid "Please, select a list to subscribe users"
 msgstr ""
 
-#: ../admin_page.php:21 ../admin_page.php:167
-msgid "Import"
-msgstr ""
-
-#: ../admin_page.php:23
-msgid "Error Log"
-msgstr ""
-
-#: ../admin_page.php:38 ../admin_page.php:41
+#: ../admin_page.php:97 ../admin_page.php:100
 msgid "MailChimp Settings"
 msgstr ""
 
-#: ../admin_page.php:178
+#: ../admin_page.php:208
+msgid "Settings"
+msgstr ""
+
+#: ../admin_page.php:212 ../admin_page.php:270 ../admin_page.php:475
+msgid "Import"
+msgstr ""
+
+#: ../admin_page.php:214
+msgid "Error Log"
+msgstr ""
+
+#: ../admin_page.php:281
 msgid "Settings updated"
 msgstr ""
 
-#: ../admin_page.php:182
+#: ../admin_page.php:285
 #, php-format
 msgid "%d users added, %d updated, and %d errors."
 msgstr ""
 
-#: ../admin_page.php:230
+#: ../admin_page.php:332
 msgid ""
 "After you have entered a valid API key you will be able to select different "
 "MailChimp options below."
 msgstr ""
 
-#: ../admin_page.php:237
+#: ../admin_page.php:339
 msgid "MailChimp API Key"
 msgstr ""
 
-#: ../admin_page.php:239
+#: ../admin_page.php:341
 msgid ""
 "Visit <a href=\"http://admin.mailchimp.com/account/api\" target=\"_blank"
 "\">your API dashboard</a> to create an API key."
 msgstr ""
 
-#: ../admin_page.php:247 ../admin_page.php:306
+#: ../admin_page.php:349 ../admin_page.php:408
 msgid "API Key Test"
 msgstr ""
 
-#: ../admin_page.php:248
+#: ../admin_page.php:350
 msgid "Passed"
 msgstr ""
 
-#: ../admin_page.php:252 ../admin_page.php:356
+#: ../admin_page.php:354 ../admin_page.php:463
 msgid "Auto Opt-in"
 msgstr ""
 
-#: ../admin_page.php:255 ../admin_page.php:265 ../admin_page.php:359
+#: ../admin_page.php:357 ../admin_page.php:367 ../admin_page.php:466
 msgid "Yes"
 msgstr ""
 
-#: ../admin_page.php:256 ../admin_page.php:266 ../admin_page.php:360
+#: ../admin_page.php:358 ../admin_page.php:368 ../admin_page.php:467
 msgid "No"
 msgstr ""
 
-#: ../admin_page.php:258 ../admin_page.php:362
+#: ../admin_page.php:360 ../admin_page.php:469
 msgid ""
 "Automatically opt-in new users to the mailing list. Users will not receive "
 "an email confirmation. Use at your own risk."
 msgstr ""
 
-#: ../admin_page.php:262
+#: ../admin_page.php:364
 msgid "Ignore email addresses including + signs"
 msgstr ""
 
-#: ../admin_page.php:268
+#: ../admin_page.php:370
 msgid ""
 "Ignore email address including + signs. These are usually duplicate accounts."
 msgstr ""
 
-#: ../admin_page.php:273
+#: ../admin_page.php:375
 msgid ""
 "You must have at least one MailChimp mailing list in order to use this "
 "plugin. Please create a mailing list via the MailChimp admin panel."
 msgstr ""
 
-#: ../admin_page.php:276 ../admin_page.php:343
+#: ../admin_page.php:378 ../admin_page.php:450
 msgid "Mailing List"
 msgstr ""
 
-#: ../admin_page.php:280
+#: ../admin_page.php:382
 msgid "Please select a mailing list"
 msgstr ""
 
-#: ../admin_page.php:286
+#: ../admin_page.php:388
 msgid "Select a mailing list you want to have new users added to."
 msgstr ""
 
-#: ../admin_page.php:293
+#: ../admin_page.php:395
 msgid "Allow widget in all subsites"
 msgstr ""
 
-#: ../admin_page.php:298
+#: ../admin_page.php:400
 msgid "Allow shortcode use in all subsites"
 msgstr ""
 
-#: ../admin_page.php:307
+#: ../admin_page.php:409
 msgid "Failed - Please check your key and try again."
 msgstr ""
 
-#: ../admin_page.php:337
+#: ../admin_page.php:439
+msgid ""
+"Importing users, please wait. This could take long depending on the number "
+"of users you have in your site..."
+msgstr ""
+
+#: ../admin_page.php:444
 msgid "Sync Existing Users"
 msgstr ""
 
-#: ../admin_page.php:338
+#: ../admin_page.php:445
 msgid ""
 "This function will syncronize all existing users on your install with your "
 "MailChimp list, adding new ones, updating the first/last name of previously "
@@ -133,15 +143,15 @@ msgid ""
 "carried on automatically after installation."
 msgstr ""
 
-#: ../admin_page.php:352
+#: ../admin_page.php:459
 msgid "The mailing list you want to import existing users to."
 msgstr ""
 
-#: ../admin_page.php:387
+#: ../admin_page.php:496
 msgid "Error log"
 msgstr ""
 
-#: ../admin_page.php:387
+#: ../admin_page.php:496
 #, php-format
 msgid "(Last %d lines)"
 msgstr ""
