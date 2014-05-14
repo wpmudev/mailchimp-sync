@@ -39,7 +39,7 @@
 
 		<?php do_action( 'mailchimp_form_after_fields' ); ?>
 
-		<input type="submit" class="incsub-mailchimp-submit" name="submit-subscribe-user" value="<?php echo $button_text; ?>"> <span class="mailchimp-spinner"></span>
+		<input type="submit" class="incsub-mailchimp-submit" name="<?php echo $submit_name; ?>" value="<?php echo $button_text; ?>"> <span class="mailchimp-spinner"></span>
 	</form>
 
 <?php  endif; ?>

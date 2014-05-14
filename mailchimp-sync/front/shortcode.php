@@ -9,7 +9,7 @@ class WPMUDEV_MailChimp_Shortcode {
 	static $number = 1;
 
 	public function __construct() {
-		add_action( 'wp_loaded', array( &$this, 'init_form' ) );
+		//add_action( 'wp_loaded', array( &$this, 'init_form' ) );
 		add_shortcode( 'mailchimp-form', array( $this, 'render_form' ) );
 		add_action( 'init', array( &$this, 'add_tinymce_buttons' ) );
 		add_action( 'wp_enqueue_scripts', array( &$this, 'register_scripts' ) );
@@ -39,7 +39,7 @@ class WPMUDEV_MailChimp_Shortcode {
 	}
 
 	public function register_scripts() {
-		$this->form->register_scripts();
+		//$this->form->register_scripts();
 	}
 
 
@@ -63,10 +63,18 @@ class WPMUDEV_MailChimp_Shortcode {
 	public function render_form( $atts ) {
 		extract( $atts );
 
-		$this->form->args['text'] = $title;
-		$this->form->args['subscribed_placeholder'] = $success_text;
-		$this->form->args['button_text'] = $button_text;
-		$this->form->render_form();
+		$args['text'] = $title;
+		$args['subscribed_placeholder'] = $success_text;
+		$args['button_text'] = $button_text;
+		$args['form_id'] = 'incsub-mailchimp-shortcode-form-' . self::$number;
+		$args['submit_name'] = 'submit-subscribe-shortcode-user';
+		$args['subscribed'] = isset( $_GET[ 'mailchimp-shortcode-subscribed-' . self::$number ] );
+		$args['errors'] = isset( $this->errors[ self::$number ] ) ? $this->errors[ self::$number ] : array();
+		$args['firstname'] = ! empty( $_POST['subscription-firstname'] ) ? stripslashes( $_POST['subscription-firstname'] ) : '';
+		$args['lastname'] = ! empty( $_POST['subscription-lastname'] ) ? stripslashes( $_POST['subscription-lastname'] ) : '';
+		$args['email'] = ! empty( $_POST['subscription-email'] ) ? stripslashes( $_POST['subscription-email'] ) : '';
+
+		$this->form->render_form( $args );
 	}
 
 	public function display_shortcode_admin_form() {

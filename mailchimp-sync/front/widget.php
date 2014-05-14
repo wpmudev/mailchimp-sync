@@ -1,13 +1,12 @@
 <?php
 
-require_once( MAILCHIMP_FRONT_DIR . 'form.class.php' );
 
 class Incsub_Mailchimp_Widget extends WP_Widget {
 
 	private $errors = array();
 	private $success;
 	private $enqueue_scripts = false;
-	private $form = null;
+	private $form_id;
 
 	/**
 	 * Widget setup.
@@ -25,70 +24,76 @@ class Incsub_Mailchimp_Widget extends WP_Widget {
 		/* Create the widget. */
 		parent::WP_Widget( 'incsub-mailchimp-widget' , __( 'Mailchimp', MAILCHIMP_LANG_DOMAIN ), $widget_ops );
 
-		add_action( 'init', array( &$this, 'init_form' ) );
-		add_action( 'wp_enqueue_scripts', array( &$this, 'register_scripts' ) );
-
 		add_filter( 'mailchimp_form_require_field', array( &$this, 'set_require_field' ), 10, 3 );
 		add_filter( 'mailchimp_form_success_redirect', array( &$this, 'set_form_success_redirect' ) );
 		add_filter( 'mailchimp_form_subscribed_placeholder', array( &$this, 'set_form_success_placeholder' ), 10, 2 );
 
-	}
+		add_action( 'init', array( $this, 'init' ) );
+		add_action( 'init', array( $this, 'validate_widget' ) );
 
-	public function init_form() {
-		$instance = $this->get_settings();
-
-		if ( ! isset( $instance[ $this->number ] ) )
-			return;
-		
-		$instance = $instance[ $this->number ];
-
-		$form_args = array(
-	    	'text' => $instance['text'],
-	    	'subscribed' => isset( $_GET['mailchimp-subscribed'] ) && 'true' == $_GET['mailchimp-subscribed'],
-	    	'subscribed_placeholder' => $instance['subscribed_placeholder'],
-	    	'button_text' => ! empty( $instance['button_text'] ) ? $instance['button_text'] : __( 'Subscribe', MAILCHIMP_LANG_DOMAIN ),
-	    	'form_id' => 'incsub-mailchimp-widget-form-' . $this->number,
-	    	'form_class' => 'incsub-mailchimp-widget-form'
-	    );
-
-		$this->form = new WPMUDEV_MailChimp_Form( $form_args );
 		
 	}
 
-	public function set_require_field( $require, $field, $form_id ) {
-		$instance = $this->get_settings();
-		if ( false !== $instance && 'incsub-mailchimp-widget-form-' . $this->number == $form_id ) {
-			$widget_settings = $instance[ $this->number ];
-			$require = $widget_settings[ 'require_' . $field ];
+	function init() {
+		WPMUDEV_MailChimp_Form::enqueue_dependencies();
+	}
+
+
+	function validate_widget() {
+		if ( isset( $_POST['submit-subscribe-widget-user'] ) ) {
+
+			global $mailchimp_sync;
+
+			$doing_ajax = defined( 'DOING_AJAX' ) && DOING_AJAX;
+			$errors = array();
+
+			if ( ! $doing_ajax ) {
+				if ( ! wp_verify_nonce( $_POST['_wpnonce'], 'mailchimp_subscribe_user' ) )
+					return false;
+			}
+			else {
+				check_ajax_referer( 'mailchimp_subscribe_user', 'nonce' );
+			}
+
+			$_form_id = $_POST['form_id'];
+			$form_id = explode( '-', $_form_id );
+			$number = $form_id[ count( $form_id ) -1 ];
+
+			$settings = $this->get_settings();
+
+			if ( ! isset( $settings[ $number ] ) )
+				return;
+
+			$settings = $settings[ $number ];
+
+			include_once( 'form.class.php' );
+			$errors = WPMUDEV_MailChimp_Form::validate_subscription_form( $_POST, $settings );
+
+			if ( empty( $errors ) ) {
+				$user['email'] = $email;
+				$user['first_name'] = $firstname;
+				$user['last_name'] = $lastname;
+
+				$mailchimp_sync->mailchimp_add_user( $user );
+
+				if ( ! $doing_ajax ) {
+					$redirect_to = add_query_arg( 'mailchimp-subscribed-' . $number, 'true' ) . '#' . $_form_id;
+					wp_redirect( $redirect_to );
+					exit;		
+				}
+				else {
+					$text = apply_filters( 'mailchimp_form_subscribed_placeholder', $this->args['subscribed_placeholder'], $_POST['form_id'] );
+					wp_send_json_success( array( 'message' => $text ) );
+				}
+			}
+			elseif ( ! empty( $errors ) && $doing_ajax ) {
+    			wp_send_json_error( $errors );
+    		}
+
+    		$this->errors[ $number ] = $errors;
+
+
 		}
-
-		
-		return $require;
-	}
-
-	public function register_scripts() {
-		if ( ! is_null( $this->form ) )
-			$this->form->register_scripts();
-	}
-
-	public function set_form_success_redirect( $redirect_to ) {
-		$instance = $this->get_settings();
-		if ( false !== $instance ) {
-			$widget_settings = $instance[ $this->number ];
-			$redirect_to .= '#incsub-mailchimp-widget-' . $this->number;
-		}
-		
-		return $redirect_to;
-	}
-
-	public function set_form_success_placeholder( $placeholder, $form_id ) {
-		$instance = $this->get_settings();
-		if ( false !== $instance && 'incsub-mailchimp-widget-form-' . $this->number == $form_id ) {
-			$widget_settings = $instance[ $this->number ];
-			$placeholder = $widget_settings['subscribed_placeholder'];
-		}
-		
-		return $placeholder;
 	}
 
 
@@ -106,7 +111,23 @@ class Incsub_Mailchimp_Widget extends WP_Widget {
 	    if ( $title )
 	     	echo $before_title . $title . $after_title; 
 
-	    $this->form->render_form();
+	    
+	    $firstname = ! empty( $_POST['subscription-firstname'] ) ? stripslashes( $_POST['subscription-firstname'] ) : '';
+		$lastname = ! empty( $_POST['subscription-lastname'] ) ? stripslashes( $_POST['subscription-lastname'] ) : '';
+		$email = ! empty( $_POST['subscription-email'] ) ? stripslashes( $_POST['subscription-email'] ) : '';
+
+		$form_id = 'incsub-mailchimp-widget-form-' . $this->number;
+		$subscribed = isset( $_GET[ 'mailchimp-subscribed-' . $this->number ] );
+
+		$submit_name = 'submit-subscribe-widget-user';
+		$errors = isset( $this->errors[ $this->number ] ) ? $this->errors[ $this->number ] : array();
+
+		$args = compact( 'submit_name', 'form_id', 'subscribed', 'firstname', 'lastname', 'email', 'errors' );
+		$args['button_text'] = $instance['button_text'];
+		$args['subscribed_placeholder'] = $instance['subscribed_placeholder'];
+		$args['text'] = $instance['text'];
+	    
+	    WPMUDEV_MailChimp_Form::render_form( $args );
 
 		echo $after_widget;
 	}

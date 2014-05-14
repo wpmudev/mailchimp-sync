@@ -8,33 +8,22 @@ class WPMUDEV_MailChimp_Form {
 	public $form_id = '';
 
 	public function __construct( $args ) {
-		$defaults = array(
-			'text' 						=> __( 'Subscribe to our MailChimp list.', MAILCHIMP_LANG_DOMAIN ),
-			'button_text' 				=> __( 'Subscribe', MAILCHIMP_LANG_DOMAIN ),
-			'subscribed_placeholder' 	=> __( 'Thank you, your email has been added to the list.', MAILCHIMP_LANG_DOMAIN ),
-		    'subscribed' 				=> false,
-		    'firstname' 				=> isset( $_POST['subscription-firstname'] ) ? stripslashes( $_POST['subscription-firstname'] ) : '',
-		    'lastname' 					=> isset( $_POST['subscription-lastname'] ) ? stripslashes( $_POST['subscription-lastname'] ) : '',
-		    'email' 					=> isset( $_POST['subscription-email'] ) ? stripslashes( $_POST['subscription-email'] ) : '',
-		    'form_id' 					=> '',
-		    'form_class' 				=> ''
-		);
-
-		$args = wp_parse_args( $args, $defaults );
-		$args = apply_filters( 'mailchimp_form_args', $args );
-		$this->args = $args;
-
-		$this->form_id = $args['form_id'];
-
-		$this->errors = array();
-
-		add_action( 'template_redirect', array( $this, 'validate_form' ) );
 		add_action( 'wp_ajax_incsub_mailchimp_subscribe_user', array( $this, 'validate_form' ) );
 		add_action( 'wp_ajax_nopriv_incsub_mailchimp_subscribe_user', array( $this, 'validate_form' ) );
 	}
-	public function register_scripts() {
-		wp_register_script( 'mailchimp-form-js', MAILCHIMP_ASSETS_URL . 'form.js', array( 'jquery' ), '20140212', true );
+
+	public static function enqueue_dependencies() {
+		add_action( 'wp_enqueue_scripts', array( 'WPMUDEV_MailChimp_Form', 'register_styles' ) );
+		//add_action( 'wp_enqueue_scripts', array( 'WPMUDEV_MailChimp_Form', 'register_scripts' ) );
+	}
+
+	public static function register_styles() {
 		wp_enqueue_style( 'mailchimp-form-css', MAILCHIMP_ASSETS_URL . 'form.css', array(), '20140212' );
+	}
+
+	public static function register_scripts() {
+		wp_register_script( 'mailchimp-form-js', MAILCHIMP_ASSETS_URL . 'form.js', array( 'jquery' ), '20140212', true );
+		
 
 		$l10n = array(
 			'ajaxurl' => admin_url( 'admin-ajax.php' ),
@@ -42,87 +31,59 @@ class WPMUDEV_MailChimp_Form {
 		);
 		wp_localize_script( 'mailchimp-form-js', 'mailchimp_form_captions', $l10n );
 
-		add_action( 'wp_footer', array( $this, 'enqueue_scripts' ) );
+		add_action( 'wp_footer', array( 'WPMUDEV_MailChimp_Form', 'enqueue_scripts' ) );
 
 	}
 
-	public function set_form_id( $id ) {
-		$this->form_id = $id;
+
+	public static function enqueue_scripts() {
+		wp_enqueue_script( 'mailchimp-form-js' );
 	}
 
-	public function enqueue_scripts() {
-		if ( $this->enqueue_scripts ) {
-			wp_enqueue_script( 'mailchimp-form-js' );
-			//wp_enqueue_style( 'mailchimp-form-css' );
-		}
+
+	public static function render_form( $args ) {
+		$defaults = array(
+			'submit_name' => 'submit-subscribe-user',
+			'button_text' => '',
+			'form_id' => '',
+			'subscribed_placeholder' => '',
+			'text' => '',
+			'subscribed' => false,
+			'firstname' => '',
+			'lastname' => '',
+			'email' => '',
+			'errors' => array(),
+			'form_class' => ''
+		);
+
+		$args = wp_parse_args( $args, $defaults );
+		extract( $args );
+		include( apply_filters( 'mailchimp_form_template_location', MAILCHIMP_PLUGIN_DIR . 'front/form-template.php' ) );
 	}
 
-	public function render_form() {
-		$this->enqueue_scripts = true;
-		$errors = $this->errors;
-		extract( $this->args );
-		include( 'form-template.php' );
-	}
+	public static function validate_subscription_form( $input, $settings ) {
+		$default_settings = array(
+			'require_firstname' => false,
+			'require_lastname' => false
+		);
 
-	public function validate_form() {
-		global $mailchimp_sync;
+		$settings = wp_parse_args( $settings, $default_settings );
 
-		if ( isset( $_POST['action'] ) && 'incsub_mailchimp_subscribe_user' == $_POST['action'] ) {
+		$email = sanitize_email( $input['subscription-email'] );
+		if ( ! is_email( $email ) )
+			$errors[] = ( __( 'Please, insert a valid email', MAILCHIMP_LANG_DOMAIN ) );
 
-			$doing_ajax = defined( 'DOING_AJAX' ) && DOING_AJAX;
-			$errors = array();
+		$firstname = sanitize_text_field( $input['subscription-firstname'] );
+		$firstname = ! empty( $firstname ) ? $firstname : '';
+		if ( empty( $firstname ) && $settings['require_firstname'] )
+			$errors[] = ( __( 'First name is required', MAILCHIMP_LANG_DOMAIN ) );
 
-			if ( ! $doing_ajax ) {
-				if ( ! wp_verify_nonce( $_POST['_wpnonce'], 'mailchimp_subscribe_user' ) )
-					return false;
-			}
-			else {
-				check_ajax_referer( 'mailchimp_subscribe_user', 'nonce' );
-			}
-				
-			$email = sanitize_email( $_POST['subscription-email'] );
-			if ( ! is_email( $email ) )
-				$errors[] = ( __( 'Please, insert a valid email', MAILCHIMP_LANG_DOMAIN ) );
+		
+		$lastname = sanitize_text_field( $input['subscription-lastname'] );
+		$lastname = ! empty( $lastname ) ? $lastname : '';
+		if ( empty( $lastname ) && $settings['require_lastname'] )
+			$errors[] = ( __( 'Last name is required', MAILCHIMP_LANG_DOMAIN ) );
 
-			$firstname = sanitize_text_field( $_POST['subscription-firstname'] );
-			$firstname = ! empty( $firstname ) ? $firstname : '';
-			$require_firstname = apply_filters( 'mailchimp_form_require_field', false, 'firstname', $_POST['form_id'] );
-			if ( empty( $firstname ) && $require_firstname )
-				$errors[] = ( __( 'First name is required', MAILCHIMP_LANG_DOMAIN ) );
-
-			
-			$lastname = sanitize_text_field( $_POST['subscription-lastname'] );
-			$lastname = ! empty( $lastname ) ? $lastname : '';
-			$require_lastname = apply_filters( 'mailchimp_form_require_field', false, 'lastname', $_POST['form_id'] );
-			if ( empty( $lastname ) && $require_lastname )
-				$errors[] = ( __( 'Last name is required', MAILCHIMP_LANG_DOMAIN ) );
-
-			apply_filters( 'mailchimp_form_validate', $this->errors );
-
-			if ( empty( $errors ) ) {
-				$user['email'] = $email;
-				$user['first_name'] = $firstname;
-				$user['last_name'] = $lastname;
-
-				$mailchimp_sync->mailchimp_add_user( $user );
-
-				if ( ! $doing_ajax ) {
-					$redirect_to = add_query_arg( 'mailchimp-subscribed', 'true' );
-					$redirect_to = apply_filters( 'mailchimp_form_success_redirect', $redirect_to );
-					wp_redirect( $redirect_to );
-					exit;		
-				}
-				else {
-					$text = apply_filters( 'mailchimp_form_subscribed_placeholder', $this->args['subscribed_placeholder'], $_POST['form_id'] );
-					wp_send_json_success( array( 'message' => $text ) );
-				}
-			}
-			elseif ( ! empty( $errors ) && $doing_ajax ) {
-    			wp_send_json_error( $errors );
-    		}
-
-    		$this->errors = $errors;
-
-		}
+		return apply_filters( 'mailchimp_form_validate', $errors );
 	}
 }
