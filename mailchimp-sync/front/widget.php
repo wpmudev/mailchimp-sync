@@ -1,5 +1,6 @@
 <?php
 
+require_once( MAILCHIMP_FRONT_DIR . 'form.class.php' );
 
 class Incsub_Mailchimp_Widget extends WP_Widget {
 
@@ -66,7 +67,6 @@ class Incsub_Mailchimp_Widget extends WP_Widget {
 
 			$settings = $settings[ $number ];
 
-			include_once( 'form.class.php' );
 			$errors = WPMUDEV_MailChimp_Form::validate_subscription_form( $_POST, $settings );
 
 			if ( empty( $errors ) ) {

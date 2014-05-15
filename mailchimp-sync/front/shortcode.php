@@ -42,7 +42,7 @@ class WPMUDEV_MailChimp_Shortcode {
 			$form_id = explode( '-', $_form_id );
 			$number = $form_id[ count( $form_id ) -1 ];
 
-			include_once( 'form.class.php' );
+			
 			$errors = WPMUDEV_MailChimp_Form::validate_subscription_form( $_POST, $settings );
 
 			if ( empty( $errors ) ) {
