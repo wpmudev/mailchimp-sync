@@ -67,6 +67,8 @@ class WPMUDEV_MailChimp_Form {
 			'require_lastname' => false
 		);
 
+		$errors = array();
+		
 		$settings = wp_parse_args( $settings, $default_settings );
 
 		$email = sanitize_email( $input['subscription-email'] );

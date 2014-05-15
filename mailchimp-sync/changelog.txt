@@ -7,6 +7,13 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+1.6.1 - 2014-05-15
+----------------------------------------------------------------------
+- Fixed: Widgets issues when there were more than one in the same screen
+- Improved forms validation
+- Tiny MCE plugin improved
+- Other minor fixes
+
 1.6 - 2014-05-02
 ----------------------------------------------------------------------
 - curl functions replaced by wp_remote_* functions in Maiclhimp API

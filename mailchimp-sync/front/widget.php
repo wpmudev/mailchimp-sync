@@ -70,9 +70,9 @@ class Incsub_Mailchimp_Widget extends WP_Widget {
 			$errors = WPMUDEV_MailChimp_Form::validate_subscription_form( $_POST, $settings );
 
 			if ( empty( $errors ) ) {
-				$user['email'] = $email;
-				$user['first_name'] = $firstname;
-				$user['last_name'] = $lastname;
+				$user['email'] = sanitize_email( $_POST['subscription-email'] );
+				$user['first_name'] = sanitize_text_field( $_POST['subscription-firstname'] );
+				$user['last_name'] = sanitize_text_field( $_POST['subscription-lastname'] );
 
 				$mailchimp_sync->mailchimp_add_user( $user );
 

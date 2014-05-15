@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mailchimp\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-02 11:52+0100\n"
-"PO-Revision-Date: 2014-05-02 11:52+0100\n"
+"POT-Creation-Date: 2014-05-15 14:09+0100\n"
+"PO-Revision-Date: 2014-05-15 14:09+0100\n"
 "Last-Translator: Ignacio <igmoweb@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -156,30 +156,15 @@ msgstr ""
 msgid "(Last %d lines)"
 msgstr ""
 
-#: ../front/form.class.php:12 ../front/widget.php:141
-#: ../front/shortcode.php:148
-msgid "Subscribe to our MailChimp list."
-msgstr ""
-
-#: ../front/form.class.php:13 ../front/widget.php:49 ../front/widget.php:142
-#: ../front/shortcode.php:160
-msgid "Subscribe"
-msgstr ""
-
-#: ../front/form.class.php:14 ../front/widget.php:143
-#: ../front/shortcode.php:154
-msgid "Thank you, your email has been added to the list."
-msgstr ""
-
-#: ../front/form.class.php:85
+#: ../front/form.class.php:76
 msgid "Please, insert a valid email"
 msgstr ""
 
-#: ../front/form.class.php:91
+#: ../front/form.class.php:81
 msgid "First name is required"
 msgstr ""
 
-#: ../front/form.class.php:98
+#: ../front/form.class.php:87
 msgid "Last name is required"
 msgstr ""
 
@@ -195,72 +180,84 @@ msgstr ""
 msgid "Email"
 msgstr ""
 
-#: ../front/widget.php:22
+#: ../front/widget.php:21
 msgid ""
 "This widget allows visitors to subscribe to a Mailchimp email list (set by "
 "the network administrator)."
 msgstr ""
 
-#: ../front/widget.php:26
+#: ../front/widget.php:25
 msgid "Mailchimp"
 msgstr ""
 
-#: ../front/widget.php:140
+#: ../front/widget.php:161
 msgid "Subscribe to MailChimp"
 msgstr ""
 
-#: ../front/widget.php:150
-msgid "Title:"
+#: ../front/widget.php:162 ../front/shortcode.php:222
+msgid "Subscribe to our MailChimp list."
 msgstr ""
 
-#: ../front/widget.php:154
-msgid "Text:"
+#: ../front/widget.php:163 ../front/shortcode.php:234
+msgid "Subscribe"
 msgstr ""
 
-#: ../front/widget.php:158
-msgid "Subscribe button text:"
-msgstr ""
-
-#: ../front/widget.php:162
-msgid "Text displayed when a user subscribes:"
-msgstr ""
-
-#: ../front/widget.php:167
-msgid "Require first name field"
+#: ../front/widget.php:164 ../front/shortcode.php:228
+msgid "Thank you, your email has been added to the list."
 msgstr ""
 
 #: ../front/widget.php:171
+msgid "Title:"
+msgstr ""
+
+#: ../front/widget.php:175
+msgid "Text:"
+msgstr ""
+
+#: ../front/widget.php:179
+msgid "Subscribe button text:"
+msgstr ""
+
+#: ../front/widget.php:183
+msgid "Text displayed when a user subscribes:"
+msgstr ""
+
+#: ../front/widget.php:188
+msgid "Require first name field"
+msgstr ""
+
+#: ../front/widget.php:192
 msgid "Require last name field"
 msgstr ""
 
-#: ../front/shortcode.php:83
+#: ../front/shortcode.php:151
 msgid "Mailchimp Shortcode"
 msgstr ""
 
-#: ../front/shortcode.php:147
+#: ../front/shortcode.php:221
 msgid "Form title"
 msgstr ""
 
-#: ../front/shortcode.php:153
+#: ../front/shortcode.php:227
 msgid "Text displayed when a user subscribes"
 msgstr ""
 
-#: ../front/shortcode.php:159
+#: ../front/shortcode.php:233
 msgid "Subscribe button text"
 msgstr ""
 
-#: ../front/shortcode.php:166
+#: ../front/shortcode.php:240
 msgid "Require First Name"
 msgstr ""
 
-#: ../front/shortcode.php:172
+#: ../front/shortcode.php:246
 msgid "Require Last Name"
 msgstr ""
 
-#: ../front/shortcode.php:178
+#: ../front/shortcode.php:252
 msgid "Cancel"
 msgstr ""
 
-#: ../front/shortcode.php:182
+#: ../front/shortcode.php:256
 msgid "Insert"
 msgstr ""
