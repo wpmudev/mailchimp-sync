@@ -25,24 +25,16 @@ class WPMUDEV_MailChimp_Shortcode {
 		if ( isset( $_POST['submit-subscribe-shortcode-user'] ) ) {
 
 			global $mailchimp_sync;
-
-			$doing_ajax = defined( 'DOING_AJAX' ) && DOING_AJAX;
 			$errors = array();
 
-			if ( ! $doing_ajax ) {
-				if ( ! wp_verify_nonce( $_POST['_wpnonce'], 'mailchimp_subscribe_user' ) )
-					return false;
-			}
-			else {
-				check_ajax_referer( 'mailchimp_subscribe_user', 'nonce' );
-			}
+			if ( ! wp_verify_nonce( $_POST['_wpnonce'], 'mailchimp_subscribe_user' ) )
+				return false;
 
 			
 			$_form_id = $_POST['form_id'];
 			$form_id = explode( '-', $_form_id );
 			$number = $form_id[ count( $form_id ) -1 ];
 
-			
 			$errors = WPMUDEV_MailChimp_Form::validate_subscription_form( $_POST, $settings );
 
 			if ( empty( $errors ) ) {
@@ -51,15 +43,7 @@ class WPMUDEV_MailChimp_Shortcode {
 				$user['last_name'] = sanitize_text_field( $_POST['subscription-lastname'] );
 
 				$mailchimp_sync->mailchimp_add_user( $user );
-
-				if ( $doing_ajax ) {
-					$text = apply_filters( 'mailchimp_form_subscribed_placeholder', $this->args['subscribed_placeholder'], $_POST['form_id'] );
-					wp_send_json_success( array( 'message' => $text ) );
-				}
 			}
-			elseif ( ! empty( $errors ) && $doing_ajax ) {
-    			wp_send_json_error( $errors );
-    		}
 
     		$this->errors[ $number ] = $errors;
 
@@ -82,7 +66,6 @@ class WPMUDEV_MailChimp_Shortcode {
 		if ( $this->enqueue_styles ) {
 			WPMUDEV_MailChimp_Form::enqueue_dependencies();
 		}
-		//$this->form->register_scripts();
 	}
 
 
@@ -134,6 +117,8 @@ class WPMUDEV_MailChimp_Shortcode {
 
 		$args['errors'] = isset( $this->errors[ self::$number ] ) ? $this->errors[ self::$number ] : array();
 		$args['subscribed'] = isset( $_POST[ 'submit-subscribe-shortcode-user' ] ) && empty( $this->errors[ self::$number ] );
+		$args['require_fn'] = $settings['require_firstname'];
+		$args['require_ln'] = $settings['require_lastname'];
 
 		self::$number++;
 		$this->enqueue_styles = true;

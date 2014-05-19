@@ -126,6 +126,8 @@ class Incsub_Mailchimp_Widget extends WP_Widget {
 		$args['button_text'] = $instance['button_text'];
 		$args['subscribed_placeholder'] = $instance['subscribed_placeholder'];
 		$args['text'] = $instance['text'];
+		$args['require_fn'] = $instance['require_firstname'];
+		$args['require_ln'] = $instance['require_lastname'];
 	    
 	    WPMUDEV_MailChimp_Form::render_form( $args );
 

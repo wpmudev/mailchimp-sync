@@ -81,6 +81,8 @@ class WPMUDEV_MailChimp_Sync {
 			include_once( 'externals/wpmudev-dash-notification.php' );
 		}
 
+		
+
 			
 	}
 
@@ -94,6 +96,12 @@ class WPMUDEV_MailChimp_Sync {
 			require_once( MAILCHIMP_FRONT_DIR . 'shortcode.php' );
 			new WPMUDEV_MailChimp_Shortcode();
 		}
+
+		require_once( MAILCHIMP_FRONT_DIR . 'form.class.php' );
+		add_action( 'wp_ajax_incsub_mailchimp_subscribe_user', array( 'WPMUDEV_MailChimp_Form', 'validate_ajax_form' ) );
+		add_action( 'wp_ajax_nopriv_incsub_mailchimp_subscribe_user', array( 'WPMUDEV_MailChimp_Form', 'validate_ajax_form' ) );
+
+		
 
 	}
 
@@ -149,6 +157,8 @@ class WPMUDEV_MailChimp_Sync {
 		do_action( 'mailchimp_subscribe_user', $merge_vars, $user );
 
 		$results = mailchimp_subscribe_user( $user->user_email, $mailchimp_mailing_list, $autopt, $merge_vars, true );
+
+		return $results;
 	}
 
 

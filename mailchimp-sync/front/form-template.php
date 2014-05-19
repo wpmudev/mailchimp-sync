@@ -3,10 +3,15 @@
 		<?php echo $subscribed_placeholder; ?>
 	</p>
 <?php  else: ?>
+	
 	<form method="post" class="incsub-mailchimp-form <?php echo $form_class; ?>" action="#<?php echo $form_id; ?>" id="<?php echo $form_id; ?>">		        	
+		
+		<?php do_action( 'mailchimp_form_start', $args ); ?>
+
 		<p>
 			<?php echo $text; ?>
 		</p>
+
 		<?php if ( ! empty( $errors ) ): ?>
 			<ul class="incsub-mailchimp-error">
 			<?php foreach ( $errors as $error ): ?>
@@ -14,6 +19,8 @@
 			<?php endforeach; ?>
 			</ul>
 		<?php endif; ?>
+
+		<?php do_action( 'mailchimp_form_after_errors', $args ); ?>
 	
 		<?php do_action( 'mailchimp_form_before_fields' ); ?>
 
@@ -34,8 +41,10 @@
 
 		<input type="hidden" class="incsub-mailchimp-field" name="action" value="incsub_mailchimp_subscribe_user">
 		<input type="hidden" class="incsub-mailchimp-field" name="form_id" value="<?php echo $form_id; ?>">
+		<input type="hidden" class="incsub-mailchimp-field" name="require_fn" value="<?php echo $require_fn ? 1 : 0; ?>">
+		<input type="hidden" class="incsub-mailchimp-field" name="require_ln" value="<?php echo $require_ln ? 1 : 0; ?>">
 
-		<?php wp_nonce_field( 'mailchimp_subscribe_user' ); ?>
+		<?php wp_nonce_field( 'mailchimp_subscribe_user_' . $form_id . $require_fn . $require_ln ); ?>
 
 		<?php do_action( 'mailchimp_form_after_fields' ); ?>
 

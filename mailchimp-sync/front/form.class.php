@@ -7,14 +7,29 @@ class WPMUDEV_MailChimp_Form {
 	public $args = array();
 	public $form_id = '';
 
-	public function __construct( $args ) {
-		add_action( 'wp_ajax_incsub_mailchimp_subscribe_user', array( $this, 'validate_form' ) );
-		add_action( 'wp_ajax_nopriv_incsub_mailchimp_subscribe_user', array( $this, 'validate_form' ) );
-	}
 
 	public static function enqueue_dependencies() {
 		add_action( 'wp_enqueue_scripts', array( 'WPMUDEV_MailChimp_Form', 'register_styles' ) );
-		//add_action( 'wp_enqueue_scripts', array( 'WPMUDEV_MailChimp_Form', 'register_scripts' ) );
+		add_action( 'wp_enqueue_scripts', array( 'WPMUDEV_MailChimp_Form', 'register_scripts' ) );
+
+		// Template hooks
+		add_action( 'mailchimp_form_start', array( 'WPMUDEV_MailChimp_Form', 'add_subscribed_message' ) );
+		add_action( 'mailchimp_form_after_errors', array( 'WPMUDEV_MailChimp_Form', 'add_errors_list_section' ) );
+	}
+
+	public static function add_subscribed_message( $args ) {
+		?>
+			<p style="display:none" class="incsub-mailchimp-updated">
+				<?php echo $args['subscribed_placeholder']; ?>
+			</p>
+		<?php
+	}
+
+	public static function add_errors_list_section() {
+		?>
+			<ul style="display:none" class="incsub-mailchimp-error">
+			</ul>
+		<?php
 	}
 
 	public static function register_styles() {
@@ -53,12 +68,45 @@ class WPMUDEV_MailChimp_Form {
 			'lastname' => '',
 			'email' => '',
 			'errors' => array(),
-			'form_class' => ''
+			'form_class' => '',
+			'require_fn' => false,
+			'require_ln' => false
 		);
 
 		$args = wp_parse_args( $args, $defaults );
 		extract( $args );
+
+		$require_fn = $require_fn ? 1 : 0;
+		$require_ln = $require_ln ? 1 : 0;
 		include( apply_filters( 'mailchimp_form_template_location', MAILCHIMP_PLUGIN_DIR . 'front/form-template.php' ) );
+	}
+
+	public static function validate_ajax_form() {
+		global $mailchimp_sync;
+
+		check_ajax_referer( 'mailchimp_subscribe_user_' . $_POST['form_id'] . $_POST['require_fn'] . $_POST['require_ln'] );
+
+		$errors = self::validate_subscription_form( 
+			$_POST, 
+			array( 
+				'require_firstname' => (bool)$_POST['require_fn'], 
+				'require_lastname' => (bool)$_POST['require_ln'] 
+			) 
+		);
+
+		if ( ! empty( $errors ) )
+			wp_send_json_error( array( 'errors' => $errors ) );
+
+		
+		$user['email'] = sanitize_email( $_POST['subscription-email'] );
+		$user['first_name'] = sanitize_text_field( $_POST['subscription-firstname'] );
+		$user['last_name'] = sanitize_text_field( $_POST['subscription-lastname'] );
+
+		$results = $mailchimp_sync->mailchimp_add_user( $user );
+
+		wp_send_json_success( $results );
+
+		die();
 	}
 
 	public static function validate_subscription_form( $input, $settings ) {
@@ -66,6 +114,7 @@ class WPMUDEV_MailChimp_Form {
 			'require_firstname' => false,
 			'require_lastname' => false
 		);
+
 
 		$errors = array();
 		
