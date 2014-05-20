@@ -226,8 +226,8 @@ class WPMUDEV_MailChimp_Admin {
 			$redirect_to = add_query_arg( 'page', 'mailchimp', $admin_url );
 
 			if ( $_POST['action'] == 'submit-settings' ) {
-				update_site_option( 'mailchimp_allow_widget', ! empty( $_POST['allow_widget'] ) );
-				update_site_option( 'mailchimp_allow_shortcode', ! empty( $_POST['allow_shortcode'] ) );
+				update_site_option( 'mailchimp_allow_widget', ! empty( $_POST['allow_widget'] ) && apply_filters( 'mailchimp_allow_front_widgets', true ) );
+				update_site_option( 'mailchimp_allow_shortcode', ! empty( $_POST['allow_shortcode'] ) && apply_filters( 'mailchimp_allow_front_widgets', true ) );
 
 				if ( isset( $_POST['mailchimp_apikey'] ) )
 					update_site_option('mailchimp_apikey', $_POST['mailchimp_apikey']);
@@ -390,7 +390,7 @@ class WPMUDEV_MailChimp_Admin {
 			            </tr>
 					<?php endif; ?>
 
-					<?php if ( is_multisite() ): ?>
+					<?php if ( is_multisite() && apply_filters( 'mailchimp_allow_front_widgets', true ) ): ?>
 	      				<tr class="form-field form-required">
 				            <th scope="row"><?php _e('Allow widget in all subsites', MAILCHIMP_LANG_DOMAIN)?></th>
 				            <td><input type="checkbox" name="allow_widget" id="allow_widget" <?php checked( $mailchimp_allow_widget ); ?> style="width:inherit;"/>
