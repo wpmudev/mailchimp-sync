@@ -228,7 +228,7 @@ class Mailchimp {
 
     public function __construct($apikey=null, $opts=array()) {
         if(!$apikey) $apikey = getenv('MAILCHIMP_APIKEY');
-        if(!$apikey) $apikey = $this->readConfigs();
+        //if(!$apikey) $apikey = $this->readConfigs();
         if(!$apikey) throw new Mailchimp_Error('You must provide a MailChimp API key');
         $this->apikey = $apikey;
         $dc = "us1";
@@ -240,7 +240,7 @@ class Mailchimp {
         $this->root = rtrim($this->root, '/') . '/';
 
         if ( isset( $opts['timeout'] ) && is_int( $opts['timeout'] ) )
-            $this->timeout = absint( $opts['ssl_verifypeer'] );
+            $this->timeout = absint( $opts['timeout'] );
 
         if ( isset( $opts['debug'] ) )
             $this->debug = true;
@@ -288,7 +288,7 @@ class Mailchimp {
         );
 
         $args = apply_filters( 'mailchimp_request_args', $args );
-
+var_dump($args);
         if ( $this->ssl_cainfo )
             $args['sslcertificates'] = $this->ssl_cainfo;
 
