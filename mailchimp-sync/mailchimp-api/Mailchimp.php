@@ -288,7 +288,7 @@ class Mailchimp {
         );
 
         $args = apply_filters( 'mailchimp_request_args', $args );
-var_dump($args);
+
         if ( $this->ssl_cainfo )
             $args['sslcertificates'] = $this->ssl_cainfo;
 
