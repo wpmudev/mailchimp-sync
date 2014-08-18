@@ -1,7 +1,7 @@
 <?php
 
-class Mailchimp_Campaigns {
-    public function __construct(Mailchimp $master) {
+class WPMUDEV_Mailchimp_Campaigns_API {
+    public function __construct(WPMUDEV_Mailchimp_Sync_API $master) {
         $this->master = $master;
     }
 

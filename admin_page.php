@@ -105,8 +105,9 @@ class WPMUDEV_MailChimp_Admin {
 	}
 
 	public function enqueue_scripts( $hook ) {
-		if ( $hook === $this->page_id && $this->get_current_tab() === 'import' )
+		if ( $hook === $this->page_id && $this->get_current_tab() === 'import' ) {
 			wp_enqueue_script( 'jquery-ui-progressbar' );
+		}
 	}
 
 	public function enqueue_styles( $hook ) {

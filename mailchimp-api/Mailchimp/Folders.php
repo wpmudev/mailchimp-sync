@@ -1,7 +1,7 @@
 <?php
 
-class Mailchimp_Folders {
-    public function __construct(Mailchimp $master) {
+class WPMUDEV_Mailchimp_Folders_API {
+    public function __construct(WPMUDEV_Mailchimp_Sync_API $master) {
         $this->master = $master;
     }
 

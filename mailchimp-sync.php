@@ -4,7 +4,7 @@ Plugin Name: MailChimp Sync
 Plugin URI: http://premium.wpmudev.org/project/mailchimp-newsletter-integration
 Description: Simply integrate MailChimp with your Multisite (or regular old single user WP) site - automatically add new users to your email lists and import all your existing users
 Author: WPMU DEV
-Version: 1.6.2
+Version: 1.6.3
 Author URI: http://premium.wpmudev.org
 Network: true
 WDP ID: 73
@@ -29,8 +29,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class WPMUDEV_MailChimp_Sync {
 
-	public $api = null;
-
 	public function __construct() {
 		$this->set_globals();
 		$this->includes();
@@ -52,6 +50,9 @@ class WPMUDEV_MailChimp_Sync {
 		add_action( 'bp_core_action_set_spammer_status', array( $this, 'mailchimp_bp_spamming' ) , 10, 2); //for buddypress
 
 		add_action( 'widgets_init', array( $this, 'mailchimp_widget_init' )  );
+
+		$plugin_basename = plugin_basename( plugin_dir_path( __FILE__ )) . '/mailchimp-sync.php';
+		add_filter( 'network_admin_plugin_action_links_' . $plugin_basename, array( $this, 'add_action_links' ) );
 	}
 
 	private function set_globals() {
@@ -84,6 +85,15 @@ class WPMUDEV_MailChimp_Sync {
 		
 
 			
+	}
+
+	public function add_action_links( $links ) {
+		return array_merge(
+			array(
+				'settings' => '<a href="' . network_admin_url( 'settings.php?page=mailchimp' ) . '">' . __( 'Settings', WPMUDEV_CLONER_LANG_DOMAIN ) . '</a>'
+			),
+			$links
+		);
 	}
 
 	public function init() {

@@ -39,7 +39,7 @@ function mailchimp_load_API() {
 	}
 
 	try {
-		$api = new Mailchimp( $mailchimp_apikey, $options );
+		$api = new WPMUDEV_Mailchimp_Sync_API( $mailchimp_apikey, $options );
 	}
 	catch ( Exception $e ) {
 		return new WP_Error( $e->getCode(), $e->getMessage() );

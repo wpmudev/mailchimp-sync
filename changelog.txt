@@ -1,11 +1,16 @@
 Plugin Name: MailChimp Sync
 Author: WPMU DEV
 Requires at least: 3.5
-Tested up to: 3.9
+Tested up to: 3.9.2
 
 Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
+
+1.6.3 - 2014-08-18
+----------------------------------------------------------------------
+- Enhanced: added prefix to Mailchimp API classes.
+- Enhanced: Added Settings link in plugins list.
 
 1.6.2 - 2014-05-15
 ----------------------------------------------------------------------

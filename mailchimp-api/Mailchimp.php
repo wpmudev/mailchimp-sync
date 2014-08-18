@@ -14,7 +14,7 @@ require_once 'Mailchimp/Reports.php';
 require_once 'Mailchimp/Gallery.php';
 require_once 'Mailchimp/Exceptions.php';
 
-class Mailchimp {
+class WPMUDEV_Mailchimp_Sync_API {
 
     /**
      * Placeholder attribute for Mailchimp_Folders class
@@ -229,7 +229,7 @@ class Mailchimp {
     public function __construct($apikey=null, $opts=array()) {
         if(!$apikey) $apikey = getenv('MAILCHIMP_APIKEY');
         //if(!$apikey) $apikey = $this->readConfigs();
-        if(!$apikey) throw new Mailchimp_Error('You must provide a MailChimp API key');
+        if(!$apikey) throw new WPMUDEV_Mailchimp_Error_API('You must provide a MailChimp API key');
         $this->apikey = $apikey;
         $dc = "us1";
         if (strstr($this->apikey,"-")){
@@ -255,18 +255,18 @@ class Mailchimp {
             $this->ssl_cainfo = $opts['ssl_cainfo'];
 
 
-        $this->folders = new Mailchimp_Folders($this);
-        $this->templates = new Mailchimp_Templates($this);
-        $this->users = new Mailchimp_Users($this);
-        $this->helper = new Mailchimp_Helper($this);
-        $this->mobile = new Mailchimp_Mobile($this);
-        $this->ecomm = new Mailchimp_Ecomm($this);
-        $this->neapolitan = new Mailchimp_Neapolitan($this);
-        $this->lists = new Mailchimp_Lists($this);
-        $this->campaigns = new Mailchimp_Campaigns($this);
-        $this->vip = new Mailchimp_Vip($this);
-        $this->reports = new Mailchimp_Reports($this);
-        $this->gallery = new Mailchimp_Gallery($this);
+        $this->folders = new WPMUDEV_Mailchimp_Folders_API($this);
+        $this->templates = new WPMUDEV_Mailchimp_Templates_API($this);
+        $this->users = new WPMUDEV_Mailchimp_Users_API($this);
+        $this->helper = new WPMUDEV_Mailchimp_Helper_API($this);
+        $this->mobile = new WPMUDEV_Mailchimp_Mobile_API($this);
+        $this->ecomm = new WPMUDEV_Mailchimp_Ecomm_API($this);
+        $this->neapolitan = new WPMUDEV_Mailchimp_Neapolitan_API($this);
+        $this->lists = new WPMUDEV_Mailchimp_Lists_API($this);
+        $this->campaigns = new WPMUDEV_Mailchimp_Campaigns_API($this);
+        $this->vip = new WPMUDEV_Mailchimp_Vip_API($this);
+        $this->reports = new WPMUDEV_Mailchimp_Reports_API($this);
+        $this->gallery = new WPMUDEV_Mailchimp_Gallery_API($this);
     }
 
     public function call($url, $params) {
@@ -339,9 +339,9 @@ class Mailchimp {
     }
 
     public function castError($result) {
-        if($result['status'] !== 'error' || !$result['name']) return new Mailchimp_Error('We received an unexpected error: ' . json_encode($result));
+        if($result['status'] !== 'error' || !$result['name']) return new WPMUDEV_Mailchimp_Error_API('We received an unexpected error: ' . json_encode($result));
 
-        $class = (isset(self::$error_map[$result['name']])) ? self::$error_map[$result['name']] : 'Mailchimp_Error';
+        $class = (isset(self::$error_map[$result['name']])) ? self::$error_map[$result['name']] : 'WPMUDEV_Mailchimp_Error_API';
         return new $class($result['error'], $result['code']);
     }
 
