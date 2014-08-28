@@ -258,6 +258,9 @@ class WPMUDEV_MailChimp_Admin {
 			if ( $_POST['action'] == 'submit-import' ) {
 				global $wpdb, $mailchimp_sync;
 
+				if ( ! empty( $_POST['mailchimp_import_mailing_list'] ) )
+					update_site_option( 'mailchimp_last_imported_list', $_POST['mailchimp_import_mailing_list'] );
+
 				// Render progressbar script
 				add_action( 'admin_head', array( &$this, 'process_import_javascript' ) );
 			}
@@ -424,6 +427,7 @@ class WPMUDEV_MailChimp_Admin {
 		$mailchimp_mailing_list = get_site_option('mailchimp_mailing_list');
 		$mailchimp_ignore_plus = get_site_option('mailchimp_ignore_plus');
 		$mailchimp_allow_widget = get_site_option('mailchimp_allow_widget', false);
+		$mailchimp_last_imported_list = get_site_option( 'mailchimp_last_imported_list', $mailchimp_mailing_list );
 
 		if ( ! empty( $mailchimp_apikey ) ) {
 			$api = mailchimp_load_API();
@@ -453,7 +457,7 @@ class WPMUDEV_MailChimp_Admin {
 					<select name="mailchimp_import_mailing_list" id="mailchimp_import_mailing_list">
 						<?php
 			            foreach ( $mailchimp_lists as $mailchimp_list ) {
-			              ?><option value="<?php echo $mailchimp_list['id']; ?>" ><?php echo $mailchimp_list['name']; ?></option><?php
+			              ?><option value="<?php echo $mailchimp_list['id']; ?>" <?php selected( $mailchimp_last_imported_list == $mailchimp_list['id'] ); ?>><?php echo $mailchimp_list['name']; ?></option><?php
 			            }
 			            ?>
 					</select><br />
