@@ -188,7 +188,7 @@ class WPMUDEV_MailChimp_Sync {
 	  	$merge_vars = apply_filters('mailchimp_merge_vars', $merge_vars, $user);
 	  	do_action( 'mailchimp_update_user', $merge_vars, $user );
 
-		$results = mailchimp_update_user( $mailchimp_mailing_list, $user->user_email, $merge_vars );
+        $results = mailchimp_update_user( $user->user_email, $mailchimp_mailing_list, $merge_vars );
 
 	}
 
