@@ -1,7 +1,7 @@
 <?php
 
-class WPMUDEV_Mailchimp_Neapolitan_API {
-    public function __construct(WPMUDEV_Mailchimp_Sync_API $master) {
+class Mailchimp_Neapolitan {
+    public function __construct(Mailchimp $master) {
         $this->master = $master;
     }
 

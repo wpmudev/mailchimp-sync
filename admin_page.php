@@ -235,10 +235,28 @@ class WPMUDEV_MailChimp_Admin {
 				else 
 					update_site_option('mailchimp_apikey', '' );
 
-				if ( isset( $_POST['mailchimp_mailing_list'] ) )
+
+				if ( isset( $_POST['mailchimp_mailing_list'] ) ) {
+					$list = $_POST['mailchimp_mailing_list'];
 					update_site_option('mailchimp_mailing_list', $_POST['mailchimp_mailing_list']);
-				else 
+
+					$current_groups = get_site_option( 'mailchimp_groups', array() );
+					$groups = array( $list => array() );
+
+					$groups = wp_parse_args( $groups, $current_groups );
+					if ( ! empty( $_POST['mailchimp_groups'] ) ) {
+						$groups[ $list ] = $_POST['mailchimp_groups'];
+					}
+					else {
+						$groups[ $list ] = array();
+					}
+
+					update_site_option( 'mailchimp_groups', $groups );
+				}
+				else {
+					$list = false;
 					update_site_option('mailchimp_mailing_list', '' );
+				}
 
 				if ( isset( $_POST['mailchimp_auto_opt_in'] ) )
 					update_site_option('mailchimp_auto_opt_in', $_POST['mailchimp_auto_opt_in']);
@@ -272,6 +290,7 @@ class WPMUDEV_MailChimp_Admin {
 
 		$current_tab = $this->get_current_tab();
 		$submit_text = 'settings' == $current_tab ? null : __( 'Import', MAILCHIMP_LANG_DOMAIN );
+
 		?>
 			<div class="wrap">
 				
@@ -323,13 +342,20 @@ class WPMUDEV_MailChimp_Admin {
 		$mailchimp_allow_widget = get_site_option('mailchimp_allow_widget', false);
 		$mailchimp_allow_shortcode = get_site_option('mailchimp_allow_shortcode', false);
 
+		$groups = get_site_option( 'mailchimp_groups' );
+
 		if ( ! empty( $mailchimp_apikey ) ) {
 			$api = mailchimp_load_API();
 			if ( is_wp_error( $api ) )
 				$api_error = $api->get_error_message();
-        	
+
         	$mailchimp_lists = mailchimp_get_lists();
 			$api_error = ! empty( $api_error );
+
+			$list_groups = array();
+
+			if ( $mailchimp_lists && $mailchimp_mailing_list ) 
+				$list_groups = mailchimp_get_list_groups( $mailchimp_mailing_list );
 		}
 
 		if ( empty( $mailchimp_apikey ) ): ?>
@@ -376,7 +402,7 @@ class WPMUDEV_MailChimp_Admin {
 		            </tr>
 
 				    <?php if ( ! is_array( $mailchimp_lists ) || ! count( $mailchimp_lists ) ): ?>
-				    	<p><?php _e('You must have at least one MailChimp mailing list in order to use this plugin. Please create a mailing list via the MailChimp admin panel.', MAILCHIMP_LANG_DOMAIN); ?></p>
+				    	<div class="error"><p><?php _e('You must have at least one MailChimp mailing list in order to use this plugin. Please create a mailing list via the MailChimp admin panel.', MAILCHIMP_LANG_DOMAIN); ?></p></div>
 					<?php else: ?>
 						<tr class="form-field form-required">
 			                <th scope="row"><?php _e('Mailing List', MAILCHIMP_LANG_DOMAIN)?></th>
@@ -393,6 +419,27 @@ class WPMUDEV_MailChimp_Admin {
 			                </td>
 			            </tr>
 					<?php endif; ?>
+
+					<?php if ( ! empty( $list_groups ) && is_array( $list_groups ) ): ?>
+						<p><?php _e( 'Assign users to the following groups:', MAILCHIMP_LANG_DOMAIN ); ?></p>
+						<tr class="form-field">
+			                <th scope="row"><?php _e( 'List Groups', MAILCHIMP_LANG_DOMAIN )?></th>
+			                <td>
+			                	<?php foreach ( $list_groups as $group ): ?>
+			                		<?php 
+			                			if ( empty( $group['groups'] ) )
+			                				continue;
+			                		?>
+
+			                		<?php $this->render_list_group( $group ); ?>		
+									
+			                	<?php endforeach; ?>
+			                  	
+			                </td>
+			            </tr>
+					<?php endif; ?>
+
+
 
 					<?php if ( is_multisite() && apply_filters( 'mailchimp_allow_front_widgets', true ) ): ?>
 	      				<tr class="form-field form-required">
@@ -502,6 +549,68 @@ class WPMUDEV_MailChimp_Admin {
 			<textarea name="" id="" cols="30" rows="10" disabled class="widefat code"><?php echo esc_textarea( $content ); ?></textarea>
         <?php
 	}
+
+	private function render_list_group( $group ) {
+		$subgroups = $group['groups'];
+		?>
+			<h4><?php echo $group['name']; ?></h4>
+			<?php 
+				switch ( $group['form_field'] ):
+					case 'dropdown':
+					case 'radio': {
+						$this->render_dropdown_group( $group );
+						break;
+					}
+					default: {
+						$this->render_checkboxes_group( $group );
+						break;
+					}
+
+				endswitch; 
+			?>
+		<?php
+	}
+
+	private function render_dropdown_group( $group ) {
+		$mailchimp_mailing_list = get_site_option('mailchimp_mailing_list');
+		$groups = get_site_option('mailchimp_groups');
+
+		$selected = '';
+		if ( isset( $groups[ $mailchimp_mailing_list ][ $group['id'] ] ) )
+			$selected = $groups[ $mailchimp_mailing_list ][ $group['id'] ];
+
+		?>
+			<select name="mailchimp_groups[<?php echo $group['id'] ?>]" id="mailchimp-group-<?php echo $group['id']; ?>">
+				<option value="" <?php selected( empty( $selected ) ); ?>><?php _e( '-- Select a group --', MAILCHIMP_LANG_DOMAIN ); ?></option>
+				<?php foreach ( $group['groups'] as $subgroup ): ?>
+					<option value="<?php echo $subgroup['id']; ?>" <?php selected( $selected == $subgroup['id'] ); ?>><?php echo $subgroup['name']; ?></option>
+				<?php endforeach; ?>
+				
+			</select>
+		<?php
+	}
+
+	private function render_checkboxes_group( $group ) {
+		$mailchimp_mailing_list = get_site_option('mailchimp_mailing_list');
+		$groups = get_site_option('mailchimp_groups');
+
+		$selected = array();
+		if ( isset( $groups[ $mailchimp_mailing_list ][ $group['id'] ] ) )
+			$selected = $groups[ $mailchimp_mailing_list ][ $group['id'] ];
+
+		if ( ! is_array( $selected ) )
+			$selected = array();
+
+		?>
+			<?php foreach ( $group['groups'] as $subgroup ): ?>
+				<label for="mailchimp-group-<?php echo $group['id'] . '-' . $subgroup['id'] ?>">
+					<input type="checkbox" <?php checked( in_array( $subgroup['id'], $selected ) ); ?> name="mailchimp_groups[<?php echo $group['id'] ?>][]" id="mailchimp-group-<?php echo $group['id'] . '-' . $subgroup['id'] ?>" value="<?php echo $subgroup['id']; ?>" />
+					<?php echo $subgroup['name']; ?>
+				</label><br/>
+			<?php endforeach; ?>
+		<?php
+	}
+
 
 
 }

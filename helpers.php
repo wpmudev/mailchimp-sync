@@ -11,7 +11,7 @@ function mailchimp_load_API() {
 	if ( ! empty( $mailchimp_sync->api ) )
 		return $mailchimp_sync->api;
 
-	require_once( 'mailchimp-api/Mailchimp.php' );
+	require_once( 'mailchimp-api/mailchimp-api.php' );
 	$mailchimp_apikey = get_site_option('mailchimp_apikey');
 
 	$options = array(
@@ -304,5 +304,20 @@ function mailchimp_get_lists() {
 		return $lists['data'];
 
 	return array();
+}
+
+function mailchimp_get_list_groups( $list_id ) {
+	$api = mailchimp_load_API();
+
+	if ( is_wp_error( $api ) )
+		return array();
+
+	$groups = $api->lists->interestGroupings( $list_id );
+
+	if ( is_wp_error( $groups ) )
+		return array();
+
+	return $groups;
+
 }
 

@@ -1,7 +1,7 @@
 <?php
 
-class WPMUDEV_Mailchimp_Mobile_API {
-    public function __construct(WPMUDEV_Mailchimp_Sync_API $master) {
+class Mailchimp_Mobile {
+    public function __construct(Mailchimp $master) {
         $this->master = $master;
     }
 

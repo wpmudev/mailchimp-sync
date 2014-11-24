@@ -1,7 +1,7 @@
 <?php
 
-class WPMUDEV_Mailchimp_Vip_API {
-    public function __construct(WPMUDEV_Mailchimp_Sync_API $master) {
+class Mailchimp_Vip {
+    public function __construct(Mailchimp $master) {
         $this->master = $master;
     }
 

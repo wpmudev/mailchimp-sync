@@ -276,3 +276,31 @@ class WPMUDEV_MailChimp_Sync {
 
 global $mailchimp_sync;
 $mailchimp_sync = new WPMUDEV_MailChimp_Sync();
+
+//add_action( 'init', 'test' );
+function test() {
+	$mailchimp_mailing_list = get_site_option('mailchimp_mailing_list');
+	$groups = get_site_option('mailchimp_groups');
+
+	$merge_groups = array();
+	if ( ! empty( $groups[ $mailchimp_mailing_list ] ) ) {
+
+		foreach ( $groups[ $mailchimp_mailing_list ] as $group_id => $subgroups ) {
+			if ( is_array( $subgroups ) && ! empty( $subgroups ) ) {
+				$merge_groups[] = array(
+					'id' => $group_id,
+					'groups' => $subgroups
+				);
+			}
+			elseif ( ! empty( $subgroups ) ) {
+				$merge_groups[] = array(
+					'id' => $group_id,
+					'groups' => array( $subgroups )
+				);
+			}
+		}
+
+		$merge = array( 'groupings' => $merge_groups );
+		mailchimp_subscribe_user( 'igmoweb@gmail.com', $mailchimp_mailing_list, true, $merge );
+	}
+}
