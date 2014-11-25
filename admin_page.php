@@ -38,6 +38,13 @@ function mailchimp_import_process() {
 			if ( $last_name = get_user_meta( $user_id, 'last_name', true ) )
 				$merge_vars['LNAME'] = $last_name;
 
+			$merge_groups = mailchimp_get_interest_groups();
+			if ( ! empty( $merge_groups ) )
+				$merge_groups = array( 'groupings' => $merge_groups );
+
+			$merge_vars = array_merge( $merge_vars, $merge_groups );
+
+
 			$merge_vars = apply_filters( 'mailchimp_bulk_merge_vars', $merge_vars, $item, $user_id );
 
 			$item['merge_vars'] = $merge_vars;
@@ -583,7 +590,7 @@ class WPMUDEV_MailChimp_Admin {
 			<select name="mailchimp_groups[<?php echo $group['id'] ?>]" id="mailchimp-group-<?php echo $group['id']; ?>">
 				<option value="" <?php selected( empty( $selected ) ); ?>><?php _e( '-- Select a group --', MAILCHIMP_LANG_DOMAIN ); ?></option>
 				<?php foreach ( $group['groups'] as $subgroup ): ?>
-					<option value="<?php echo $subgroup['id']; ?>" <?php selected( $selected == $subgroup['id'] ); ?>><?php echo $subgroup['name']; ?></option>
+					<option value="<?php echo esc_attr( $subgroup['name'] ); ?>" <?php selected( $selected == $subgroup['name'] ); ?>><?php echo $subgroup['name']; ?></option>
 				<?php endforeach; ?>
 				
 			</select>
@@ -604,7 +611,7 @@ class WPMUDEV_MailChimp_Admin {
 		?>
 			<?php foreach ( $group['groups'] as $subgroup ): ?>
 				<label for="mailchimp-group-<?php echo $group['id'] . '-' . $subgroup['id'] ?>">
-					<input type="checkbox" <?php checked( in_array( $subgroup['id'], $selected ) ); ?> name="mailchimp_groups[<?php echo $group['id'] ?>][]" id="mailchimp-group-<?php echo $group['id'] . '-' . $subgroup['id'] ?>" value="<?php echo $subgroup['id']; ?>" />
+					<input type="checkbox" <?php checked( in_array( $subgroup['name'], $selected ) ); ?> name="mailchimp_groups[<?php echo $group['id'] ?>][]" id="mailchimp-group-<?php echo $group['id'] . '-' . $subgroup['id'] ?>" value="<?php echo esc_attr( $subgroup['name'] ); ?>" />
 					<?php echo $subgroup['name']; ?>
 				</label><br/>
 			<?php endforeach; ?>

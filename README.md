@@ -1,5 +1,7 @@
 # Instructions for developers
 
+Mailchimp Syncs uses Bower and Gulp to manage dependencies. Whenever a new API wrapper is released is a good practice to update it inside the plugins files.
+
 ## Requisites
 
 1. Install nodejs: [https://github.com/joyent/node/wiki/installing-node.js-via-package-manager]
@@ -18,10 +20,10 @@ Mailchimp API Wrapper should have been installed in mailchimp-api folder
 
 ## Update Mailchimp API
 
-Just run `gulp update`
+Just run `gulp update` in the root folder of the plugin
 
 ## Notes
 
-Try not to touch the Mailchimp classes, there's another class that makes all the work: mailchimp-api/mailchimp-api.php
+Try not to touch the Mailchimp classes, there's another class that makes all the work: mailchimp-api/mailchimp-api.php. If changes are needed, this is your file.
 
 This class extends from the main Mailchimp class and overrides several methods but uses WordPress functions instead.

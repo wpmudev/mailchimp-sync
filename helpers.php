@@ -321,3 +321,37 @@ function mailchimp_get_list_groups( $list_id ) {
 
 }
 
+/**
+ * Return the groups that the user has selected in Settings
+ * 
+ * @return array Array of groups
+ */
+function mailchimp_get_interest_groups() {
+	$mailchimp_mailing_list = get_site_option( 'mailchimp_mailing_list', '' );
+	$groups = get_site_option( 'mailchimp_groups', array() );
+
+	$vars = array();
+	$merge_groups = array();
+	if ( ! empty( $groups[ $mailchimp_mailing_list ] ) ) {
+
+		foreach ( $groups[ $mailchimp_mailing_list ] as $group_id => $subgroups ) {
+			if ( is_array( $subgroups ) && ! empty( $subgroups ) ) {
+				$merge_groups[] = array(
+					'id' => $group_id,
+					'groups' => $subgroups
+				);
+			}
+			elseif ( ! empty( $subgroups ) ) {
+				$merge_groups[] = array(
+					'id' => $group_id,
+					'groups' => array( $subgroups )
+				);
+			}
+		}
+
+		$vars = $merge_groups;
+	}
+
+	return $vars;
+}
+

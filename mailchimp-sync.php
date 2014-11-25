@@ -29,6 +29,17 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class WPMUDEV_MailChimp_Sync {
 
+	public static $instance = null;
+
+	public static function get_instance() {
+		if ( ! self::$instance ) {
+			return new self();
+		}
+
+		return self::$instance;
+	}
+
+
 	public function __construct() {
 		$this->set_globals();
 		$this->includes();
@@ -162,6 +173,11 @@ class WPMUDEV_MailChimp_Sync {
 
 		$autopt = $mailchimp_auto_opt_in == 'yes' ? true : false;
 		$merge_vars = array( 'FNAME' => $user->user_firstname, 'LNAME' => $user->user_lastname );
+		$merge_groups = mailchimp_get_interest_groups();
+		if ( ! empty( $merge_groups ) )
+			$merge_groups = array( 'groupings' => $merge_groups );
+
+		$merge_vars = array_merge( $merge_vars, $merge_groups );
 
 		$merge_vars = apply_filters( 'mailchimp_merge_vars', $merge_vars, $user );
 		do_action( 'mailchimp_subscribe_user', $merge_vars, $user );
@@ -275,32 +291,8 @@ class WPMUDEV_MailChimp_Sync {
 }
 
 global $mailchimp_sync;
-$mailchimp_sync = new WPMUDEV_MailChimp_Sync();
+$mailchimp_sync = WPMUDEV_MailChimp_Sync::get_instance();
 
-//add_action( 'init', 'test' );
-function test() {
-	$mailchimp_mailing_list = get_site_option('mailchimp_mailing_list');
-	$groups = get_site_option('mailchimp_groups');
-
-	$merge_groups = array();
-	if ( ! empty( $groups[ $mailchimp_mailing_list ] ) ) {
-
-		foreach ( $groups[ $mailchimp_mailing_list ] as $group_id => $subgroups ) {
-			if ( is_array( $subgroups ) && ! empty( $subgroups ) ) {
-				$merge_groups[] = array(
-					'id' => $group_id,
-					'groups' => $subgroups
-				);
-			}
-			elseif ( ! empty( $subgroups ) ) {
-				$merge_groups[] = array(
-					'id' => $group_id,
-					'groups' => array( $subgroups )
-				);
-			}
-		}
-
-		$merge = array( 'groupings' => $merge_groups );
-		mailchimp_subscribe_user( 'igmoweb@gmail.com', $mailchimp_mailing_list, true, $merge );
-	}
+function mailchimp_sync() {
+	return WPMUDEV_MailChimp_Sync::get_instance();
 }
