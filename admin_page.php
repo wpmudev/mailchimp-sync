@@ -7,7 +7,6 @@ function mailchimp_import_process() {
 	check_ajax_referer( 'mailchimp-import', 'nonce' );
 
 	$mailchimp_stats = $_POST['mailchimp_stats'];
-
 	$mailchimp_import_mailing_list = $_POST['mailchimp_import_mailing_list'];
 	$mailchimp_import_auto_opt_in = $_POST['mailchimp_import_auto_opt_in'];
 
@@ -515,7 +514,7 @@ class WPMUDEV_MailChimp_Admin {
 		            <td>
 		            	<input type="text" name="mailchimp_webhooks[webhook_key]" value="<?php echo esc_attr( $webhooks_settings['webhook_key'] ); ?>" /><br/>
 		            	<span class="description"><?php _e( 'Leave it blank if you want to deactivate webhooks', MAILCHIMP_LANG_DOMAIN ); ?></span>
-		            	<span class="description"><?php printf( __( 'Your Webhook URL is: %s', MAILCHIMP_LANG_DOMAIN ), mailchimp_get_webhook_url() ); ?></span><br/>
+		            	<span class="description"><?php printf( __( 'Your Webhook URL is: <code>%s</code>', MAILCHIMP_LANG_DOMAIN ), mailchimp_get_webhook_url() ); ?></span><br/>
 		            </td>
 
 		            </tr>

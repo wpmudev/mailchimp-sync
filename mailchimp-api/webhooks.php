@@ -74,7 +74,7 @@ class WPMUDEV_MailChimp_Sync_Webhooks {
 	}
 
 	private function trigger_webhook_action() {
-		$req = $_REQUEST;
+		$req = $_POST;
 
 		if ( ! isset( $req['type'] ) ) {
 			$this->log( __( 'Request type not defined', MAILCHIMP_LANG_DOMAIN ) );
