@@ -355,3 +355,30 @@ function mailchimp_get_interest_groups() {
 	return $vars;
 }
 
+function mailchimp_get_webhooks_settings() {
+	return wp_parse_args( get_site_option( 'mailchimp_webhooks_settings', array() ), mailchimp_get_webhooks_default_settings() );
+}
+
+function mailchimp_get_webhooks_default_settings() {
+	return array(
+		'webhook_key' => '',
+		'write_log' => false,
+		'delete_user' => 'mark'
+	);
+}
+
+function mailchimp_update_webhooks_settings( $new_settings ) {
+	update_site_option( 'mailchimp_webhooks_settings', $new_settings );
+}
+
+function mailchimp_get_webhook_url() {
+	return WPMUDEV_MailChimp_Sync_Webhooks::get_callback_url();
+}
+
+function mailchimp_set_webhooks_rewrite_rules() {
+	WPMUDEV_MailChimp_Sync_Webhooks::add_rewrite_rules();
+}
+
+function mailchimp_is_webhooks_active() {
+	return WPMUDEV_MailChimp_Sync_Webhooks::is_webhooks_active();
+}

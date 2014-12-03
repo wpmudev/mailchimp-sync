@@ -64,6 +64,8 @@ class WPMUDEV_MailChimp_Sync {
 
 		$plugin_basename = plugin_basename( plugin_dir_path( __FILE__ )) . '/mailchimp-sync.php';
 		add_filter( 'network_admin_plugin_action_links_' . $plugin_basename, array( $this, 'add_action_links' ) );
+
+		new WPMUDEV_MailChimp_Sync_Webhooks();
 	}
 
 	private function set_globals() {
@@ -79,6 +81,7 @@ class WPMUDEV_MailChimp_Sync {
 	private function includes() {
 		require_once( 'helpers.php' );
 		require_once( 'integration.php' );
+		require_once( 'mailchimp-api/webhooks.php' );
 
 		// WPMUDEV Dashboard class
 		if ( is_admin() ) {
@@ -122,9 +125,9 @@ class WPMUDEV_MailChimp_Sync {
 		add_action( 'wp_ajax_incsub_mailchimp_subscribe_user', array( 'WPMUDEV_MailChimp_Form', 'validate_ajax_form' ) );
 		add_action( 'wp_ajax_nopriv_incsub_mailchimp_subscribe_user', array( 'WPMUDEV_MailChimp_Form', 'validate_ajax_form' ) );
 
-		
 
 	}
+
 
 	function mailchimp_localization() {
 	  // Load up the localization file if we're using WordPress in a different language
@@ -135,7 +138,6 @@ class WPMUDEV_MailChimp_Sync {
 
 
 	function mailchimp_widget_init() {
-
 		if ( ! is_multisite() || ( is_multisite() && get_site_option( 'mailchimp_allow_widget', false ) ) ) {
 			require_once( MAILCHIMP_FRONT_DIR . 'widget.php' );
 			register_widget( 'Incsub_Mailchimp_Widget' );

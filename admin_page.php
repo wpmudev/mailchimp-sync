@@ -75,6 +75,8 @@ function mailchimp_import_process() {
 	}
 	
 }
+
+
 class WPMUDEV_MailChimp_Admin {
 
 	private $page_id;
@@ -219,7 +221,7 @@ class WPMUDEV_MailChimp_Admin {
 		if ( ! is_wp_error( $api ) )
 			$this->tabs['import'] = __( 'Import', MAILCHIMP_LANG_DOMAIN );
 
-		$this->tabs['error-log'] = __( 'Error Log', MAILCHIMP_LANG_DOMAIN );
+		$this->tabs['error-log'] = __( 'Logs', MAILCHIMP_LANG_DOMAIN );
 	}
 
 	public function process_form() {
@@ -275,6 +277,32 @@ class WPMUDEV_MailChimp_Admin {
 				else 
 					update_site_option('mailchimp_ignore_plus', '' );
 
+				$webhooks = $_POST['mailchimp_webhooks'];
+				$webhooks_settings = mailchimp_get_webhooks_settings();
+
+				if ( empty( $webhooks['create_user'] ) )
+					$webhooks_settings['create_user'] = false;
+				else
+					$webhooks_settings['create_user'] = true;
+
+				if ( empty( $webhooks['delete_user'] ) )
+					$webhooks_settings['delete_user'] = false;
+				else
+					$webhooks_settings['delete_user'] = true;
+
+				$webhook_key_updated = false;
+				$webhook_key = sanitize_text_field( $webhooks['webhook_key'] );
+				if ( $webhook_key != $webhooks_settings['webhook_key'] )
+					$webhook_key_updated = true;
+
+				$webhooks_settings['webhook_key'] = $webhook_key;
+
+				mailchimp_update_webhooks_settings( $webhooks_settings );
+
+				if ( $webhook_key_updated ) {
+					mailchimp_set_webhooks_rewrite_rules();
+					flush_rewrite_rules();
+				}
 
 				wp_redirect( add_query_arg( 'updated', 'true', $redirect_to ) );
 				exit();
@@ -348,6 +376,7 @@ class WPMUDEV_MailChimp_Admin {
 		$mailchimp_ignore_plus = get_site_option('mailchimp_ignore_plus');
 		$mailchimp_allow_widget = get_site_option('mailchimp_allow_widget', false);
 		$mailchimp_allow_shortcode = get_site_option('mailchimp_allow_shortcode', false);
+		$webhooks_settings = mailchimp_get_webhooks_settings();
 
 		$groups = get_site_option( 'mailchimp_groups' );
 
@@ -472,6 +501,40 @@ class WPMUDEV_MailChimp_Admin {
 	    	<?php endif; // if ( ! empty( $mailchimp_apikey ) ) ?>
 
     	</table>
+		
+		<?php if ( ! empty( $mailchimp_apikey ) && ! empty( $mailchimp_mailing_list ) ): ?>
+
+	    	<h3><?php esc_html_e( 'Webhooks', MAILCHIMP_LANG_DOMAIN ); ?></h3>
+			<p><?php _e( 'Allows WordPress users to be updated with MailChimp subscribe/unsubscribe actions', MAILCHIMP_LANG_DOMAIN ); ?></p>
+			<p><?php printf( __( 'Please, follow <a href="%s">this</a> instructions to set up your webhooks', MAILCHIMP_LANG_DOMAIN ), 'http://kb.mailchimp.com/integrations/other-integrations/what-are-webhooks-and-how-can-i-set-them-up' ); ?></p>
+
+			<table class="form-table">
+
+		        <tr class="form-field form-required">
+		            <th scope="row"><?php _e( 'Specify a unique webhook key', MAILCHIMP_LANG_DOMAIN ); ?></th>
+		            <td>
+		            	<input type="text" name="mailchimp_webhooks[webhook_key]" value="<?php echo esc_attr( $webhooks_settings['webhook_key'] ); ?>" /><br/>
+		            	<span class="description"><?php _e( 'Leave it blank if you want to deactivate webhooks', MAILCHIMP_LANG_DOMAIN ); ?></span>
+		            	<span class="description"><?php printf( __( 'Your Webhook URL is: %s', MAILCHIMP_LANG_DOMAIN ), mailchimp_get_webhook_url() ); ?></span><br/>
+		            </td>
+
+		            </tr>
+						<tr class="form-field form-required">
+						<th scope="row"><label for="mailchimp_webhooks_delete_user"><?php _e( 'Action to take when user unsubscribes from list', MAILCHIMP_LANG_DOMAIN ); ?></label></th>
+						<td>
+							<select name="mailchimp_webhooks[delete_user]" id="mailchimp_webhooks_delete_user">
+				                <option value="mark" <?php selected( $webhooks_settings['delete_user'] == 'mark' ); ?>><?php _e( 'Mark as not subscribed', MAILCHIMP_LANG_DOMAIN); ?></option>
+				                <option value="delete" <?php selected( $webhooks_settings['delete_user'] == 'delete' ); ?>><?php _e( 'Delete user', MAILCHIMP_LANG_DOMAIN); ?></option>
+				            </select><br />
+							<?php _e( '<strong>Warning</strong>: Be caution with this option. Administrators (on single sites) and Super Administrators (on networks) cannot be deleted for a better security', MAILCHIMP_LANG_DOMAIN); ?>
+						</td>
+					</tr>
+
+		        </tr>
+
+			</table>
+
+		<?php endif; ?>
 
     	<?php
 	}
@@ -554,6 +617,28 @@ class WPMUDEV_MailChimp_Admin {
         ?>
         	<h3><?php _e( 'Error log', MAILCHIMP_LANG_DOMAIN ); ?> <span class="description"><?php printf( __( '(Last %d lines)', MAILCHIMP_LANG_DOMAIN ), MAILCHIMP_MAX_LOG_LINES ); ?></span></h3>
 			<textarea name="" id="" cols="30" rows="10" disabled class="widefat code"><?php echo esc_textarea( $content ); ?></textarea>
+        <?php
+
+        $webhooks_log = get_site_option( 'mailchimp_webhooks_log' );
+        $content = '';
+
+        if ( is_array( $webhooks_log ) ) {
+            $webhooks_log = array_reverse( $webhooks_log );
+
+            $content = '';
+            if ( ! empty( $webhooks_log ) ) {
+            	$content = array();
+            	foreach ( $webhooks_log as $row )
+            		$content[] = $row;
+
+            	$content = implode( "\n", $content );
+            }
+        }
+        ?>
+			<?php if ( mailchimp_is_webhooks_active() ): ?>
+				<h3><?php _e( 'Webhooks log', MAILCHIMP_LANG_DOMAIN ); ?> <span class="description"><?php printf( __( '(Last %d lines)', MAILCHIMP_LANG_DOMAIN ), MAILCHIMP_MAX_LOG_LINES ); ?></span></h3>
+				<textarea name="" id="" cols="30" rows="10" disabled class="widefat code"><?php echo esc_textarea( $content ); ?></textarea>
+			<?php endif; ?>
         <?php
 	}
 
