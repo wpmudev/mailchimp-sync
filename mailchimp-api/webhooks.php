@@ -82,8 +82,8 @@ class WPMUDEV_MailChimp_Sync_Webhooks {
 		}
 
 		$list_id = get_site_option( 'mailchimp_mailing_list' );
-		if ( $list_id != $req['list_id'] ) {
-			$this->log( sprintf( __( 'Requested list ID [%s] is not the same than the selected one in Mailchimp Settings [%s]', MAILCHIMP_LANG_DOMAIN ), $req['list_id'], $list_id ) );
+		if ( $list_id != $req['data']['list_id'] ) {
+			$this->log( sprintf( __( 'Requested list ID [%s] is not the same than the selected one in Mailchimp Settings [%s]', MAILCHIMP_LANG_DOMAIN ), $req['data']['list_id'], $list_id ) );
 			return;
 		}
 
@@ -95,7 +95,7 @@ class WPMUDEV_MailChimp_Sync_Webhooks {
 		$function = array( $this, $req['type'] );
 		$function = apply_filters( 'mailchimp_webhook_action_function', $function, $req );
 
-		$result = call_user_func_array( $function, array( $req ) );
+		$result = call_user_func_array( $function, array( $req['data'] ) );
 
 		if ( is_wp_error( $result ) )
 			$this->log( strtoupper( $req['type'] ) . ': ' . $result->get_error_message() );
@@ -246,6 +246,8 @@ class WPMUDEV_MailChimp_Sync_Webhooks {
 		$list_id = get_site_option( 'mailchimp_mailing_list' );
 		update_user_meta( $user->ID, 'mailchimp_subscriber_' . $list_id, 1 );
 
+		$this->log( sprintf( __( 'UPEMAIL: email updated: "%s" to "%s"', MAILCHIMP_LANG_DOMAIN ), $user_email, $new_email ) );		
+
 		return true;
 		
 	}
@@ -271,6 +273,8 @@ class WPMUDEV_MailChimp_Sync_Webhooks {
 
 		$list_id = get_site_option( 'mailchimp_mailing_list' );
 		update_user_meta( $user->ID, 'mailchimp_subscriber_' . $list_id, 1 );
+
+		$this->log( sprintf( __( 'PROFILE: profile updated: "%s"', MAILCHIMP_LANG_DOMAIN ), $user_email ) );		
 
 		return true;
 		

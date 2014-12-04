@@ -279,15 +279,11 @@ class WPMUDEV_MailChimp_Admin {
 				$webhooks = $_POST['mailchimp_webhooks'];
 				$webhooks_settings = mailchimp_get_webhooks_settings();
 
-				if ( empty( $webhooks['create_user'] ) )
-					$webhooks_settings['create_user'] = false;
+				$allowed_delete_user = array( 'mark', 'delete' );
+				if ( ! in_array( $webhooks['delete_user'], $allowed_delete_user ) )
+					$webhooks_settings['delete_user'] = 'mark';
 				else
-					$webhooks_settings['create_user'] = true;
-
-				if ( empty( $webhooks['delete_user'] ) )
-					$webhooks_settings['delete_user'] = false;
-				else
-					$webhooks_settings['delete_user'] = true;
+					$webhooks_settings['delete_user'] = $webhooks['delete_user'];
 
 				$webhook_key_updated = false;
 				$webhook_key = sanitize_text_field( $webhooks['webhook_key'] );
