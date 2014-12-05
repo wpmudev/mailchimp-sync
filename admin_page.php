@@ -521,7 +521,7 @@ class WPMUDEV_MailChimp_Admin {
 				                <option value="mark" <?php selected( $webhooks_settings['delete_user'] == 'mark' ); ?>><?php _e( 'Mark as not subscribed', MAILCHIMP_LANG_DOMAIN); ?></option>
 				                <option value="delete" <?php selected( $webhooks_settings['delete_user'] == 'delete' ); ?>><?php _e( 'Delete user', MAILCHIMP_LANG_DOMAIN); ?></option>
 				            </select><br />
-							<?php _e( '<strong>Warning</strong>: Be caution with this option. Administrators (on single sites) and Super Administrators (on networks) cannot be deleted for a better security', MAILCHIMP_LANG_DOMAIN); ?>
+							<?php _e( '<strong>Warning</strong>: Use with caution! Please note, Administrators (on single sites) and Super Administrators (on networks) cannot be deleted.', MAILCHIMP_LANG_DOMAIN); ?>
 						</td>
 					</tr>
 

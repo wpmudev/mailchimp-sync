@@ -295,7 +295,10 @@ class WPMUDEV_MailChimp_Sync_Webhooks {
 	    	<table class="form-table">
 	        	<tr>
 	        		<th><label for="mailchimp_list"><?php _e( 'Subscribed to the current Mailchimp List', MAILCHIMP_LANG_DOMAIN ); ?></label></th> 
-	        		<td><input type="checkbox" name="_newsletter_subscriber" id="_newsletter_subscriber" <?php checked( $subscribed ); ?> /></td>
+	        		<td>
+	        			<input type="checkbox" name="_newsletter_subscriber" id="_newsletter_subscriber" <?php checked( $subscribed ); ?> />
+	        			<span class="description"><?php _e( '<strong>Note</strong>: Changing this setting will not subscribe or unsubscribe the user on MailChimp', MAILCHIMP_LANG_DOMAIN ); ?></span>
+	        		</td>
         		</tr>
     		</table>
     	<?php
