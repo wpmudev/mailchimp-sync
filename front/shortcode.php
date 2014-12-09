@@ -123,7 +123,9 @@ class WPMUDEV_MailChimp_Shortcode {
 		self::$number++;
 		$this->enqueue_styles = true;
 		
+		ob_start();
 		WPMUDEV_MailChimp_Form::render_form( $args );
+		return ob_get_clean();
 	}
 
 	public function display_shortcode_admin_form() {
