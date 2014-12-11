@@ -509,8 +509,12 @@ class WPMUDEV_MailChimp_Admin {
 		            <th scope="row"><?php _e( 'Specify a unique webhook key', MAILCHIMP_LANG_DOMAIN ); ?></th>
 		            <td>
 		            	<input type="text" name="mailchimp_webhooks[webhook_key]" value="<?php echo esc_attr( $webhooks_settings['webhook_key'] ); ?>" /><br/>
-		            	<span class="description"><?php _e( 'Leave it blank if you want to deactivate webhooks', MAILCHIMP_LANG_DOMAIN ); ?></span>
-		            	<span class="description"><?php printf( __( 'Your Webhook URL is: <code>%s</code>', MAILCHIMP_LANG_DOMAIN ), mailchimp_get_webhook_url() ); ?></span><br/>
+		            	
+		            	<?php if ( mailchimp_get_webhook_url() ): ?>
+		            		<span class="description"><?php printf( __( 'Your Webhook URL is: <code>%s</code>', MAILCHIMP_LANG_DOMAIN ), mailchimp_get_webhook_url() ); ?></span><br/>
+		            	<?php else: ?>
+		            		<span class="description"><?php _e( 'Enter the name you want to use for your secret key, then click Save Changes. The callback URL you will need to add to your webhook at MailChimp will then appear here', MAILCHIMP_LANG_DOMAIN ); ?></span>
+		            	<?php endif; ?>
 		            </td>
 
 		            </tr>
