@@ -295,7 +295,7 @@ function mailchimp_get_lists() {
 	if ( is_wp_error( $api ) )
 		return array();
 
-	$lists = $api->lists->getList();
+	$lists = $api->lists->getList( array(), 0, 100 );
 
 	if ( is_wp_error( $lists ) )
 		return array();
