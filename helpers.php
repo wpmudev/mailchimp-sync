@@ -221,9 +221,15 @@ function mailchimp_update_user( $user_email, $list_id, $merge_vars ) {
  * @param String $list_id 
  * @return Boolean. True if the user is subscribed already to the list
  */
-function mailchimp_is_user_subscribed( $user_email, $list_id ) {
+function mailchimp_is_user_subscribed( $user_email, $list_id = false ) {
 	if ( ! is_email( $user_email ) )
 		return false;
+
+	if ( ! $list_id ) {
+		$list_id = get_site_option( 'mailchimp_mailing_list' );
+		if ( ! $list_id )
+			return false;
+	}
 
 	$api = mailchimp_load_API();
 

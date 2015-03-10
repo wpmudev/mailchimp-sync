@@ -135,6 +135,11 @@ class WPMUDEV_MailChimp_Form {
 		if ( empty( $lastname ) && $settings['require_lastname'] )
 			$errors[] = ( __( 'Last name is required', MAILCHIMP_LANG_DOMAIN ) );
 
+		// Check if user is already subscribed and confirmed
+		$is_subscribed = mailchimp_is_user_subscribed( $email );
+		if ( $is_subscribed )
+			$errors[] = ( __( 'The email is already in the subscription list', MAILCHIMP_LANG_DOMAIN ) );
+
 		return apply_filters( 'mailchimp_form_validate', $errors );
 	}
 }

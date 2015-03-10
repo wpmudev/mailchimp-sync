@@ -2,21 +2,18 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mailchimp\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-12-09 12:44+0100\n"
-"PO-Revision-Date: 2014-12-09 12:45+0100\n"
+"POT-Creation-Date: 2015-03-10 09:25+0100\n"
+"PO-Revision-Date: 2015-03-10 09:26+0100\n"
 "Last-Translator: Ignacio <igmoweb@gmail.com>\n"
-"Language-Team: \n"
+"Language-Team: WPMU DEV\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-KeywordsList: _;gettext;gettext_noop;__;_e\n"
 "X-Poedit-Basepath: .\n"
 "X-Generator: Poedit 1.5.4\n"
+"Language: English\n"
 "X-Poedit-SearchPath-0: ..\n"
-
-#: ../mailchimp-sync.php:107 ../admin_page.php:217
-msgid "Settings"
-msgstr ""
 
 #: ../admin_page.php:71
 msgid "Please, select a list to subscribe users"
@@ -26,7 +23,11 @@ msgstr ""
 msgid "MailChimp Settings"
 msgstr ""
 
-#: ../admin_page.php:221 ../admin_page.php:322 ../admin_page.php:592
+#: ../admin_page.php:217 ../mailchimp-sync.php:108
+msgid "Settings"
+msgstr ""
+
+#: ../admin_page.php:221 ../admin_page.php:322 ../admin_page.php:596
 msgid "Import"
 msgstr ""
 
@@ -67,19 +68,19 @@ msgstr ""
 msgid "Passed"
 msgstr ""
 
-#: ../admin_page.php:415 ../admin_page.php:580
+#: ../admin_page.php:415 ../admin_page.php:584
 msgid "Auto Opt-in"
 msgstr ""
 
-#: ../admin_page.php:418 ../admin_page.php:428 ../admin_page.php:583
+#: ../admin_page.php:418 ../admin_page.php:428 ../admin_page.php:587
 msgid "Yes"
 msgstr ""
 
-#: ../admin_page.php:419 ../admin_page.php:429 ../admin_page.php:584
+#: ../admin_page.php:419 ../admin_page.php:429 ../admin_page.php:588
 msgid "No"
 msgstr ""
 
-#: ../admin_page.php:421 ../admin_page.php:586
+#: ../admin_page.php:421 ../admin_page.php:590
 msgid ""
 "Automatically opt-in new users to the mailing list. Users will not receive "
 "an email confirmation. Use at your own risk."
@@ -100,7 +101,7 @@ msgid ""
 "plugin. Please create a mailing list via the MailChimp admin panel."
 msgstr ""
 
-#: ../admin_page.php:439 ../admin_page.php:567
+#: ../admin_page.php:439 ../admin_page.php:571
 msgid "Mailing List"
 msgstr ""
 
@@ -148,44 +149,47 @@ msgstr ""
 msgid "Specify a unique webhook key"
 msgstr ""
 
-#: ../admin_page.php:512
-msgid "Leave it blank if you want to deactivate webhooks"
-msgstr ""
-
-#: ../admin_page.php:513
+#: ../admin_page.php:514
 #, php-format
 msgid "Your Webhook URL is: <code>%s</code>"
 msgstr ""
 
-#: ../admin_page.php:518
-msgid "Action to take when user unsubscribes from list"
-msgstr ""
-
-#: ../admin_page.php:521
-msgid "Mark as not subscribed"
+#: ../admin_page.php:516
+msgid ""
+"Enter the name you want to use for your secret key, then click Save Changes. "
+"The callback URL you will need to add to your webhook at MailChimp will then "
+"appear here"
 msgstr ""
 
 #: ../admin_page.php:522
+msgid "Action to take when user unsubscribes from list"
+msgstr ""
+
+#: ../admin_page.php:525
+msgid "Mark as not subscribed"
+msgstr ""
+
+#: ../admin_page.php:526
 msgid "Delete user"
 msgstr ""
 
-#: ../admin_page.php:524
+#: ../admin_page.php:528
 msgid ""
 "<strong>Warning</strong>: Use with caution! Please note, Administrators (on "
 "single sites) and Super Administrators (on networks) cannot be deleted."
 msgstr ""
 
-#: ../admin_page.php:556
+#: ../admin_page.php:560
 msgid ""
 "Importing users, please wait. This could take long depending on the number "
 "of users you have in your site..."
 msgstr ""
 
-#: ../admin_page.php:561
+#: ../admin_page.php:565
 msgid "Sync Existing Users"
 msgstr ""
 
-#: ../admin_page.php:562
+#: ../admin_page.php:566
 msgid ""
 "This function will syncronize all existing users on your install with your "
 "MailChimp list, adding new ones, updating the first/last name of previously "
@@ -194,49 +198,25 @@ msgid ""
 "carried on automatically after installation."
 msgstr ""
 
-#: ../admin_page.php:576
+#: ../admin_page.php:580
 msgid "The mailing list you want to import existing users to."
 msgstr ""
 
-#: ../admin_page.php:613
+#: ../admin_page.php:617
 msgid "Error log"
 msgstr ""
 
-#: ../admin_page.php:613 ../admin_page.php:634
+#: ../admin_page.php:617 ../admin_page.php:638
 #, php-format
 msgid "(Last %d lines)"
 msgstr ""
 
-#: ../admin_page.php:634
+#: ../admin_page.php:638
 msgid "Webhooks log"
 msgstr ""
 
-#: ../admin_page.php:671
+#: ../admin_page.php:675
 msgid "-- Select a group --"
-msgstr ""
-
-#: ../front/form.class.php:125
-msgid "Please, insert a valid email"
-msgstr ""
-
-#: ../front/form.class.php:130
-msgid "First name is required"
-msgstr ""
-
-#: ../front/form.class.php:136
-msgid "Last name is required"
-msgstr ""
-
-#: ../front/form-template.php:28
-msgid "First name"
-msgstr ""
-
-#: ../front/form-template.php:33
-msgid "Last name"
-msgstr ""
-
-#: ../front/form-template.php:38
-msgid "Email"
 msgstr ""
 
 #: ../front/widget.php:22
@@ -319,6 +299,34 @@ msgstr ""
 
 #: ../front/shortcode.php:243
 msgid "Insert"
+msgstr ""
+
+#: ../front/form-template.php:28
+msgid "First name"
+msgstr ""
+
+#: ../front/form-template.php:33
+msgid "Last name"
+msgstr ""
+
+#: ../front/form-template.php:38
+msgid "Email"
+msgstr ""
+
+#: ../front/form.class.php:125
+msgid "Please, insert a valid email"
+msgstr ""
+
+#: ../front/form.class.php:130
+msgid "First name is required"
+msgstr ""
+
+#: ../front/form.class.php:136
+msgid "Last name is required"
+msgstr ""
+
+#: ../front/form.class.php:141
+msgid "The email is already in the subscription list"
 msgstr ""
 
 #: ../mailchimp-api/webhooks.php:67
