@@ -98,6 +98,15 @@ class WPMUDEV_MailChimp_Shortcode {
 
 
 	public function render_form( $atts ) {
+		$defaults = array(
+			'title' => __( 'Subscribe to our MailChimp list.', MAILCHIMP_LANG_DOMAIN ),
+			'success_text' => __( 'Thank you, your email has been added to the list.', MAILCHIMP_LANG_DOMAIN ),
+			'button_text' => __( 'Subscribe!', MAILCHIMP_LANG_DOMAIN ),
+			'lastname' => 1,
+			'firstname' => 1
+		);
+
+		$atts = wp_parse_args( $atts, $defaults );
 		extract( $atts );
 
 		$args['text'] = $title;

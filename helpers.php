@@ -167,7 +167,7 @@ function mailchimp_bulk_unsubscribe_users( $emails, $list_id, $delete = false ) 
 
 	if ( $results['error_count'] ) {
 		foreach( $results['errors'] as $error ) {
-			$return['errors'][] = new WP_Error( $error['code'], '{' . $error['email']['email'] . '} ' . $error['error'] );
+			$return['errors'][] = new WP_Error( $error['code'], '{' . $error['email'] . '} ' . $error['error'] );
 		}
 	}
 
