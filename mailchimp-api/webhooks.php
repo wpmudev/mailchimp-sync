@@ -5,12 +5,6 @@ class WPMUDEV_MailChimp_Sync_Webhooks {
 	public function __construct() {
 		add_action( 'init', array( 'WPMUDEV_MailChimp_Sync_Webhooks', 'add_rewrite_rules' ) );
 		add_action( 'template_redirect', array( $this, 'parse_request' ), 99 );
-
-		add_action( 'show_user_profile', array( $this, 'show_user_profile' ) );
-		add_action( 'edit_user_profile', array( $this, 'show_user_profile' ) );
-
-		add_action( 'personal_options_update', array( $this, 'save_user_profile_fields' ) );
-		add_action( 'edit_user_profile_update', array( $this, 'save_user_profile_fields' ) );
 	}
 
 	public static function add_rewrite_rules() {
@@ -136,12 +130,8 @@ class WPMUDEV_MailChimp_Sync_Webhooks {
 
 		$user = get_user_by( 'email', $user_email );
 
-		if ( $user ) {
-			$list_id = get_site_option( 'mailchimp_mailing_list' );
-			if ( $list_id )
-				update_user_meta( $user->ID, 'mailchimp_subscriber_' . $list_id, 1 );
+		if ( $user )
 			return new WP_Error( 'user_exists', sprintf( __( 'Existing user found with this email address: "%s"', MAILCHIMP_LANG_DOMAIN ), $user_email ) );
-		}
 
 		$login = explode( '@', $user_email );
 		$login = $login[0];
@@ -169,7 +159,6 @@ class WPMUDEV_MailChimp_Sync_Webhooks {
 			return new WP_Error( 'user_exists', sprintf( __( 'FAILED! Problem encountered trying to create new user: "%s"', MAILCHIMP_LANG_DOMAIN ), $user_email ) );
 
 		$list_id = get_site_option( 'mailchimp_mailing_list' );
-		add_user_meta( $user_id, 'mailchimp_subscriber_' . $list_id, 1 );
 
 		$this->log( sprintf( __( 'SUBSCRIBE: New user created: "%s"', MAILCHIMP_LANG_DOMAIN ), $user_email ) );		
 
@@ -186,9 +175,7 @@ class WPMUDEV_MailChimp_Sync_Webhooks {
 		
 		$settings = mailchimp_get_webhooks_settings();
 		if ( 'mark' === $settings['delete_user'] ) {
-			$list_id = get_site_option( 'mailchimp_mailing_list' );
-			update_user_meta( $user->ID, 'mailchimp_subscriber_' . $list_id, 0 );
-			$this->log( sprintf( __( 'UNSUBSCRIBE: user unsubscribed from list: "%s"', MAILCHIMP_LANG_DOMAIN ), $user_email ) );		
+			$this->log( sprintf( __( 'UNSUBSCRIBE: user unsubscribed from list: "%s"', MAILCHIMP_LANG_DOMAIN ), $user_email ) );
 		}
 		else {
 			if ( is_multisite() ) {
@@ -243,9 +230,6 @@ class WPMUDEV_MailChimp_Sync_Webhooks {
 		if ( ! $result )
 			return new WP_Error( 'error_updating_email', sprintf( __( 'FAILED: Something went wrong while trying to update user email: "%s"', MAILCHIMP_LANG_DOMAIN ), $new_email ) );
 
-		$list_id = get_site_option( 'mailchimp_mailing_list' );
-		update_user_meta( $user->ID, 'mailchimp_subscriber_' . $list_id, 1 );
-
 		$this->log( sprintf( __( 'UPEMAIL: email updated: "%s" to "%s"', MAILCHIMP_LANG_DOMAIN ), $user_email, $new_email ) );		
 
 		return true;
@@ -271,8 +255,6 @@ class WPMUDEV_MailChimp_Sync_Webhooks {
 		if ( ! $result )
 			return new WP_Error( 'error_updating_profile', sprintf( __( 'FAILED: Something went wrong while trying to update user profile: "%s"', MAILCHIMP_LANG_DOMAIN ), $user_email ) );
 
-		$list_id = get_site_option( 'mailchimp_mailing_list' );
-		update_user_meta( $user->ID, 'mailchimp_subscriber_' . $list_id, 1 );
 
 		$this->log( sprintf( __( 'PROFILE: profile updated: "%s"', MAILCHIMP_LANG_DOMAIN ), $user_email ) );		
 
@@ -280,43 +262,5 @@ class WPMUDEV_MailChimp_Sync_Webhooks {
 		
 	}
 
-	public function show_user_profile( $user ) {
-
-		if ( is_multisite() && ! current_user_can( 'manage_network_users') )
-			return;
-		elseif ( ! is_multisite() && ! current_user_can( 'edit_users' ) )
-			return;
-
-		$list_id = get_site_option( 'mailchimp_mailing_list' );
-		$subscribed = (bool)get_user_meta( $user->ID, 'mailchimp_subscriber_' . $list_id, true );
-
-		?>
-	    	<h3>MailChimp</h3>
-	    	<table class="form-table">
-	        	<tr>
-	        		<th><label for="mailchimp_list"><?php _e( 'Subscribed to the current Mailchimp List', MAILCHIMP_LANG_DOMAIN ); ?></label></th> 
-	        		<td>
-	        			<input type="checkbox" name="_newsletter_subscriber" id="_newsletter_subscriber" <?php checked( $subscribed ); ?> />
-	        			<span class="description"><?php _e( '<strong>Note</strong>: Changing this setting will not subscribe or unsubscribe the user on MailChimp', MAILCHIMP_LANG_DOMAIN ); ?></span>
-	        		</td>
-        		</tr>
-    		</table>
-    	<?php
-	}
-
-	public function save_user_profile_fields( $user_id ) {
-		if ( is_multisite() && ! current_user_can( 'manage_network_users') )
-			return;
-		elseif ( ! is_multisite() && ! current_user_can( 'edit_users' ) )
-			return;
-
-		$list_id = get_site_option( 'mailchimp_mailing_list' );
-		if ( empty( $_POST['_newsletter_subscriber'] ) )
-			$value = 0;
-		else
-			$value = 1;
-
-		update_user_meta( $user_id, 'mailchimp_subscriber_' . $list_id, $value );
-	}
 
 }

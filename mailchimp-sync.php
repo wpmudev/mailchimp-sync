@@ -4,7 +4,7 @@ Plugin Name: MailChimp Sync
 Plugin URI: http://premium.wpmudev.org/project/mailchimp-newsletter-integration
 Description: Simply integrate MailChimp with your Multisite (or regular old single user WP) site - automatically add new users to your email lists and import all your existing users
 Author: WPMU DEV
-Version: 1.7.3
+Version: 1.8
 Author URI: http://premium.wpmudev.org
 Network: true
 WDP ID: 73
@@ -83,6 +83,10 @@ class WPMUDEV_MailChimp_Sync {
 		require_once( 'helpers.php' );
 		require_once( 'integration.php' );
 		require_once( 'mailchimp-api/webhooks.php' );
+
+		if ( is_admin() ) {
+			include_once( 'admin/user-profile.php' );
+		}
 
 		// WPMUDEV Dashboard class
 		if ( is_admin() ) {
