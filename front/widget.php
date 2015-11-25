@@ -12,7 +12,7 @@ class Incsub_Mailchimp_Widget extends WP_Widget {
 	/**
 	 * Widget setup.
 	 */
-	function Incsub_Mailchimp_Widget() {
+	function __construct() {
 
 		$this->success = false;
 
@@ -23,7 +23,7 @@ class Incsub_Mailchimp_Widget extends WP_Widget {
 		);
 
 		/* Create the widget. */
-		parent::WP_Widget( 'incsub-mailchimp-widget' , __( 'Mailchimp', MAILCHIMP_LANG_DOMAIN ), $widget_ops );
+		parent::__construct( 'incsub-mailchimp-widget' , __( 'Mailchimp', MAILCHIMP_LANG_DOMAIN ), $widget_ops );
 
 		add_filter( 'mailchimp_form_require_field', array( &$this, 'set_require_field' ), 10, 3 );
 		add_filter( 'mailchimp_form_success_redirect', array( &$this, 'set_form_success_redirect' ) );
