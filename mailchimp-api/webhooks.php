@@ -38,7 +38,7 @@ class WPMUDEV_MailChimp_Sync_Webhooks {
 					'mailchimp-sync' => 1,
 					'mckey' => $webhooks_settings['webhook_key']
 				),
-				site_url()
+				home_url()
 			);
 		}
 		else {

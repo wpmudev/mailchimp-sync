@@ -276,7 +276,11 @@ class WPMUDEV_MailChimp_Admin {
 				else 
 					update_site_option('mailchimp_ignore_plus', '' );
 
-				$webhooks = $_POST['mailchimp_webhooks'];
+				if ( isset( $_POST['mailchimp_webhooks'] ) ) {
+					$webhooks = $_POST['mailchimp_webhooks'];
+				} else {
+					$webhooks = array( 'delete_user' => '', 'webhook_key' => '' );
+				}
 				$webhooks_settings = mailchimp_get_webhooks_settings();
 
 				$allowed_delete_user = array( 'mark', 'delete' );
