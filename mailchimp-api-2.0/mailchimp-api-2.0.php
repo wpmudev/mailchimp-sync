@@ -2,7 +2,7 @@
 
 include_once( 'Mailchimp.php' );
 
-class WPMUDEV_Mailchimp_Sync_API extends Mailchimp {
+class WPMUDEV_Mailchimp_Sync_API_20 extends Mailchimp {
 
 	/**
      * CURLOPT_SSL_VERIFYPEER setting

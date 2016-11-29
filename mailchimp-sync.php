@@ -4,7 +4,7 @@ Plugin Name: MailChimp Sync
 Plugin URI: http://premium.wpmudev.org/project/mailchimp-newsletter-integration
 Description: Simply integrate MailChimp with your Multisite (or regular old single user WP) site - automatically add new users to your email lists and import all your existing users
 Author: WPMU DEV
-Version: 1.8.2
+Version: 1.9
 Author URI: http://premium.wpmudev.org
 Network: true
 WDP ID: 73
@@ -32,6 +32,8 @@ class WPMUDEV_MailChimp_Sync {
 
 	public static $instance = null;
 
+	public static $version = '1.9';
+
 	public static function get_instance() {
 		if ( ! self::$instance ) {
 			return new self();
@@ -48,6 +50,7 @@ class WPMUDEV_MailChimp_Sync {
 		add_action( 'plugins_loaded', array( $this, 'mailchimp_localization' ) );
 
 		add_action( 'init', array( $this, 'init' ), 1 );
+		add_action( 'admin_init', array( $this, 'maybe_upgrade' ), 1 );
 
 		add_action( 'wpmu_new_user', array( $this, 'mailchimp_add_user' ) );
 		add_action( 'user_register', array( $this, 'mailchimp_add_user' ) );
@@ -66,7 +69,14 @@ class WPMUDEV_MailChimp_Sync {
 		$plugin_basename = plugin_basename( plugin_dir_path( __FILE__ )) . '/mailchimp-sync.php';
 		add_filter( 'network_admin_plugin_action_links_' . $plugin_basename, array( $this, 'add_action_links' ) );
 
-		new WPMUDEV_MailChimp_Sync_Webhooks();
+		new WPMUDEV_MailChimp_Sync_Webhooks_20();
+
+		if ( is_multisite() ) {
+			add_action( 'network_admin_notices', array( $this, 'admin_notices' ) );
+		}
+		else {
+			add_action( 'admin_notices', array( $this, 'admin_notices' ) );
+		}
 	}
 
 	private function set_globals() {
@@ -80,9 +90,10 @@ class WPMUDEV_MailChimp_Sync {
 	}
 
 	private function includes() {
+		require_once( 'deprecated.php' );
 		require_once( 'helpers.php' );
 		require_once( 'integration.php' );
-		require_once( 'mailchimp-api/webhooks.php' );
+		require_once( 'mailchimp-api-2.0/webhooks.php' );
 
 		if ( is_admin() ) {
 			include_once( 'admin/user-profile.php' );
@@ -100,9 +111,6 @@ class WPMUDEV_MailChimp_Sync {
 			);
 			include_once( 'externals/wpmudev-dash-notification.php' );
 		}
-
-		
-
 			
 	}
 
@@ -117,7 +125,7 @@ class WPMUDEV_MailChimp_Sync {
 
 	public function init() {
 		if ( is_admin() ) {
-			require_once( 'admin_page.php' );
+			require_once( 'admin/admin_page.php' );
 			new WPMUDEV_MailChimp_Admin();
 		}
 
@@ -176,7 +184,7 @@ class WPMUDEV_MailChimp_Sync {
 		//check for spam
 		if ( $user->spam || $user->deleted )
 	    	return false;
-		
+
 		//remove + sign emails
 		if ( get_site_option('mailchimp_ignore_plus') == 'yes' && strstr( $user->user_email, '+' ) )
 			return false;
@@ -310,6 +318,64 @@ class WPMUDEV_MailChimp_Sync {
 		update_site_option( 'mailchimp_error_log', $new_log );
 
 	}
+
+	public function maybe_upgrade() {
+		$saved_version = get_site_option( 'mailchimp_sync_version', '1.8.5' );
+		if ( $saved_version === self::$version ) {
+			return;
+		}
+
+		if ( version_compare( $saved_version, '1.9', '<' ) ) {
+			// Show a notice so the user can set the groups again
+			$mailchimp_apikey = get_site_option('mailchimp_apikey', '');
+			$mailchimp_mailing_list = get_site_option('mailchimp_mailing_list');
+			$groups = get_site_option( 'mailchimp_groups' );
+
+			if ( $mailchimp_apikey && $mailchimp_mailing_list && $groups ) {
+				update_site_option( 'mailchimp_sync_set_groups_again_notice', true );
+			}
+		}
+
+		update_site_option( 'mailchimp_sync_version', self::$version );
+
+	}
+
+	public function admin_notices() {
+		if ( ! current_user_can( 'manage_network' ) || ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		if ( get_site_option( 'mailchimp_sync_set_groups_again_notice' ) ) {
+			?>
+			<div class="error">
+				<p><?php printf(
+					__( 'Mailchimp API has been updated. These change affects to groups references. Please, <a href="%s">click here</a> to set the groups again.', 'mailchimp' ),
+						is_multisite() ? network_admin_url('settings.php') . '?page=mailchimp' : admin_url('options.php') . '?page=mailchimp'
+					); ?>
+					<a href="#" data-option="mailchimp_sync_set_groups_again_notice" class="mailchimp-dismiss dashicons-dismiss dashicons"><span class="screen-reader-text"><?php _e( 'Dismiss', 'mailchimp' ); ?></span></a>
+				</p>
+			</div>
+			<style>
+				.error .mailchimp-dismiss {float:right; text-decoration: none; color:#dc3232 }
+				.error .mailchimp-dismiss:hover {color:red;}
+			</style>
+			<script>
+				jQuery(document).ready( function( $ ) {
+					$('.mailchimp-dismiss').click( function(e) {
+						e.preventDefault();
+						var data = {
+							action: 'mailchimp_dismiss_notice',
+							option: $(this).data( 'option' )
+						};
+						$(this).parent().parent().remove();
+						$.post( ajaxurl, data );
+					});
+
+				});
+			</script>
+			<?php
+		}
+	}
 }
 
 global $mailchimp_sync;
@@ -317,4 +383,20 @@ $mailchimp_sync = WPMUDEV_MailChimp_Sync::get_instance();
 
 function mailchimp_sync() {
 	return WPMUDEV_MailChimp_Sync::get_instance();
+}
+
+add_action( 'wp_ajax_mailchimp_dismiss_notice', 'mailchimp_dismiss_notice' );
+function mailchimp_dismiss_notice() {
+	if (
+		( is_multisite() && current_user_can( 'manage_network' ) )
+		|| ( ! is_multisite() && current_user_can( 'manage_options' ) )
+	) {
+		$option = $_POST['option'];
+		$allowed_options = array(
+			'mailchimp_sync_set_groups_again_notice'
+		);
+		if ( in_array( $option, $allowed_options ) ) {
+			delete_site_option( $option );
+		}
+	}
 }

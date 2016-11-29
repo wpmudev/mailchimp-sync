@@ -1,9 +1,9 @@
 <?php
 
-class WPMUDEV_MailChimp_Sync_Webhooks {
+class WPMUDEV_MailChimp_Sync_Webhooks_20 {
 	
 	public function __construct() {
-		add_action( 'init', array( 'WPMUDEV_MailChimp_Sync_Webhooks', 'add_rewrite_rules' ) );
+		add_action( 'init', array( 'WPMUDEV_MailChimp_Sync_Webhooks_20', 'add_rewrite_rules' ) );
 		add_action( 'template_redirect', array( $this, 'parse_request' ), 99 );
 	}
 
