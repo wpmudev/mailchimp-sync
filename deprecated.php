@@ -20,7 +20,7 @@ function mailchimp_load_API() {
 	if ( ! empty( $mailchimp_sync->api ) )
 		return $mailchimp_sync->api;
 
-	require_once( 'mailchimp-api-2.0/mailchimp-api-2.0.php' );
+	require_once( 'mailchimp-api/2.0/mailchimp-api-2.0.php' );
 	$mailchimp_apikey = get_site_option('mailchimp_apikey');
 
 	$options = array(
@@ -225,6 +225,44 @@ function mailchimp_bulk_subscribe_users( $emails, $list_id, $autopt = false, $up
 	if ( $results['error_count'] ) {
 		foreach( $results['errors'] as $error ) {
 			$return['errors'][] = new WP_Error( $error['code'], '{' . $error['email']['email'] . '} ' . $error['error'] );
+		}
+	}
+
+	return $return;
+
+}
+
+/**
+ * Unsubscribe a list of users
+ * @param Array $emails
+Array(
+array(
+'email' => Email
+),
+...
+)
+ * @param String $list_id
+ * @param Boolean $autopt
+ * @param Array $merge Array of merge vars
+ * @return type
+ * @deprecated
+ */
+function mailchimp_bulk_unsubscribe_users( $emails, $list_id, $delete = false ) {
+	_deprecated_function( __FUNCTION__, '1.9', 'mailchimp_30_bulk_unsubscribe_users()' );
+	$api = mailchimp_load_API();
+
+	if ( is_wp_error( $api ) )
+		return $api;
+
+	$results = $api->lists->batchUnsubscribe( $list_id, $emails, $delete );
+
+	$return = array();
+	$return['success_count'] = $results['success_count'];
+	$return['errors'] = array();
+
+	if ( $results['error_count'] ) {
+		foreach( $results['errors'] as $error ) {
+			$return['errors'][] = new WP_Error( $error['code'], '{' . $error['email'] . '} ' . $error['error'] );
 		}
 	}
 

@@ -23,7 +23,6 @@ class MailChimp_Sync_Mailchimp
     private $last_error         = '';
     private $last_response      = array();
     private $last_request       = array();
-	public static $operation_number = 0;
 
     /**
      * Create a new instance
@@ -174,10 +173,6 @@ class MailChimp_Sync_Mailchimp
      */
     private function makeRequest($http_verb, $method, $args = array(), $timeout = 10)
     {
-        if (!function_exists('curl_init') || !function_exists('curl_setopt')) {
-            throw new Exception("cURL support is required, but can't be found.");
-        }
-
         $url = $this->api_endpoint . '/' . $method;
 
         $this->last_error         = '';
@@ -193,63 +188,37 @@ class MailChimp_Sync_Mailchimp
             'timeout' => $timeout,
         );
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-            'Accept: application/vnd.api+json',
-            'Content-Type: application/vnd.api+json',
-            'Authorization: apikey ' . $this->api_key
-        ));
-        curl_setopt($ch, CURLOPT_USERAGENT, 'DrewM/MailChimp-API/3.0 (github.com/drewm/mailchimp-api)');
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->verify_ssl);
-        curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_0);
-        curl_setopt($ch, CURLOPT_ENCODING, '');
-        curl_setopt($ch, CURLINFO_HEADER_OUT, true);
+	    $request_args = array(
+	    	'headers' => array(
+			    'Accept' => 'application/vnd.api+json',
+			    'Content-Type' => 'application/vnd.api+json',
+			    'Authorization' => 'apikey ' . $this->api_key
+		    ),
+		    'user-agent' => 'DrewM/MailChimp-API/3.0 (github.com/drewm/mailchimp-api)',
+		    'timeout' => apply_filters( 'mailchimp_sync_api_timeout', $timeout ),
+		    'sslverify' => $this->verify_ssl,
+		    'method' => strtoupper( $http_verb )
+	    );
 
-        switch ($http_verb) {
-            case 'post':
-                curl_setopt($ch, CURLOPT_POST, true);
-                $this->attachRequestPayload($ch, $args);
-                break;
+	    if ( 'get' !== $http_verb ) {
+		    $request_args['body'] = wp_json_encode( $args );
+	    }
+	    else {
+		    $request_args['body'] = $args;
+	    }
 
-            case 'get':
-                $query = http_build_query($args, '', '&');
-                curl_setopt($ch, CURLOPT_URL, $url . '?' . $query);
-                break;
+	    $wp_response = wp_remote_request( $url, $request_args );
+	    if ( is_wp_error( $wp_response ) ) {
+		    $this->last_error = $wp_response->get_error_code() . ': ' . $wp_response->get_error_message();
+	    }
 
-            case 'delete':
-                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
-                break;
+        $response['body']    = wp_remote_retrieve_body( $wp_response );
+        $response['headers'] = wp_remote_retrieve_headers( $wp_response );
+	    $this->last_request['headers'] = $request_args['headers'];
 
-            case 'patch':
-                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PATCH');
-                $this->attachRequestPayload($ch, $args);
-                break;
+        $formattedResponse = $this->formatResponse($wp_response);
 
-            case 'put':
-                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PUT');
-                $this->attachRequestPayload($ch, $args);
-                break;
-        }
-
-        $response['body']    = curl_exec($ch);
-        $response['headers'] = curl_getinfo($ch);
-
-        if (isset($response['headers']['request_header'])) {
-            $this->last_request['headers'] = $response['headers']['request_header'];
-        }
-
-        if ($response['body'] === false) {
-            $this->last_error = curl_error($ch);
-        }
-
-        curl_close($ch);
-
-        $formattedResponse = $this->formatResponse($response);
-
-        $this->determineSuccess($response, $formattedResponse);
+        $this->determineSuccess($wp_response, $formattedResponse);
 
         return $formattedResponse;
     }
@@ -314,13 +283,13 @@ class MailChimp_Sync_Mailchimp
      */
     private function findHTTPStatus($response, $formattedResponse)
     {
-        if (!empty($response['headers']) && isset($response['headers']['http_code'])) {
-            return (int) $response['headers']['http_code'];
-        }
-
-        if (!empty($response['body']) && isset($formattedResponse['status'])) {
-            return (int) $formattedResponse['status'];
-        }
+	    $status = wp_remote_retrieve_response_code( $response );
+	    if ( ! empty( $status ) ) {
+	    	return  $status;
+	    }
+	    elseif ( !empty($response['body']) && isset($formattedResponse['status']) ) {
+		    return (int) $formattedResponse['status'];
+	    }
 
         return 418;
     }

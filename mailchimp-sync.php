@@ -93,7 +93,7 @@ class WPMUDEV_MailChimp_Sync {
 		require_once( 'deprecated.php' );
 		require_once( 'helpers.php' );
 		require_once( 'integration.php' );
-		require_once( 'mailchimp-api-2.0/webhooks.php' );
+		require_once( 'mailchimp-api/2.0/webhooks.php' );
 
 		if ( is_admin() ) {
 			include_once( 'admin/user-profile.php' );

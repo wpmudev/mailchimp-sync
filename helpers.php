@@ -1,6 +1,6 @@
 <?php
 
-include_once( 'mailchimp-api-3.0/mailchimp-api-3.0.php' );
+include_once( 'mailchimp-api/3.0/mailchimp-api-3.0.php' );
 
 /**
  * Make a ping to MailChimp API
@@ -203,99 +203,144 @@ function mailchimp_30_get_user_info( $user_email, $list_id = '' ) {
 
 /**
  * Subscribe a list of users
- * @param Array $emails 
-	Array(
-		array(
-			'email' => array(
-				'email' => Email
-			)
-			'merge_vars' => array(
-				'FNAME' => First name,
-				'LNAME' => Last name
-			)
-		),
-		...
-	) 
- * @param String $list_id 
- * @param Boolean $autopt 
- * @param Array $merge Array of merge vars
- * @return type
+ * @param array $data List of users and their data
+ * [
+ *      user_email      string      User email
+ *      options         array       List of options.
+ *      [
+ *	       autopt          boolean
+ *	       merge_fields    array [
+ *	           FNAME string First Name
+ *	           LNAME string Last Name
+ *	       ]
+ *	       interests       array       List of interests IDs with boolean values
+ *
+ *	  ]
+ * ]
+ * @return WP_Error|array
  */
-function mailchimp_30_bulk_subscribe_users( $emails, $list_id, $autopt = false, $update = false ) {
-	$api = mailchimp_load_API();
+function mailchimp_30_bulk_subscribe_users( $data, $list_id = '' ) {
+	if ( ! $list_id ) {
+		$list_id = get_site_option( 'mailchimp_mailing_list' );
+	}
 
-	if ( is_wp_error( $api ) )
-		return $api;
+	if ( ! $list_id ) {
+		return new WP_Error( 'missing-list-id', __( 'A list is not specified', 'mailchimp' ) );
+	}
 
-	$merge_vars = array();
-	if ( $autopt ) {
-		$merge_vars['optin_ip'] = $_SERVER['REMOTE_ADDR'];
-		$merge_vars['optin_time'] = current_time( 'mysql', true );
-	} 
+	$path = "lists/$list_id/members";
+	$method = 'post';
 
-	$results = $api->lists->batchSubscribe( $list_id, $emails, ! $autopt, $update );
+	$defaults = array(
+		'autopt' => false,
+		'merge_fields' => array(),
+		'interests' => array()
+	);
 
-	$return = array();
-	$return['added'] = $results['adds'];
-	$return['updated'] = $results['updates'];
-	$return['errors'] = array();
+	$operations = array();
+	foreach ( $data as $row ) {
+		$row_options = wp_parse_args( $row, $defaults );
 
-	if ( $results['error_count'] ) {
-		foreach( $results['errors'] as $error ) {
-			$return['errors'][] = new WP_Error( $error['code'], '{' . $error['email']['email'] . '} ' . $error['error'] );
+		$operation = array(
+			'path' => $path,
+			'method' => $method
+		);
+
+		$operation_args = array(
+			'email_address' => $row['user_email']
+		);
+
+		if ( $row_options['autopt'] ) {
+			$operation_args['status'] = 'subscribed';
+			$operation_args['ip_opt'] = $_SERVER['REMOTE_ADDR'];
+		}
+		else {
+			$operation_args['status'] = 'pending';
+		}
+
+		if ( $row_options['merge_fields'] ) {
+			$operation_args['merge_fields'] = (object)$row_options['merge_fields'];
+		}
+
+		if ( $row_options['interests'] ) {
+			$operation_args['interests'] = (object)$row_options['interests'];
+		}
+
+		$operation['args'] = $operation_args;
+		$operations[] = $operation;
+	}
+
+	$result = mailchimp_api_30_make_batch_request( $operations );
+
+	return $result;
+}
+
+/**
+ * UnSubscribe a list of users
+ *
+ * @param array $emails List of emails to unsubscribe
+ *
+ * @return WP_Error|array
+ */
+function mailchimp_30_bulk_unsubscribe_users( $emails, $list_id = '', $delete = false ) {
+	if ( ! $list_id ) {
+		$list_id = get_site_option( 'mailchimp_mailing_list' );
+	}
+
+	if ( ! $list_id ) {
+		return new WP_Error( 'missing-list-id', __( 'A list is not specified', 'mailchimp' ) );
+	}
+
+	$operations = array();
+	foreach ( $emails as $email ) {
+		$hash = md5( strtolower( $email ) );
+		if ( $delete ) {
+			$operations[] = array(
+				'path' => "lists/$list_id/members/$hash",
+				'method' => 'delete'
+			);
+		}
+		else {
+			$operations[] = array(
+				'path' => "lists/$list_id/members/$hash",
+				'method' => 'patch',
+				'args' => array(
+					'status' => 'unsubscribed'
+				)
+			);
 		}
 	}
 
-	return $return;
-
+	return mailchimp_api_30_make_batch_request( $operations );
 }
+
 
 add_action( 'admin_init', function() {
 	if ( isset( $_GET['test'] ) ) {
 		$interests = mailchimp_30_get_interest_groups();
-		$result = mailchimp_30_subscribe_user( 'ignacio.incsub@gmail.com', '', array( 'interests' => $interests, 'autopt' => true, 'merge_fields' => array( 'FNAME' => 'ignacio', 'LNAME' => 'cruz' ) ) );
-		$result = mailchimp_30_update_user( 'ignacio.incsub@gmail.com', '', array( 'merge_fields' => array( 'FNAME' => 'Yeah', 'LNAME' => 'Lala' ) ) );
-		$result = mailchimp_30_get_user_info( 'ignacio.incsub@gmail.com' );
-		$result = mailchimp_30_unsubscribe_user( 'ignacio.incsub@gmail.com' );
-		$result = mailchimp_30_unsubscribe_user( 'ignacio.incsub@gmail.com', '', true );
+		$result = mailchimp_30_bulk_subscribe_users(array(
+			array(
+				'user_email' => 'ignacio.incsub@gmail.com',
+				'autopt' => true,
+				'merge_fields' => array( 'FNAME' => 'Ignacio', 'LNAME' => 'Cruz' ),
+				'interests' => $interests
+			),
+			array(
+				'user_email' => 'ignacio@incsub.com',
+				'autopt' => false,
+				'merge_fields' => array( 'FNAME' => 'IgnacioI', 'LNAME' => 'CruzI' ),
+				'interests' => $interests
+			),
+		));
+//		$result = mailchimp_30_subscribe_user( 'ignacio.incsub@gmail.com', '', array( 'interests' => $interests, 'autopt' => true, 'merge_fields' => array( 'FNAME' => 'ignacio', 'LNAME' => 'cruz' ) ) );
+//		$result = mailchimp_30_update_user( 'ignacio@incsub.com', '', array( 'merge_fields' => array( 'FNAME' => 'Yeah', 'LNAME' => 'Lala' ) ) );
+//		$result = mailchimp_30_get_user_info( 'ignacio@incsub.com' );
+//		$result = mailchimp_30_unsubscribe_user( 'ignacio@incsub.com' );
+//		$result = mailchimp_30_unsubscribe_user( 'ignacio@incsub.com', '', true );
 	}
 });
 
-/**
- * Unsubscribe a list of users
- * @param Array $emails 
-	Array(
-		array(
-			'email' => Email
-		),
-		...
-	) 
- * @param String $list_id 
- * @param Boolean $autopt 
- * @param Array $merge Array of merge vars
- * @return type
- */
-function mailchimp_bulk_unsubscribe_users( $emails, $list_id, $delete = false ) {
-	$api = mailchimp_load_API();
 
-	if ( is_wp_error( $api ) )
-		return $api;
-
-	$results = $api->lists->batchUnsubscribe( $list_id, $emails, $delete );
-
-	$return = array();
-	$return['success_count'] = $results['success_count'];
-	$return['errors'] = array();
-
-	if ( $results['error_count'] ) {
-		foreach( $results['errors'] as $error ) {
-			$return['errors'][] = new WP_Error( $error['code'], '{' . $error['email'] . '} ' . $error['error'] );
-		}
-	}
-
-	return $return;
-
-}
 
 
 

@@ -642,7 +642,7 @@ class WPMUDEV_MailChimp_Admin {
             if ( ! empty( $error_log ) ) {
             	$content = array();
             	foreach ( $error_log as $error ) {
-            		$content[] = '[' . $error['date'] . '] [CODE:' . $error['code'] . '] [EMAIL:' . $error['email'] . '] - ' . $error['message'];
+            		$content[] = '[' . $error['date'] . '] [CODE:' . $error['code'] . '] - ' . $error['message'];
             	} 
             	$content = implode( "\n", $content );
             }

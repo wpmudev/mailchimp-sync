@@ -35,18 +35,18 @@ function mailchimp_api_30_make_request( $method, $path, $args = array() ) {
 		}
 	}
 	catch ( Exception $e ) {
-		return new WP_Error( $e->getCode(), $e->getMessage() );
+		$error = new WP_Error( $e->getCode(), $e->getMessage() );
+		mailchimp_log( $error->get_error_message() );
+		return $error;
 	}
 
 	if ( ! $api->success() ) {
-		$response = $api->getLastResponse();
-		$status = '';
-		if ( ! empty( $response['headers']['http_code'] ) ) {
-			$status = $response['headers']['http_code'];
-		}
-
+		$status = wp_remote_retrieve_response_code( $api->getLastResponse() );
 		// Log here
-
+		mailchimp_log( array(
+			'message' => $api->getLastError(),
+			'code' => $status
+		) );
 		return new WP_Error( $status, $api->getLastError() );
 	}
 
@@ -56,54 +56,77 @@ function mailchimp_api_30_make_request( $method, $path, $args = array() ) {
 /**
  * A wrapper method for Batch API calls
  *
- * @param string $method
- * @param string $path
- * @param array $args
+ * @param array $operations A list of operations
+ * [
+ *      method      string      Request method
+ *      path        string      Request path
+ *      args        array       List of arguments to pass
+ * ]
  *
  * @return WP_Error|array
  */
-function mailchimp_api_30_make_batch_request( $method, $path, $args = array() ) {
+function mailchimp_api_30_make_batch_request( $operations ) {
 	$api = mailchimp_load_api_30();
 	if ( is_wp_error( $api ) ) {
 		return $api;
 	}
 
 	$batch = $api->new_batch();
-	$batch::$operation_number++;
 
-	try {
-		switch ( $method ) {
+	foreach ( $operations as $key => $operation ) {
+		$op_number = 'op_' . $key;
+		switch ( $operation['method'] ) {
 			case 'post': {
-				$result = $batch->post( 'op_' . $batch::$operation_number, $path, $args );
+				$batch->post( $op_number, $operation['path'], $operation['args'] );
 				break;
 			}
 			case 'delete': {
-				$result = $batch->delete( 'op_' . $batch::$operation_number, $path, $args );
+				$batch->delete( $op_number, $operation['path'] );
 				break;
 			}
 			case 'patch': {
-				$result = $batch->patch( 'op_' . $batch::$operation_number, $path, $args );
+				$batch->patch( $op_number, $operation['path'], $operation['args'] );
 				break;
 			}
 			default: {
-				$result = $batch->get( 'op_' . $batch::$operation_number, $path, $args );
+				$batch->get( $op_number, $operation['path'], $operation['args'] );
 			}
 		}
+	}
+
+	try {
+		$result = $batch->execute();
 	}
 	catch ( Exception $e ) {
 		return new WP_Error( $e->getCode(), $e->getMessage() );
 	}
 
 	if ( ! $api->success() ) {
-		$response = $api->getLastResponse();
-		$status = '';
-		if ( ! empty( $response['headers']['http_code'] ) ) {
-			$status = $response['headers']['http_code'];
-		}
-
+		$status = wp_remote_retrieve_response_code( $api->getLastResponse() );
 		// Log here
-
+		mailchimp_log( array(
+			'message' => $api->getLastError(),
+			'code' => $status
+		) );
 		return new WP_Error( $status, $api->getLastError() );
+	}
+
+	return $result['id'];
+}
+
+function mailchimp_api_30_get_batch_operation_result( $batch_id ) {
+	$api = mailchimp_load_api_30();
+	if ( is_wp_error( $api ) ) {
+		return $api;
+	}
+
+	$batch = $api->new_batch( $batch_id );
+	$result = $batch->check_status();
+	if ( is_wp_error( $result ) ) {
+		mailchimp_log( array(
+			'message' => $result->get_error_message(),
+			'code' => $result->get_error_code()
+		) );
 	}
 
 	return $result;
@@ -170,6 +193,35 @@ function mailchimp_api_options() {
 	}
 
 	return $options;
+}
+
+function mailchimp_log( $details ) {
+	if ( ! is_array( $details ) ) {
+		return;
+	}
+
+	$current_log = get_site_option( 'mailchimp_error_log' );
+	$new_log = array();
+
+	$code = isset( $details['code'] ) ? $details['code'] : 0;
+	$message = isset( $details['message'] ) ? $details['message'] : '';
+	$date = date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), current_time( 'timestamp' ) );
+
+	$new_log[] = compact( 'code', 'message', 'email', 'date' );
+
+	if ( $current_log ) {
+
+		$new_log = array_merge( $current_log, $new_log );
+
+		// We'll only saved the last X lines of the log
+		$count = count( $new_log );
+		if ( $count > MAILCHIMP_MAX_LOG_LINES ) {
+			$new_log = array_slice( $new_log, $count - 1 );
+		}
+
+	}
+
+	update_site_option( 'mailchimp_error_log', $new_log );
 }
 
 //
