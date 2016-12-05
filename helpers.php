@@ -313,34 +313,32 @@ function mailchimp_30_bulk_unsubscribe_users( $emails, $list_id = '', $delete = 
 
 	return mailchimp_api_30_make_batch_request( $operations );
 }
-
-
-add_action( 'admin_init', function() {
-	if ( isset( $_GET['test'] ) ) {
-		$interests = mailchimp_30_get_interest_groups();
-		$result = mailchimp_30_bulk_subscribe_users(array(
-			array(
-				'user_email' => 'ignacio.incsub@gmail.com',
-				'autopt' => true,
-				'merge_fields' => array( 'FNAME' => 'Ignacio', 'LNAME' => 'Cruz' ),
-				'interests' => $interests
-			),
-			array(
-				'user_email' => 'ignacio@incsub.com',
-				'autopt' => false,
-				'merge_fields' => array( 'FNAME' => 'IgnacioI', 'LNAME' => 'CruzI' ),
-				'interests' => $interests
-			),
-		));
-//		$result = mailchimp_30_subscribe_user( 'ignacio.incsub@gmail.com', '', array( 'interests' => $interests, 'autopt' => true, 'merge_fields' => array( 'FNAME' => 'ignacio', 'LNAME' => 'cruz' ) ) );
-//		$result = mailchimp_30_update_user( 'ignacio@incsub.com', '', array( 'merge_fields' => array( 'FNAME' => 'Yeah', 'LNAME' => 'Lala' ) ) );
-//		$result = mailchimp_30_get_user_info( 'ignacio@incsub.com' );
-//		$result = mailchimp_30_unsubscribe_user( 'ignacio@incsub.com' );
-//		$result = mailchimp_30_unsubscribe_user( 'ignacio@incsub.com', '', true );
-	}
-});
-
-
+//
+//
+//add_action( 'admin_init', function() {
+//	if ( isset( $_GET['test'] ) ) {
+//		$interests = mailchimp_30_get_interest_groups();
+//		$result = mailchimp_30_bulk_subscribe_users(array(
+//			array(
+//				'user_email' => 'ignacio.incsub@gmail.com',
+//				'autopt' => true,
+//				'merge_fields' => array( 'FNAME' => 'Ignacio', 'LNAME' => 'Cruz' ),
+//				'interests' => $interests
+//			),
+//			array(
+//				'user_email' => 'ignacio@incsub.com',
+//				'autopt' => false,
+//				'merge_fields' => array( 'FNAME' => 'IgnacioI', 'LNAME' => 'CruzI' ),
+//				'interests' => $interests
+//			),
+//		));
+////		$result = mailchimp_30_subscribe_user( 'ignacio.incsub@gmail.com', '', array( 'interests' => $interests, 'autopt' => true, 'merge_fields' => array( 'FNAME' => 'ignacio', 'LNAME' => 'cruz' ) ) );
+////		$result = mailchimp_30_update_user( 'ignacio@incsub.com', '', array( 'merge_fields' => array( 'FNAME' => 'Yeah', 'LNAME' => 'Lala' ) ) );
+////		$result = mailchimp_30_get_user_info( 'ignacio@incsub.com' );
+////		$result = mailchimp_30_unsubscribe_user( 'ignacio@incsub.com' );
+////		$result = mailchimp_30_unsubscribe_user( 'ignacio@incsub.com', '', true );
+//	}
+//});
 
 
 

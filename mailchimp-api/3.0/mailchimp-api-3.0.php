@@ -74,7 +74,7 @@ function mailchimp_api_30_make_batch_request( $operations ) {
 	$batch = $api->new_batch();
 
 	foreach ( $operations as $key => $operation ) {
-		$op_number = 'op_' . $key;
+		$op_number = 'op_' . time();
 		switch ( $operation['method'] ) {
 			case 'post': {
 				$batch->post( $op_number, $operation['path'], $operation['args'] );
