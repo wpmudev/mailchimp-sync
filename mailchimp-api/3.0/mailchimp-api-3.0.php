@@ -138,15 +138,16 @@ function mailchimp_api_30_get_batch_operation_result( $batch_id ) {
  * @return MailChimp_Sync_Mailchimp|WP_Error Object
  */
 function mailchimp_load_api_30() {
-	global $mailchimp_sync;
+	global $mailchimp_sync_api;
 
-	include_once( 'Mailchimp/Mailchimp.php' );
+	include_once( 'Mailchimp/MailChimp.php' );
 	include_once( 'Mailchimp/Batch.php' );
 	include_once( 'Mailchimp/Webhook.php' );
 
-	if ( is_a( $mailchimp_sync, 'MailChimp_Sync_Mailchimp' ) ) {
-		return $mailchimp_sync;
+	if ( is_a( $mailchimp_sync_api, 'MailChimp_Sync_Mailchimp' ) ) {
+		return $mailchimp_sync_api;
 	}
+
 
 	$mailchimp_apikey = get_site_option('mailchimp_apikey');
 
@@ -157,9 +158,9 @@ function mailchimp_load_api_30() {
 		return new WP_Error( $e->getCode(), $e->getMessage() );
 	}
 
-	$mailchimp_sync = $api;
+	$mailchimp_sync_api = $api;
 
-	return $mailchimp_sync;
+	return $mailchimp_sync_api;
 }
 
 /**
@@ -195,12 +196,14 @@ function mailchimp_api_options() {
 	return $options;
 }
 
-function mailchimp_log( $details ) {
+function mailchimp_log( $details, $type = 'error' ) {
 	if ( ! is_array( $details ) ) {
 		return;
 	}
 
-	$current_log = get_site_option( 'mailchimp_error_log' );
+	$option_name = 'mailchimp_' . $type . '_log';
+
+	$current_log = get_site_option( $option_name );
 	$new_log = array();
 
 	$code = isset( $details['code'] ) ? $details['code'] : 0;
@@ -221,7 +224,7 @@ function mailchimp_log( $details ) {
 
 	}
 
-	update_site_option( 'mailchimp_error_log', $new_log );
+	update_site_option( $option_name, $new_log );
 }
 
 //

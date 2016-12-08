@@ -82,7 +82,7 @@ class WPMUDEV_MailChimp_Form {
 	}
 
 	public static function validate_ajax_form() {
-		global $mailchimp_sync;
+		global $mailchimp_sync_api;
 
 		check_ajax_referer( 'mailchimp_subscribe_user_' . $_POST['form_id'] . $_POST['require_fn'] . $_POST['require_ln'] );
 
@@ -102,7 +102,7 @@ class WPMUDEV_MailChimp_Form {
 		$user['first_name'] = sanitize_text_field( $_POST['subscription-firstname'] );
 		$user['last_name'] = sanitize_text_field( $_POST['subscription-lastname'] );
 
-		$results = $mailchimp_sync->mailchimp_add_user( $user );
+		$results = $mailchimp_sync_api->mailchimp_add_user( $user );
 
 		wp_send_json_success( $results );
 
@@ -136,8 +136,8 @@ class WPMUDEV_MailChimp_Form {
 			$errors[] = ( __( 'Last name is required', MAILCHIMP_LANG_DOMAIN ) );
 
 		// Check if user is already subscribed and confirmed
-		$is_subscribed = mailchimp_is_user_subscribed( $email );
-		if ( $is_subscribed )
+		$is_subscribed = mailchimp_30_get_user_info( $email );
+		if ( $is_subscribed && $is_subscribed['status'] === 'subscribed' )
 			$errors[] = ( __( 'The email is already in the subscription list', MAILCHIMP_LANG_DOMAIN ) );
 
 		return apply_filters( 'mailchimp_form_validate', $errors );

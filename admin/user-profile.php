@@ -10,18 +10,15 @@ function mailchimp_show_user_profile( $user ) {
 	elseif ( ! is_multisite() && ! current_user_can( 'edit_users' ) )
 		return;
 
-	$subscribed = mailchimp_is_user_subscribed( $user->user_email );
+	$subscribed = mailchimp_30_get_user_info( $user->user_email );
+	$is_subscribed = $subscribed && ( $subscribed['status'] === 'subscribed' );
 	?>
 	<h3>MailChimp</h3>
 	<table class="form-table">
 		<tr>
 			<th><label for="mailchimp_list"><?php _e( 'Subscribed to the current Mailchimp List', MAILCHIMP_LANG_DOMAIN ); ?></label></th>
 			<td>
-				<?php if ( is_wp_error( $subscribed ) ): ?>
-					<div class="mailchimp-no mailchimp-notice">
-						<p><?php _e( 'There was an error while connecting to Mailchimp. Please, try again after a few minutes.', MAILCHIMP_LANG_DOMAIN ); ?></p>
-					</div>
-				<?php elseif ( $subscribed ): ?>
+				<?php if ( $is_subscribed ): ?>
 					<div class="mailchimp-yes mailchimp-notice">
 						<p><?php _e( 'Yes' ); ?></p>
 					</div>

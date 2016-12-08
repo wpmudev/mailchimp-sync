@@ -10,8 +10,7 @@ function mailchimp_import_process() {
 		wp_send_json_error( array( 'message' => __( 'You\'re not allowed to do this action', 'mailchimp' ) ) );
 	}
 
-	$import_users_batch = apply_filters( 'mailchimp_import_users_batch', 10 );
-	$import_users_batch = 10;
+	$import_users_batch = apply_filters( 'mailchimp_import_users_batch', 100 );
 
 	$page = absint( $_POST['page'] );
 
@@ -214,7 +213,7 @@ class WPMUDEV_MailChimp_Admin_Page {
 
 
 	public function generate_tabs() {
-		$api = mailchimp_load_API();
+		$api = mailchimp_load_api_30();
 
 		$this->tabs = array(
 			'settings' 	=> __( 'Settings', MAILCHIMP_LANG_DOMAIN )
@@ -311,7 +310,7 @@ class WPMUDEV_MailChimp_Admin_Page {
 			}
 
 			if ( $_POST['action'] == 'submit-import' ) {
-				global $wpdb, $mailchimp_sync;
+				global $wpdb, $mailchimp_sync_api;
 
 				if ( ! empty( $_POST['mailchimp_import_mailing_list'] ) )
 					update_site_option( 'mailchimp_last_imported_list', $_POST['mailchimp_import_mailing_list'] );
@@ -375,12 +374,14 @@ class WPMUDEV_MailChimp_Admin_Page {
 			.ui-progressbar {
 				position: relative;
 			}
-			.progress-label {
-				position: absolute;
-				left: 50%;
-				top: 4px;
-				font-weight: bold;
-				text-shadow: 1px 1px 0 #fff;
+			#progress-label {
+				background: #46b450;
+				color:white;
+				padding:15px;
+				display:none;
+			}
+			#progress-label a {
+				color:white;
 			}
 		</style>
 		<?php
@@ -607,11 +608,11 @@ class WPMUDEV_MailChimp_Admin_Page {
 
 
 		if ( ! empty( $mailchimp_apikey ) ) {
-			$api = mailchimp_load_API();
+			$api = mailchimp_load_api_30();
 			if ( is_wp_error( $api ) )
 				$api_error = $api->get_error_message();
         	
-        	$mailchimp_lists = mailchimp_get_lists();
+        	$mailchimp_lists = mailchimp_30_get_lists();
 			$api_error = ! empty( $api_error );
 		}
 		
@@ -660,7 +661,14 @@ class WPMUDEV_MailChimp_Admin_Page {
 						total: <?php echo $user_count; ?>,
 						nonce: '<?php echo wp_create_nonce( "mailchimp-import-users" ); ?>',
 						progressbar: '#progressbar',
-						progressLabel: '#progress-label'
+						progressLabel: '#progress-label',
+						labels: {
+							initializing: '<?php _e( "Initializing...", "mailchimp" ); ?>',
+							processed: '<?php _e( "Processed %s / %s", "mailchimp" ); ?>',
+							checkOperation: '<?php _e( "Checking bulk action result, operation: %s. This might take some time.", "mailchimp" ); ?>',
+							downloadMoreInfo: '<?php _e( "Download more info about bulk operation", "mailchimp" ); ?>',
+							results: '<p><?php _e( "Results: Total: %s. Errors: %s", "mailchimp" ); ?></p>'
+						}
 					});
 				})
 			});
@@ -702,7 +710,7 @@ class WPMUDEV_MailChimp_Admin_Page {
             if ( ! empty( $webhooks_log ) ) {
             	$content = array();
             	foreach ( $webhooks_log as $row )
-            		$content[] = $row;
+            		$content[] = '[' . $row['date'] . '] ' . $row['message'];
 
             	$content = implode( "\n", $content );
             }

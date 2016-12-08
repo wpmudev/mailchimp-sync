@@ -12,13 +12,15 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Load the Mailchimp API
  *
  * @return Mailchimp Object
+ *
+ * @deprecated
  */
 function mailchimp_load_API() {
 	_deprecated_function( __FUNCTION__, '1.9', 'mailchimp_load_api_30()' );
-	global $mailchimp_sync;
+	global $mailchimp_sync_api;
 
-	if ( ! empty( $mailchimp_sync->api ) )
-		return $mailchimp_sync->api;
+	if ( ! empty( $mailchimp_sync_api->api ) )
+		return $mailchimp_sync_api->api;
 
 	require_once( 'mailchimp-api/2.0/mailchimp-api-2.0.php' );
 	$mailchimp_apikey = get_site_option('mailchimp_apikey');
@@ -60,7 +62,7 @@ function mailchimp_load_API() {
 	if ( is_wp_error( $ping ) )
 		return $ping;
 
-	$mailchimp_sync->api = $api;
+	$mailchimp_sync_api->api = $api;
 
 	return $api;
 }
@@ -130,6 +132,8 @@ function mailchimp_is_user_subscribed( $user_email, $list_id = '' ) {
  * @param String $user_email
  * @param String $list_id
  * @param Boolean $delete True if the user is gonna be deleted from the list (not only unsubscribed)
+ *
+ * @deprecated
  */
 function mailchimp_unsubscribe_user( $user_email, $list_id, $delete = false ) {
 	_deprecated_function( __FUNCTION__, '1.9', 'mailchimp_30_unsubscribe_user()' );

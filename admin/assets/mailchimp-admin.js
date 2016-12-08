@@ -51,15 +51,7 @@ window.MailChimp = {
         this.progressbar = this.$el.progressbar();
         this.progressbar.progressbar('option', 'value',false);
         this.setLabel( this.options.labels.initializing );
-        //         value: false,
-        //     // complete: function(event,ui) {
-        //     //     console.log(this.stats);
-        //     //     window.location = window.location + '&a=' + this.mailchimp_stats.added + '&u=' + this.mailchimp_stats.updated + '&e=' + this.mailchimp_stats.errors;},
-        //     }
-        // );
-
-
-
+        this.$progressLabel.show();
     },
 
     process() {
@@ -143,7 +135,7 @@ window.MailChimp = {
             listElem.append( link );
             urlLinks.append( listElem );
         }
-        this.setLabel( this.options.labels.results, this.getStat( 'total' ), this.getStat( 'errors' ) );
+        this.setLabel( this.options.labels.results, this.options.total, this.getStat( 'errors' ) );
         this.$progressLabel.append( urlLinks );
     },
 
@@ -211,6 +203,6 @@ window.MailChimp = {
         for (var i = 1; i < arguments.length; i++) {
             label = label.replace( '%s', arguments[i] );
         }
-        this.$progressLabel.text( label );
+        this.$progressLabel.html( label );
     }
 };

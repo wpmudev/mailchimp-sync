@@ -446,13 +446,13 @@ function mailchimp_update_webhooks_settings( $new_settings ) {
 }
 
 function mailchimp_get_webhook_url() {
-	return WPMUDEV_MailChimp_Sync_Webhooks_20::get_callback_url();
+	return WPMUDEV_MailChimp_Sync_Webhooks_30::get_callback_url();
 }
 
 function mailchimp_set_webhooks_rewrite_rules() {
-	WPMUDEV_MailChimp_Sync_Webhooks_20::add_rewrite_rules();
+	WPMUDEV_MailChimp_Sync_Webhooks_30::add_rewrite_rules();
 }
 
 function mailchimp_is_webhooks_active() {
-	return WPMUDEV_MailChimp_Sync_Webhooks_20::is_webhooks_active();
+	return WPMUDEV_MailChimp_Sync_Webhooks_30::is_webhooks_active();
 }

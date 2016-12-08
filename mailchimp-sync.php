@@ -48,7 +48,7 @@ class WPMUDEV_MailChimp_Sync {
 	public function __construct() {
 		$this->set_globals();
 		$this->includes();
-		$this->basename = plugin_basename( plugin_dir_path( __FILE__ )) . '/mailchimp-sync.php';
+		self::$basename = plugin_basename( plugin_dir_path( __FILE__ )) . '/mailchimp-sync.php';
 
 		add_action( 'plugins_loaded', array( $this, 'mailchimp_localization' ) );
 
@@ -61,7 +61,6 @@ class WPMUDEV_MailChimp_Sync {
 		add_action( 'profile_update', array( $this, 'mailchimp_edit_user' ) );
 		add_action( 'xprofile_updated_profile', array( $this, 'mailchimp_edit_user' ) ); //for buddypress
 
-		add_action( 'make_spam_blog', array( $this, 'mailchimp_blog_users_remove' ) );
 		add_action( 'make_spam_user', array( $this, 'mailchimp_user_remove' ) );
 		add_action( 'delete_user', array( $this, 'mailchimp_user_remove' ) );
 		add_action( 'wpmu_delete_user', array( $this, 'mailchimp_user_remove' ) );
@@ -69,7 +68,7 @@ class WPMUDEV_MailChimp_Sync {
 
 		add_action( 'widgets_init', array( $this, 'mailchimp_widget_init' )  );
 
-		new WPMUDEV_MailChimp_Sync_Webhooks_20();
+		new WPMUDEV_MailChimp_Sync_Webhooks_30();
 
 		if ( is_admin() ) {
 			include_once( 'admin/class-admin.php' );
@@ -92,7 +91,7 @@ class WPMUDEV_MailChimp_Sync {
 		require_once( 'deprecated.php' );
 		require_once( 'helpers.php' );
 		require_once( 'integration.php' );
-		require_once( 'mailchimp-api/2.0/webhooks.php' );
+		require_once( 'mailchimp-api/3.0/webhooks.php' );
 
 		// WPMUDEV Dashboard class
 		if ( is_admin() ) {
@@ -170,31 +169,25 @@ class WPMUDEV_MailChimp_Sync {
 		if ( get_site_option('mailchimp_ignore_plus') == 'yes' && strstr( $user->user_email, '+' ) )
 			return false;
 		
-		$mailchimp_mailing_list = get_site_option('mailchimp_mailing_list');
 		$mailchimp_auto_opt_in = get_site_option('mailchimp_auto_opt_in');
 
 		$autopt = $mailchimp_auto_opt_in == 'yes' ? true : false;
 		$merge_vars = array( 'FNAME' => $user->user_firstname, 'LNAME' => $user->user_lastname );
-		$merge_groups = mailchimp_get_interest_groups();
-		if ( ! empty( $merge_groups ) )
-			$merge_groups = array( 'groupings' => $merge_groups );
-
-		$merge_vars = array_merge( $merge_vars, $merge_groups );
 
 		$merge_vars = apply_filters( 'mailchimp_merge_vars', $merge_vars, $user );
 		do_action( 'mailchimp_subscribe_user', $merge_vars, $user );
 
-		$results = false;
-		if ( ! mailchimp_is_user_subscribed( $user->user_email ) )
-			$results = mailchimp_subscribe_user( $user->user_email, $mailchimp_mailing_list, $autopt, $merge_vars, true );
+		$interests = mailchimp_30_get_interest_groups();
+		$results = mailchimp_30_subscribe_user( $user->user_email, '', array( 'interests' => $interests, 'autopt' => $autopt, 'merge_fields' => $merge_vars ) );
 
 		if ( ! is_wp_error( $results ) ) {
 			// There could be other plugins triggering this function twice for a single user.
 			// MailChimp does not refresh the list such fast.
 			// We'll save the subscriber user data in order to avoid that.
-			$transient_key = 'mailchimp_sync_' . md5( $results['email'] );
+			$transient_key = 'mailchimp_sync_' . md5( $results['email_address'] );
 			set_site_transient( $transient_key, true, 30 ); // Set it only to 30 seconds, should be enough for most cases
 		}
+
 		return $results;
 	}
 
@@ -208,15 +201,14 @@ class WPMUDEV_MailChimp_Sync {
 		if ( $user->spam || $user->deleted )
 	    	return false;
 
-		$mailchimp_mailing_list = get_site_option('mailchimp_mailing_list');
-
 		$merge_vars = array( 'FNAME' => $user->user_firstname, 'LNAME' => $user->user_lastname );
 
 	  	$merge_vars = apply_filters('mailchimp_merge_vars', $merge_vars, $user);
 	  	do_action( 'mailchimp_update_user', $merge_vars, $user );
 
-        $results = mailchimp_update_user( $user->user_email, $mailchimp_mailing_list, $merge_vars );
+		$result = mailchimp_30_update_user( $user->user_email, '', array( 'merge_fields' => $merge_vars ) );
 
+		return $result;
 	}
 
 	function mailchimp_user_remove( $uid ) {
@@ -226,25 +218,9 @@ class WPMUDEV_MailChimp_Sync {
 		if ( ! $user )
 			return;
 
-		$mailchimp_mailing_list = get_site_option('mailchimp_mailing_list');
-
-		$results = mailchimp_unsubscribe_user( $user->user_email, $mailchimp_mailing_list );
+		$results = mailchimp_30_unsubscribe_user( $user->user_email, '', true );
 	}
 
-	function mailchimp_blog_users_remove( $blog_id ) {
-		$mailchimp_mailing_list = get_site_option('mailchimp_mailing_list');
-		$api = mailchimp_load_API();
-
-		$emails = array();
-		$blogusers = get_users_of_blog( $blog_id );
-		if ( $blogusers ) {
-			foreach ($blogusers as $bloguser) {
-				$emails[] = $bloguser->user_email;
-			}
-		}
-
-		$results = mailchimp_bulk_unsubscribe_users( $emails, $mailchimp_mailing_list );
-	}
 
 	function mailchimp_bp_spamming( $user_id, $is_spam ) {
 	  if ($is_spam)
@@ -322,8 +298,8 @@ class WPMUDEV_MailChimp_Sync {
 	}
 }
 
-global $mailchimp_sync;
-$mailchimp_sync = WPMUDEV_MailChimp_Sync::get_instance();
+global $mailchimp_sync_api;
+$mailchimp_sync_api = WPMUDEV_MailChimp_Sync::get_instance();
 
 function mailchimp_sync() {
 	return WPMUDEV_MailChimp_Sync::get_instance();

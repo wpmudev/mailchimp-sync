@@ -1,9 +1,9 @@
 <?php
 
-class WPMUDEV_MailChimp_Sync_Webhooks_20 {
+class WPMUDEV_MailChimp_Sync_Webhooks_30 {
 	
 	public function __construct() {
-		add_action( 'init', array( 'WPMUDEV_MailChimp_Sync_Webhooks_20', 'add_rewrite_rules' ) );
+		add_action( 'init', array( $this, 'add_rewrite_rules' ) );
 		add_action( 'template_redirect', array( $this, 'parse_request' ), 99 );
 	}
 
@@ -18,7 +18,6 @@ class WPMUDEV_MailChimp_Sync_Webhooks_20 {
 				'index.php?mailchimp-sync=1&mckey=$matches[1]',
 				'top'
 			);
-
 		}
 	}
 
@@ -97,32 +96,10 @@ class WPMUDEV_MailChimp_Sync_Webhooks_20 {
 	}
 
 	private function log( $message, $echo = true ) {
-
-		$current_log = get_site_option( 'mailchimp_webhooks_log' );
-		$new_log = array();
-
-		$date = date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), current_time( 'timestamp' ) );
-
-		$message = '[' . $date . '] ' . $message;
-		$new_log[] = $message;
-
-
-		if ( $current_log ) {
-
-			$new_log = array_merge( $current_log, $new_log );
-
-			// We'll only saved the last X lines of the log
-			$count = count( $new_log );
-			if ( $count > MAILCHIMP_MAX_LOG_LINES ) {
-				$new_log = array_slice( $new_log, $count - $offset - 1 );
-			}
-			
-		}
-
-		update_site_option( 'mailchimp_webhooks_log', $new_log );
-
-		if ( $echo )
+		mailchimp_log( array( 'message' => $message ), 'webhooks' );
+		if ( $echo ) {
 			echo $message;
+		}
 	}
 
 	private function subscribe( $data ) {
@@ -185,7 +162,7 @@ class WPMUDEV_MailChimp_Sync_Webhooks_20 {
 				if ( is_super_admin() )
 					return new WP_Error( 'user_not_exists', sprintf( __( 'Deleting Super Admins is not allowed: "%s"', MAILCHIMP_LANG_DOMAIN ), $user_email ) );
 
-				$result = wpmu_delete_user( $user->ID, false );
+				$result = wpmu_delete_user( $user->ID );
 			}
 			else {
 				if ( ! function_exists( 'wp_delete_user' ) )
