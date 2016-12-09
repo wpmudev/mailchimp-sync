@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MailChimp Sync 1.9.0\n"
 "Report-Msgid-Bugs-To: https://wpmudev.org\n"
-"POT-Creation-Date: 2016-12-08 16:03:43+00:00\n"
+"POT-Creation-Date: 2016-12-09 09:09:47+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -246,108 +246,12 @@ msgid ""
 "Please, <a href=\"%s\">click here</a> to set the groups again."
 msgstr ""
 
-#: admin/class-admin.php:62 externals/wpmudev-dash-notification.php:235
-#: externals/wpmudev-dash-notification.php:276
+#: admin/class-admin.php:62
 msgid "Dismiss"
 msgstr ""
 
 #: admin/user-profile.php:19
 msgid "Subscribed to the current Mailchimp List"
-msgstr ""
-
-#: externals/wpmudev-dash-notification.php:210
-msgid "install"
-msgstr ""
-
-#: externals/wpmudev-dash-notification.php:217
-msgid ""
-"Important updates are available for <strong>%s</strong>. Install the free "
-"WPMU DEV Dashboard plugin now for updates and support!"
-msgstr ""
-
-#: externals/wpmudev-dash-notification.php:219
-msgid ""
-"<strong>%s</strong> is almost ready - install the free WPMU DEV Dashboard "
-"plugin for updates and support!"
-msgstr ""
-
-#: externals/wpmudev-dash-notification.php:223
-msgid ""
-"Important updates are available for your WPMU DEV plugins/themes. Install "
-"the free WPMU DEV Dashboard plugin now for updates and support!"
-msgstr ""
-
-#: externals/wpmudev-dash-notification.php:225
-msgid ""
-"Almost ready - install the free WPMU DEV Dashboard plugin for updates and "
-"support!"
-msgstr ""
-
-#: externals/wpmudev-dash-notification.php:231
-msgid "Install Plugin"
-msgstr ""
-
-#: externals/wpmudev-dash-notification.php:234
-#: externals/wpmudev-dash-notification.php:275
-msgid "Saving..."
-msgstr ""
-
-#: externals/wpmudev-dash-notification.php:251
-msgid "activate"
-msgstr ""
-
-#: externals/wpmudev-dash-notification.php:258
-msgid ""
-"Important updates are available for <strong>%s</strong>. Activate the WPMU "
-"DEV Dashboard to update now!"
-msgstr ""
-
-#: externals/wpmudev-dash-notification.php:260
-msgid "Just one more step to enable updates and support for <strong>%s</strong>!"
-msgstr ""
-
-#: externals/wpmudev-dash-notification.php:264
-msgid ""
-"Important updates are available for your WPMU DEV plugins/themes. Activate "
-"the WPMU DEV Dashboard to update now!"
-msgstr ""
-
-#: externals/wpmudev-dash-notification.php:266
-msgid ""
-"Just one more step - activate the WPMU DEV Dashboard plugin and you're all "
-"done!"
-msgstr ""
-
-#: externals/wpmudev-dash-notification.php:272
-msgid "Activate WPMU DEV Dashboard"
-msgstr ""
-
-#: externals/wpmudev-dash-notification.php:939
-msgid "We did not find any data for this plugin or theme..."
-msgstr ""
-
-#: externals/wpmudev-dash-notification.php:1118
-msgid "%s changelog"
-msgstr ""
-
-#: externals/wpmudev-dash-notification.php:1148
-msgid "Current"
-msgstr ""
-
-#: externals/wpmudev-dash-notification.php:1154
-msgid "New"
-msgstr ""
-
-#: externals/wpmudev-dash-notification.php:1171
-msgid "Version %s"
-msgstr ""
-
-#: externals/wpmudev-dash-notification.php:1189
-msgid "Show all changes"
-msgstr ""
-
-#: externals/wpmudev-dash-notification.php:1190
-msgid "Hide details"
 msgstr ""
 
 #: front/form-template.php:28
