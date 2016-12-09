@@ -320,3 +320,27 @@ function mailchimp_dismiss_notice() {
 		}
 	}
 }
+
+register_uninstall_hook(__FILE__, 'mailchimp_sync_uninstall' );
+function mailchimp_sync_uninstall() {
+	global $wpdb;
+	delete_site_option( 'mailchimp_apikey' );
+	delete_site_option( 'mailchimp_mailing_list' );
+	delete_site_option( 'mailchimp_auto_opt_in' );
+	delete_site_option( 'mailchimp_ignore_plus' );
+	delete_site_option( 'mailchimp_webhooks_settings' );
+	delete_site_option( 'mailchimp_groups' );
+	delete_site_option( 'mailchimp_sync_version' );
+
+	$wpdb->query( "DELETE FROM $wpdb->sitemeta WHERE meta_key LIKE '%transient_mailchimp_list_groups%'" );
+	$wpdb->query( "DELETE FROM $wpdb->sitemeta WHERE meta_key LIKE '%transient_timeout_mailchimp_list_groups%'" );
+
+	$wpdb->query( "DELETE FROM $wpdb->sitemeta WHERE meta_key LIKE '%transient_mailchimp_category_interests%'" );
+	$wpdb->query( "DELETE FROM $wpdb->sitemeta WHERE meta_key LIKE '%transient_timeout_mailchimp_category_interests%'" );
+
+	$wpdb->query( "DELETE FROM $wpdb->sitemeta WHERE meta_key LIKE '%transient_mailchimp_list_groups%'" );
+	$wpdb->query( "DELETE FROM $wpdb->sitemeta WHERE meta_key LIKE '%transient_timeout_mailchimp_list_groups%'" );
+
+	$wpdb->query( "DELETE FROM $wpdb->sitemeta WHERE meta_key LIKE '%transient_mailchimp_list_groups%'" );
+	$wpdb->query( "DELETE FROM $wpdb->sitemeta WHERE meta_key LIKE '%transient_timeout_mailchimp_list_groups%'" );
+}
