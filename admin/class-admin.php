@@ -48,7 +48,7 @@ if ( ! class_exists( 'Mailchimp_Sync_Admin' ) ) {
 		 * Show plugin admin notices
 		 */
 		public function admin_notices() {
-			if ( ! current_user_can( 'manage_network' ) || ! current_user_can( 'manage_options' ) ) {
+			if ( ( is_multisite() && ! current_user_can( 'manage_network' ) ) || ( ! is_multisite() && ! current_user_can( 'manage_options' ) ) ) {
 				return;
 			}
 
@@ -57,7 +57,7 @@ if ( ! class_exists( 'Mailchimp_Sync_Admin' ) ) {
 				<div class="error">
 					<p><?php printf(
 							__( 'Mailchimp API has been updated. These change affects to groups references. Please, <a href="%s">click here</a> to set the groups again.', 'mailchimp' ),
-							is_multisite() ? network_admin_url('settings.php') . '?page=mailchimp' : admin_url('options.php') . '?page=mailchimp'
+							is_multisite() ? network_admin_url('settings.php') . '?page=mailchimp' : admin_url('options-general.php') . '?page=mailchimp'
 						); ?>
 						<a href="#" data-option="mailchimp_sync_set_groups_again_notice" class="mailchimp-dismiss dashicons-dismiss dashicons"><span class="screen-reader-text"><?php _e( 'Dismiss', 'mailchimp' ); ?></span></a>
 					</p>
