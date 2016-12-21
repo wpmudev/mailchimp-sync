@@ -1,11 +1,11 @@
 {
 	"numResults": 1,
-	"creationDate": "2016-12-09 09:26:19",
+	"creationDate": "2016-12-21 08:32:03",
 	"results": {
 		"mailchimp-sync.php": [
 			{
 				"line": 7,
-				"match": "Version: 1.9.0"
+				"match": "Version: 1.9.1"
 			}
 		]
 	}
