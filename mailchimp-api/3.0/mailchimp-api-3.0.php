@@ -41,6 +41,16 @@ function mailchimp_api_30_make_request( $method, $path, $args = array() ) {
 	}
 
 	if ( ! $api->success() ) {
+		$response = $api->getLastResponse();
+		if ( is_wp_error( $response ) ) {
+			/** @var WP_Error $response */
+			mailchimp_log( array(
+				'message' => $response->get_error_message(),
+				'code' => $response->get_error_code()
+			) );
+			return $response;
+		}
+
 		$status = wp_remote_retrieve_response_code( $api->getLastResponse() );
 		// Log here
 		mailchimp_log( array(

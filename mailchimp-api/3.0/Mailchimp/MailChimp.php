@@ -244,9 +244,9 @@ class MailChimp_Sync_Mailchimp
     {
         $this->last_response = $response;
 
-        if (!empty($response['body'])) {
-            return json_decode($response['body'], true);
-        }
+	    if ( ! is_wp_error( $response ) && ! empty( $response['body'] ) ) {
+		    return json_decode( $response['body'], true );
+	    }
 
         return false;
     }
@@ -284,6 +284,13 @@ class MailChimp_Sync_Mailchimp
     private function findHTTPStatus($response, $formattedResponse)
     {
 	    $status = wp_remote_retrieve_response_code( $response );
+    	if ( is_wp_error( $response ) ) {
+    		if ( empty( $status ) ) {
+    			return 418;
+		    }
+    		return $status;
+	    }
+
 	    if ( ! empty( $status ) ) {
 	    	return  $status;
 	    }
