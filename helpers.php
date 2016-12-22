@@ -14,8 +14,7 @@ function mailchimp_30_ping() {
 		return $api;
 	}
 
-	$ping = mailchimp_api_30_make_request( 'get', 'lists' );
-	return ! is_wp_error( $ping );
+	return mailchimp_api_30_make_request( 'get', 'lists' );
 }
 
 
