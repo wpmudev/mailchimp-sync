@@ -200,6 +200,8 @@ class MailChimp_Sync_Mailchimp
 		    'method' => strtoupper( $http_verb )
 	    );
 
+	    $args = apply_filters( 'mailchimp_api_request_args', $args, $method, $request_args );
+
 	    if ( 'get' !== $http_verb ) {
 		    $request_args['body'] = wp_json_encode( $args );
 	    }
