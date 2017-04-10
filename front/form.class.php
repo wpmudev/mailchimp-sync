@@ -82,7 +82,6 @@ class WPMUDEV_MailChimp_Form {
 	}
 
 	public static function validate_ajax_form() {
-		global $mailchimp_sync_api;
 
 		check_ajax_referer( 'mailchimp_subscribe_user_' . $_POST['form_id'] . $_POST['require_fn'] . $_POST['require_ln'] );
 
@@ -102,7 +101,7 @@ class WPMUDEV_MailChimp_Form {
 		$user['first_name'] = sanitize_text_field( $_POST['subscription-firstname'] );
 		$user['last_name'] = sanitize_text_field( $_POST['subscription-lastname'] );
 
-		$results = $mailchimp_sync_api->mailchimp_add_user( $user );
+		$results = mailchimp_sync()->mailchimp_add_user( $user );
 
 		wp_send_json_success( $results );
 
