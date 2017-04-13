@@ -38,7 +38,7 @@ class WPMUDEV_MailChimp_Sync {
 
 	public static function get_instance() {
 		if ( ! self::$instance ) {
-			return new self();
+			self::$instance = new self();
 		}
 
 		return self::$instance;
