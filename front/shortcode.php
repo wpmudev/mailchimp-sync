@@ -24,7 +24,7 @@ class WPMUDEV_MailChimp_Shortcode {
 	public function validate_shortcode( $settings = array() ) {
 		if ( isset( $_POST['submit-subscribe-shortcode-user'] ) ) {
 
-			global $mailchimp_sync_api;
+			global $mailchimp_sync;
 			$errors = array();
 
 			if ( ! wp_verify_nonce( $_POST['_wpnonce'], 'mailchimp_subscribe_user' ) )
@@ -42,7 +42,7 @@ class WPMUDEV_MailChimp_Shortcode {
 				$user['first_name'] = sanitize_text_field( $_POST['subscription-firstname'] );
 				$user['last_name'] = sanitize_text_field( $_POST['subscription-lastname'] );
 
-				$mailchimp_sync_api->mailchimp_add_user( $user );
+				$mailchimp_sync->mailchimp_add_user( $user );
 			}
 
     		$this->errors[ $number ] = $errors;
