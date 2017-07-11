@@ -43,7 +43,7 @@ class Incsub_Mailchimp_Widget extends WP_Widget {
 	function validate_widget() {
 		if ( isset( $_POST['submit-subscribe-widget-user'] ) ) {
 
-			global $mailchimp_sync_api;
+			global $mailchimp_sync;
 
 			$doing_ajax = defined( 'DOING_AJAX' ) && DOING_AJAX;
 			$errors = array();
@@ -74,7 +74,7 @@ class Incsub_Mailchimp_Widget extends WP_Widget {
 				$user['first_name'] = sanitize_text_field( $_POST['subscription-firstname'] );
 				$user['last_name'] = sanitize_text_field( $_POST['subscription-lastname'] );
 
-				$mailchimp_sync_api->mailchimp_add_user( $user );
+				$mailchimp_sync->mailchimp_add_user( $user );
 
 				if ( ! $doing_ajax ) {
 					$redirect_to = add_query_arg( 'mailchimp-subscribed-' . $number, 'true' ) . '#' . $_form_id;

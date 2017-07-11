@@ -17,10 +17,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function mailchimp_load_API() {
 	_deprecated_function( __FUNCTION__, '1.9', 'mailchimp_load_api_30()' );
-	global $mailchimp_sync_api;
+	global $mailchimp_sync;
 
-	if ( ! empty( $mailchimp_sync_api->api ) )
-		return $mailchimp_sync_api->api;
+	if ( ! empty( $mailchimp_sync->api ) )
+		return $mailchimp_sync->api;
 
 	require_once( 'mailchimp-api/2.0/mailchimp-api-2.0.php' );
 	$mailchimp_apikey = get_site_option('mailchimp_apikey');
@@ -62,7 +62,7 @@ function mailchimp_load_API() {
 	if ( is_wp_error( $ping ) )
 		return $ping;
 
-	$mailchimp_sync_api->api = $api;
+	$mailchimp_sync->api = $api;
 
 	return $api;
 }

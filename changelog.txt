@@ -1,13 +1,17 @@
 Plugin Name: MailChimp Sync
 Author: WPMU DEV
 Requires at least: 3.5
-Tested up to: 4.7
+Tested up to: 4.8
 
 Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
-1.9.3 - 2017-01-13
+1.9.3 - 2017-07-11
+----------------------------------------------------------------------
+- Fix: Fatal error when using widget/shortcode
+
+1.9.2 - 2017-01-13
 ----------------------------------------------------------------------
 - Added filter to modify the MailChimp API request parameters
 
