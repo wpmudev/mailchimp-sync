@@ -1,11 +1,12 @@
 {
   "name": "mailchimp-sync",
-  "version": "1.9.4",
+  "version": "1.9.5",
   "main": "mailchimp-sync.php",
   "projectEditUrl": "https://premium.wpmudev.org/wp-admin/edit.php?post_type=project&page=projects-manage&manage_files=73",
   "description": "",
   "scripts": {
-    "build": "grunt build"
+    "build": "grunt build",
+    "release": "grunt version-compare && git-branch-is master && git submodule update --remote && grunt build && grunt finish"
   },
   "dependencies": {},
   "devDependencies": {
