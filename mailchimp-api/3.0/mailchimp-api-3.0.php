@@ -36,7 +36,7 @@ function mailchimp_api_30_make_request( $method, $path, $args = array() ) {
 	}
 	catch ( Exception $e ) {
 		$error = new WP_Error( $e->getCode(), $e->getMessage() );
-		mailchimp_log( $error->get_error_message() );
+		mi_mailchimp_log( $error->get_error_message() );
 		return $error;
 	}
 
@@ -44,7 +44,7 @@ function mailchimp_api_30_make_request( $method, $path, $args = array() ) {
 		$response = $api->getLastResponse();
 		if ( is_wp_error( $response ) ) {
 			/** @var WP_Error $response */
-			mailchimp_log( array(
+			mi_mailchimp_log( array(
 				'message' => $response->get_error_message(),
 				'code' => $response->get_error_code()
 			) );
@@ -53,7 +53,7 @@ function mailchimp_api_30_make_request( $method, $path, $args = array() ) {
 
 		$status = wp_remote_retrieve_response_code( $api->getLastResponse() );
 		// Log here
-		mailchimp_log( array(
+		mi_mailchimp_log( array(
 			'message' => $api->getLastError(),
 			'code' => $status
 		) );
@@ -114,7 +114,7 @@ function mailchimp_api_30_make_batch_request( $operations ) {
 	if ( ! $api->success() ) {
 		$status = wp_remote_retrieve_response_code( $api->getLastResponse() );
 		// Log here
-		mailchimp_log( array(
+		mi_mailchimp_log( array(
 			'message' => $api->getLastError(),
 			'code' => $status
 		) );
@@ -133,7 +133,7 @@ function mailchimp_api_30_get_batch_operation_result( $batch_id ) {
 	$batch = $api->new_batch( $batch_id );
 	$result = $batch->check_status();
 	if ( is_wp_error( $result ) ) {
-		mailchimp_log( array(
+		mi_mailchimp_log( array(
 			'message' => $result->get_error_message(),
 			'code' => $result->get_error_code()
 		) );
@@ -206,7 +206,7 @@ function mailchimp_api_options() {
 	return $options;
 }
 
-function mailchimp_log( $details, $type = 'error' ) {
+function mi_mailchimp_log( $details, $type = 'error' ) {
 	if ( ! is_array( $details ) ) {
 		return;
 	}

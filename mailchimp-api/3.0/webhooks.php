@@ -96,7 +96,7 @@ class WPMUDEV_MailChimp_Sync_Webhooks_30 {
 	}
 
 	private function log( $message, $echo = true ) {
-		mailchimp_log( array( 'message' => $message ), 'webhooks' );
+		mi_mailchimp_log( array( 'message' => $message ), 'webhooks' );
 		if ( $echo ) {
 			echo $message;
 		}
