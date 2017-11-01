@@ -57,7 +57,7 @@ function mailchimp_30_subscribe_user( $user_email, $list_id = '', $options = arr
 
 	if ( $options['autopt'] ) {
 		$args['status'] = 'subscribed';
-		$args['ip_opt'] = $_SERVER['REMOTE_ADDR'];
+		$args['ip_opt'] = mailchimp_sync_user_ip();
 	}
 	else {
 		$args['status'] = 'pending';
@@ -251,7 +251,7 @@ function mailchimp_30_bulk_subscribe_users( $data, $list_id = '' ) {
 
 		if ( $row_options['autopt'] ) {
 			$operation_args['status'] = 'subscribed';
-			$operation_args['ip_opt'] = $_SERVER['REMOTE_ADDR'];
+			$operation_args['ip_opt'] = mailchimp_sync_user_ip();
 		}
 		else {
 			$operation_args['status'] = 'pending';
@@ -428,4 +428,18 @@ function mailchimp_set_webhooks_rewrite_rules() {
 
 function mailchimp_is_webhooks_active() {
 	return WPMUDEV_MailChimp_Sync_Webhooks_30::is_webhooks_active();
+}
+
+/**
+ * Get User IP
+ */
+function mailchimp_sync_user_ip() {
+	if ( isset( $_SERVER['HTTP_CLIENT_IP'] ) ) {
+		$ip = $_SERVER['HTTP_CLIENT_IP'];
+	} elseif ( isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
+		$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+	} else {
+		$ip = $_SERVER['REMOTE_ADDR'];
+	}
+	return $ip;
 }

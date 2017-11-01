@@ -95,10 +95,10 @@ function mailchimp_get_list_groups( $list_id ) {
  * @param String $list_id
  * @param Boolean $autopt
  * @param Array $extra Extra data
-Array(
-'FNAME' => First name,
-'LNAME' => Last Name
-)
+ *		Array(
+ *			'FNAME' => First name,
+ *			'LNAME' => Last Name
+ *		)
  * @return Array Result from the server
  * @deprecated
  */
@@ -145,10 +145,10 @@ function mailchimp_unsubscribe_user( $user_email, $list_id, $delete = false ) {
  * @param String $user_email
  * @param String $list_id
  * @param Array $merge_vars
-Array(
-'FNAME' => First name,
-'LNAME' => Last Name
-)
+ *		Array(
+ *			'FNAME' => First name,
+ *			'LNAME' => Last Name
+ *		)
  * @deprecated
  */
 function mailchimp_update_user( $user_email, $list_id, $merge_vars ) {
@@ -239,12 +239,12 @@ function mailchimp_bulk_subscribe_users( $emails, $list_id, $autopt = false, $up
 /**
  * Unsubscribe a list of users
  * @param Array $emails
-Array(
-array(
-'email' => Email
-),
-...
-)
+ *	Array(
+ *		array(
+ *			'email' => Email
+ *		),
+ *		...
+ *	)
  * @param String $list_id
  * @param Boolean $autopt
  * @param Array $merge Array of merge vars

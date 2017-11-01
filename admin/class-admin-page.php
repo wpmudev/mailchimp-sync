@@ -65,7 +65,7 @@ function mailchimp_check_bulk_process() {
 
 	$capability = is_multisite() ? 'manage_network' : 'manage_options';
 	if ( is_multisite() && ! current_user_can( $capability ) ) {
-		wp_send_json_error( array( 'message' => __( 'You\'re not allowed to do this action', 'mailchimp' ) ) );
+		wp_send_json_error( array( 'message' => __( 'You\'re not allowed to do this action', MAILCHIMP_LANG_DOMAIN ) ) );
 	}
 
 	$operation = $_POST['operation'];

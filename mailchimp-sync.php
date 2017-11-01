@@ -32,7 +32,7 @@ class WPMUDEV_MailChimp_Sync {
 
 	public static $instance = null;
 
-	public static $version = '1.9.5';
+	public static $version = '1.9.6';
 
 	public static $basename;
 
@@ -338,9 +338,9 @@ function mailchimp_sync_uninstall() {
 	$wpdb->query( "DELETE FROM $wpdb->sitemeta WHERE meta_key LIKE '%transient_mailchimp_category_interests%'" );
 	$wpdb->query( "DELETE FROM $wpdb->sitemeta WHERE meta_key LIKE '%transient_timeout_mailchimp_category_interests%'" );
 
-	$wpdb->query( "DELETE FROM $wpdb->sitemeta WHERE meta_key LIKE '%transient_mailchimp_list_groups%'" );
-	$wpdb->query( "DELETE FROM $wpdb->sitemeta WHERE meta_key LIKE '%transient_timeout_mailchimp_list_groups%'" );
+	//$wpdb->query( "DELETE FROM $wpdb->sitemeta WHERE meta_key LIKE '%transient_mailchimp_list_groups%'" );
+	//$wpdb->query( "DELETE FROM $wpdb->sitemeta WHERE meta_key LIKE '%transient_timeout_mailchimp_list_groups%'" );
 
-	$wpdb->query( "DELETE FROM $wpdb->sitemeta WHERE meta_key LIKE '%transient_mailchimp_list_groups%'" );
-	$wpdb->query( "DELETE FROM $wpdb->sitemeta WHERE meta_key LIKE '%transient_timeout_mailchimp_list_groups%'" );
+	//$wpdb->query( "DELETE FROM $wpdb->sitemeta WHERE meta_key LIKE '%transient_mailchimp_list_groups%'" );
+	//$wpdb->query( "DELETE FROM $wpdb->sitemeta WHERE meta_key LIKE '%transient_timeout_mailchimp_list_groups%'" );
 }

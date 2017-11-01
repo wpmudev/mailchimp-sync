@@ -13,18 +13,18 @@ function mailchimp_show_user_profile( $user ) {
 	$subscribed = mailchimp_30_get_user_info( $user->user_email );
 	$is_subscribed = $subscribed && ( $subscribed['status'] === 'subscribed' );
 	?>
-	<h3>MailChimp</h3>
+	<h3><?php _e( 'Mailchimp', MAILCHIMP_LANG_DOMAIN ); ?></h3>
 	<table class="form-table">
 		<tr>
 			<th><label for="mailchimp_list"><?php _e( 'Subscribed to the current Mailchimp List', MAILCHIMP_LANG_DOMAIN ); ?></label></th>
 			<td>
 				<?php if ( $is_subscribed ): ?>
 					<div class="mailchimp-yes mailchimp-notice">
-						<p><?php _e( 'Yes' ); ?></p>
+						<p><?php _e( 'Yes', MAILCHIMP_LANG_DOMAIN ); ?></p>
 					</div>
 				<?php else: ?>
 					<div class="mailchimp-no mailchimp-notice">
-						<p><?php _e( 'No' ); ?></p>
+						<p><?php _e( 'No', MAILCHIMP_LANG_DOMAIN ); ?></p>
 					</div>
 				<?php endif; ?>
 			</td>
